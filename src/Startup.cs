@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using ASPWiki.Services;
 
 namespace ASPWiki
 {
@@ -26,7 +27,7 @@ namespace ASPWiki
                 // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
                 builder.AddApplicationInsightsSettings(developerMode: true);
             }
-
+            
             Configuration = builder.Build();
         }
 
@@ -40,6 +41,8 @@ namespace ASPWiki
             services.AddApplicationInsightsTelemetry(Configuration);
 
             services.AddMvc();
+
+            services.AddSingleton<IRouteGenerator, RouteGenerator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -47,7 +50,7 @@ namespace ASPWiki
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-
+            
             app.UseApplicationInsightsRequestTelemetry();
 
             if (env.IsDevelopment())

@@ -1,3 +1,121 @@
-﻿body {
-    margin-top: 25px;
+﻿/*
+    Pallette: http://www.colourlovers.com/palette/932683/Compatible
+    Above The World - #3FB8AF
+    Release         - #7FC7AF
+    crusted mud     - #DAD8A7
+    BABY PINK       - #FF9E9D
+    High Heel       - #FF3D7F
+
+    Error:
+    Success:
+    Warning:
+
+    link:
+    linkHover
+    linkVisited:
+    p:
+    H1-H*:
+*/
+
+body {
+ margin-top: 55px;
+ background-color: #FFFFFF;
 }
+
+.navbar {
+ background-color: #3FB8AF;
+}
+
+.navbar-inverse {
+ border: solid;
+ border-width: 0px 0px 5px 0;
+ border-color: #7FC7AF; /*7FC7AF*/
+}
+
+.navbar .navbar-nav > li > a {
+ color: #FFFFFF;
+}
+
+.navbar .navbar-nav > li > a:hover {
+ color: #DAD8A7;
+}
+
+.navbar-brand {
+ color: #FFFFFF !important;
+}
+
+.navbar-brand:hover {
+  color: #DAD8A7 !important;
+}
+
+
+/*
+   LANDING PAGE
+*/
+
+.header {
+    position: relative;
+    width: 100%;
+    min-height: 60%;
+    text-align: center;
+    color: #fff;
+    background-image: url(https://drnataliematosin.files.wordpress.com/2015/10/s8iffghidtanxcqal4sc0tjcqj4uuo3kwks1b4t2dqgng4dgzjjybp4rdsikxrmj-o.jpg);
+    background-position: center;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+
+.header-content {
+    position: relative;
+    width: 100%;
+    padding: 175px 15px;
+    text-align: center;
+}
+
+.header-content-inner h1 {
+    margin-top: 0;
+    margin-bottom: 0;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-shadow: 3px 4px rgba(0,0,0,0.25);
+}
+
+#add {
+    transition: all .2s ease-in-out; 
+}
+
+#add:hover {
+    transform: scale(1.1);
+}
+
+.btn {
+  -webkit-border-radius: 4;
+  -moz-border-radius: 4;
+  border-radius: 4px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 20px;
+  background: #7FC7AF;
+  padding: 10px 20px 10px 20px;
+  border: dotted #3FB8AF 2px;
+  text-decoration: none;
+  text-align: center;
+}
+
+.btn:hover {
+  background: #3FB8AF;
+  text-decoration: none;
+}
+
+/*
+#buttonContainer:hover {
+    animation: spin 0.4s ease-in-out;
+}
+
+@keyframes spin {
+    100% {
+        -moz-transform: rotate(40deg);
+    }
+}*/

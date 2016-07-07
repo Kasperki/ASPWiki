@@ -2,4 +2,20 @@
     ViewData["Title"] = "Home";
 }
 
-HELLOOO :;DDD
+<section>
+    <div class="row">
+        <div class="col-md-6">
+            @for (var i = 0; i < 5; i++)
+            {
+                @Html.Partial("PageLink");
+            }
+        </div>
+
+        <div class="col-md-6">
+            @for (var i = 0; i < 5; i++)
+            {
+                @Html.Partial("PageLink");
+            }
+        </div>
+    </div>
+</section>

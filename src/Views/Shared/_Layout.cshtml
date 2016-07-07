@@ -7,12 +7,15 @@
 
     <environment names="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+        <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.css" />
         <link rel="stylesheet" href="~/css/main.css" />
     </environment>
     <environment names="Staging,Production">
         <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.6/css/bootstrap.min.css"
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"
+              asp-fallback-href="~/lib/font-awesome/css/font-awesome.css" />
         <link rel="stylesheet" href="~/css/main.min.css" asp-append-version="true" />
     </environment>
     @Html.ApplicationInsightsJavaScript(TelemetryConfiguration)
@@ -23,22 +26,35 @@
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
                     <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
+                    <i class="fa fa-bars" aria-hidden="true"></i>
                 </button>
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">WIKI</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li><a asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li></li>
                 </ul>
             </div>
         </div>
     </nav>
+
+    <header class="header">
+        <div class="header-content">
+            <div class="header-content-inner">
+                <div id="buttonContainer">
+                    <div class="btn" id="add">
+                        New page <i class="fa fa-plus" aria-hidden="true"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
     <main class="container body-content">
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; 2016 - TestProject</p>
+            <p>&copy; 2016 - ASP.NET Core Wiki</p>
         </footer>
     </main>
 

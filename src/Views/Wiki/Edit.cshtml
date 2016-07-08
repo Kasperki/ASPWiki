@@ -1,3 +1,31 @@
 ﻿@model string
 
-<p>WEEE! <strong>@Model</strong></p>
+<div class="row">
+    <div class="col-md-6">
+        <h1>@Model</h1>
+    </div>
+    <div class="col-md-6">
+        <div class="sm-btn" id="add" style="float:right;margin-top:20px;">
+            Save <i class="fa fa-floppy-o" aria-hidden="true"></i>
+        </div>
+        <div class="sm-btn warning" id="add" style="float:right;margin-top:20px;">
+            Delete <i class="fa fa-times" aria-hidden="true"></i>
+        </div>
+    </div>
+</div>
+
+<form method="post">
+    <textarea id="mytextarea">Hello, World!</textarea>
+</form>
+
+@section scripts{ 
+<script src="~/lib/tinymce/tinymce.js"></script>
+<script type="text/javascript">
+  tinymce.init({
+      selector: '#mytextarea',
+      height: 500,
+      plugins: "codesample image imagetools link",
+      toolbar: "undo, redo | bold, italic, underline, strikethrough | alignleft, aligncenter, alignright, alignjustify | formatselect, fontselect, fontsizeselect | bullist, numlist, outdent, indent, blockquote, | codesample link image"
+  });
+</script>
+}

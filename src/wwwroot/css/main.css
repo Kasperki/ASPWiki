@@ -109,6 +109,26 @@ body {
   text-decoration: none;
 }
 
+.sm-btn {
+  -webkit-border-radius: 4;
+  -moz-border-radius: 4;
+  border-radius: 4px;
+  font-family: Arial;
+  color: #ffffff;
+  font-size: 10px;
+  background: #7FC7AF;
+  padding: 10px 20px 10px 20px;
+  border: dotted #3FB8AF 2px;
+  text-decoration: none;
+  text-align: center;
+  margin: 5px;
+}
+
+.sm-btn:hover {
+  background: #3FB8AF;
+  text-decoration: none;
+}
+
 /*
 #buttonContainer:hover {
     animation: spin 0.4s ease-in-out;

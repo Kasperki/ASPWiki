@@ -115,7 +115,7 @@ body {
   border-radius: 4px;
   font-family: Arial;
   color: #ffffff;
-  font-size: 10px;
+  font-size: 15px;
   background: #7FC7AF;
   padding: 10px 20px 10px 20px;
   border: dotted #3FB8AF 2px;
@@ -127,6 +127,14 @@ body {
 .sm-btn:hover {
   background: #3FB8AF;
   text-decoration: none;
+}
+
+.warning {
+    background-color: #FF9E9D;
+}
+
+.warning:hover {
+    background-color: #FF3D7F;
 }
 
 /*

@@ -43,6 +43,7 @@ namespace ASPWiki
             services.AddMvc();
 
             services.AddSingleton<IRouteGenerator, RouteGenerator>();
+            services.AddSingleton<IWikiRepository, WikiRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

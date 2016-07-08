@@ -1,0 +1,24 @@
+﻿@using ASPWiki.Model;
+@model WikiPage
+
+<form asp-action="Save" method="post">
+    <div class="row" style="margin-top:20px;">
+        <div class="col-md-6">
+            <h1>@Model.Title</h1>
+        </div>
+        <div class="col-md-6">
+            <a asp-controller="Wiki" asp-action="Edit" asp-route-title="@Model.Title">
+                <div class="sm-btn" id="add" style="float:right;">
+                    Edit <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+                </div>
+            </a>
+            <a asp-controller="Wiki" asp-action="Delete" asp-route-title="@Model.Title">
+                <div class="sm-btn warning" id="add" style="float:right;">
+                    Delete <i class="fa fa-times" aria-hidden="true"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    @Html.Raw(@Model.Content)
+</form>

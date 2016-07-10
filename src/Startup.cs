@@ -40,6 +40,8 @@ namespace ASPWiki
             //ApplicationInsightsTelemetry
             services.AddApplicationInsightsTelemetry(Configuration);
 
+            services.AddSession();
+
             services.AddMvc();
 
             services.AddSingleton<IRouteGenerator, RouteGenerator>();
@@ -68,6 +70,8 @@ namespace ASPWiki
             app.UseApplicationInsightsExceptionTelemetry();
 
             app.UseStaticFiles();
+
+            app.UseSession();
 
             app.UseMvc(routes =>
             {

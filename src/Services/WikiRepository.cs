@@ -25,12 +25,15 @@ namespace ASPWiki.Services
 
         public WikiPage Get(string title)
         {
-            return wikiRepository[title];
+            if (wikiRepository.ContainsKey(title))
+                return wikiRepository[title];
+
+            return null;
         }
 
         public void Save(string title, WikiPage wikiPage)
         {
-            wikiRepository.Add(title, wikiPage);
+            wikiRepository[title] = wikiPage;
         }
     }
 }

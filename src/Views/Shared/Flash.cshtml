@@ -1,0 +1,21 @@
+﻿@{
+    var message = TempData["FlashMessage"] as string;
+    var messageClass = TempData["FlashMessageClass"] as string;
+
+    if (message != null)
+    {
+        <div class="alert @messageClass alert-dismissible" style="margin-top:10px;" role="alert">
+            <button type="button" class="close" id="CloseFlashMessage"><span aria-hidden="true">&times;</span></button>
+            @message
+        </div>
+
+        @Html.ScriptSection(
+            @<script>
+                alert('mmoi');
+                $("#CloseFlashMessage").on("click", function () {
+                    $(this).parent().hide("slow");
+                })
+            </script>
+        )
+    }
+}

@@ -21,27 +21,27 @@ namespace ASPWiki.Controllers
             this.wikiRepository = wikiRepository;
         }
 
-        //TODO CREATE ADD ROUTE -> PAGE
-         //CHECK THAT IF THE PAGE ALREADY EXISTS, | NO ERRORS!!!
-         //SHOW ALERTS IF ADDED, EDITED, REMOVED, OR IT EXISTS
-         //@RAZOR Partialize stuff that can be done .. after that look at repositories
-        public IActionResult Add()
+        [HttpGet("Wiki/New/")]
+        public IActionResult New(string title)
         {
             string route = routeGenerator.GenerateRoute();
-            return RedirectToAction("Edit", "Wiki", new {title = route});
+            return RedirectToAction("Add", new { title = route });
+        }
+
+        [HttpGet("Wiki/Add/{title}")]
+        public IActionResult Add(string title)
+        {
+            var wikiPage = new WikiPage(title);
+            return View("Edit", wikiPage);
         }
 
         [HttpGet("Wiki/Edit/{title}")]
         public IActionResult Edit(string title)
         {
-            WikiPage wikiPage;
+            var wikiPage = wikiRepository.Get(title);
 
-            if (wikiRepository.Exists(title))
-                wikiPage = wikiRepository.Get(title);
-            else
-            {
-                wikiPage = new WikiPage(title);
-            }
+            if (wikiPage == null)
+                return RedirectToAction("Add", new { title = title }); 
 
             return View("Edit", wikiPage);
         }
@@ -50,6 +50,9 @@ namespace ASPWiki.Controllers
         new public IActionResult View(string title)
         {
             var wikiPage = wikiRepository.Get(title);
+
+            if (wikiPage == null)
+                return RedirectToAction("NotFound", "Wiki", new { title = title });
 
             return View("View", wikiPage);
         }
@@ -61,6 +64,7 @@ namespace ASPWiki.Controllers
             System.Diagnostics.Debug.WriteLine(wikiPage.ToString());
             wikiRepository.Save(wikiPage.Title, wikiPage);
 
+            this.FlashMessageSuccess("Wikipage: " + wikiPage.Title + " succesfully saved");
             return RedirectToAction("View", "Wiki", new { title = wikiPage.Title });
         }
 
@@ -68,7 +72,15 @@ namespace ASPWiki.Controllers
         public IActionResult Delete(string title)
         {
             wikiRepository.Delete(title);
+
+            this.FlashMessageError("Wikipage: " + title + " deleted"); //TODO ADD UNDO.
             return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet("Wiki/NotFound/{title}")]
+        public IActionResult NotFound(string title)
+        {
+            return View("NotFound", title);
         }
     }
 }

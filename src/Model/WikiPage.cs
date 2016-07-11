@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace ASPWiki.Model
@@ -14,11 +15,40 @@ namespace ASPWiki.Model
 
         public string Content { get; set; }
 
+        public DateTime LastModified { get; set; }
+
         public WikiPage() { }
 
         public WikiPage(string title)
         {
             this.Title = title;
+        }
+
+        private const int SUMMARY_LENGTH = 200;
+        public string GetContentSummary()
+        {
+            if (Content == null || Content.Length <= 0)
+                return string.Empty;
+
+            int length = Content.Length < SUMMARY_LENGTH ? Content.Length : SUMMARY_LENGTH;
+
+            Regex rgx = new Regex(@"<\/.*>");
+            var match = rgx.Match(Content.Substring(length));
+            string s = Content.Substring(0, length + match.Index + match.Length);
+
+            s = s.Replace("<h1>", "<h4>").Replace("</h1>", "</h4>");
+            s = s.Replace("<h2>", "<h4>").Replace("</h2>", "</h4>");
+            s = s.Replace("<h3>", "<h4>").Replace("</h3>", "</h4>");
+
+            return s;
+        }
+
+        public string GetSizeKiloBytes()
+        {
+            if (Content == null)
+                return "0 KB";
+
+            return (Content.Length * sizeof(char) / 1024).ToString("0.00") + " KB";
         }
 
         public override string ToString()

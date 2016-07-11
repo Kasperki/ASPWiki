@@ -1,7 +1,12 @@
-﻿<article style="margin:15px;">
-    <a href="#"><h4>Title</h4></a>
-    <p>Content maximum length of 2 rows that means about 250 charachters
-    That sould be enought just a small mystery is that; can razor do that ezlili?</p> 
+﻿@using ASPWiki.Model
+@model WikiPage
+
+<article style="margin:15px;word-break:break-all;">
+    <a href="/Wiki/View/@Model.Title"><h3>@Model.Title</h3></a>
+    
+    @Html.Raw(@Model.GetContentSummary())
+    
     <span class="label label-info">Info</span>
-    <span>Written by: Unknown - Size: 3kb - @DateTime.Now</span> <a href="#">5 <i class="fa fa-comment-o" aria-hidden="true"></i></a>
+    <span>Written by: Unknown - Size: @Model.GetSizeKiloBytes() - @Model.LastModified</span> 
+    <a href="#">5 <i class="fa fa-comment-o" aria-hidden="true"></i></a>
 </article>

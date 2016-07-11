@@ -1,20 +1,24 @@
 ﻿@{
     ViewData["Title"] = "Home";
 }
+@using ASPWiki.Model;
+@model List<WikiPage>
 
 <section>
     <div class="row">
         <div class="col-md-6">
-            @for (var i = 0; i < 5; i++)
+            <h1>Newest</h1>
+            @for (var i = 0; i < @Model.Count; i++)
             {
-                @Html.Partial("PageLink");
+                @Html.Partial("PageLink", @Model[i]);
             }
         </div>
 
         <div class="col-md-6">
-            @for (var i = 0; i < 5; i++)
+            <h1>Popular</h1>
+            @for (var i = 0; i < @Model.Count; i++)
             {
-                @Html.Partial("PageLink");
+                @Html.Partial("PageLink", Model[i]);
             }
         </div>
     </div>

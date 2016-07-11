@@ -1,17 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using ASPWiki.Services;
 
 namespace ASPWiki.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly IWikiRepository wikiRepository;
+
+        public HomeController(IWikiRepository wikiRepository)
+        {
+            this.wikiRepository = wikiRepository;
+        }
+
         // GET: /<controller>/
         public IActionResult Index()
         {
-            return View();
+            var wikiPages = wikiRepository.GetLatest(5);
+            return View("Index", wikiPages);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ASPWiki.Model;
+using System.Collections.Generic;
 
 namespace ASPWiki.Services
 {
@@ -8,5 +9,6 @@ namespace ASPWiki.Services
         void Delete(string title);
         bool Exists(string title);
         WikiPage Get(string title);
+        List<WikiPage> GetLatest(int number);
     }
 }

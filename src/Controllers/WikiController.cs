@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ASPWiki.Services;
 using ASPWiki.Model;
+using System;
 
 namespace ASPWiki.Controllers
 {
@@ -62,6 +59,7 @@ namespace ASPWiki.Controllers
         public IActionResult Save(WikiPage wikiPage)
         {
             System.Diagnostics.Debug.WriteLine(wikiPage.ToString());
+            wikiPage.LastModified = DateTime.Now;
             wikiRepository.Save(wikiPage.Title, wikiPage);
 
             this.FlashMessageSuccess("Wikipage: " + wikiPage.Title + " succesfully saved");

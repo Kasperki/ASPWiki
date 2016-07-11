@@ -49,6 +49,12 @@ namespace ASPWiki.Services
 
             wikiPage.Content += "</p>";
 
+            wikiPage.Path = new List<string>();
+
+            wikiPage.Path.Add(nouns[random.Next(0, nouns.Count)]);
+            wikiPage.Path.Add(nouns[random.Next(0, nouns.Count)]);
+            wikiPage.Path.Add(nouns[random.Next(0, nouns.Count)]);
+
             return wikiPage;
         }
 

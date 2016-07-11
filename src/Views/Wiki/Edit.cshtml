@@ -3,11 +3,23 @@
 
 <form id="wikiForm" asp-action="Save" method="post">
     <div class="row" style="margin-top:20px;">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label for="title">Title</label>
             <input class="form-control" asp-for="Title" type="text" id="title" value="@Model.Title"/>
         </div>
-        <div class="col-md-6">
+
+        <div class="col-md-5">
+            <label for="path">Path:</label>
+            <span id="pathString">
+                
+            </span>
+            <div class="input-group">
+                <input class="form-control" asp-for="Path" type="text" id="path" value="@Model.Path.Last()"/>
+                <span class="input-group-addon" id="pathIcon"></span>
+            </div>
+        </div>
+
+        <div class="col-md-3">
             <a asp-controller="Wiki" asp-action="Save" onclick="document.getElementById('wikiForm').submit(); return false;">
                 <div class="sm-btn" id="add" style="float:right;">
                     Save <i class="fa fa-floppy-o" aria-hidden="true"></i>
@@ -32,6 +44,42 @@
       height: 500,
       plugins: "codesample image imagetools link",
       toolbar: "undo, redo | bold, italic, underline, strikethrough | alignleft, aligncenter, alignright, alignjustify | formatselect, fontselect, fontsizeselect | bullist, numlist, outdent, indent, blockquote, | codesample link image"
+  });
+
+ //TODO SET PATH AT START.
+
+  $("#path").on("change, blur", function () {
+      if(this.value !== "") {
+          $("#pathIcon").html("<i class=\"fa fa-spinner fa-spin fa-fw\"></i>");
+
+          $.ajax({
+              url: '/Wiki/IsValidPath',
+              type: 'POST',
+              data: JSON.stringify(this.value),
+              contentType: 'application/json; charset=utf-8',
+              dataType: 'json',
+              async: true,
+              success: function (msg) {
+                  if (msg !== "NOTVALID") {
+
+                      var pathString = "";
+                      msg.forEach(function (obj) { pathString += obj + " <i class=\"fa fa-angle-double-right\" aria-hidden=\"true\"></i> " });
+                      pathString += $("#title").val();
+                      $("#pathString").html(pathString);
+
+                      $("#pathIcon").html("<i class=\"fa fa-check\"></i>");
+                  }
+                  else {
+                      $("#pathString").text("Not found");
+                      $("#pathIcon").html("<i class=\"fa fa-close\"></i>");
+                  }
+              }
+          });
+      }
+      else {
+          $("#pathString").text($("#title").val());
+          $("#pathIcon").html("<i class=\"fa fa-check\"></i>");
+      }
   });
 </script>
 }

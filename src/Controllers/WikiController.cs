@@ -2,6 +2,8 @@
 using ASPWiki.Services;
 using ASPWiki.Model;
 using System;
+using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace ASPWiki.Controllers
 {
@@ -60,10 +62,26 @@ namespace ASPWiki.Controllers
         {
             System.Diagnostics.Debug.WriteLine(wikiPage.ToString());
             wikiPage.LastModified = DateTime.Now;
+
+            string parent = wikiPage.Path[0];
+            wikiPage.Path = new List<string>(wikiRepository.Get(parent).Path);
+            wikiPage.Path.Add(parent);
+
             wikiRepository.Save(wikiPage.Title, wikiPage);
 
             this.FlashMessageSuccess("Wikipage: " + wikiPage.Title + " succesfully saved");
             return RedirectToAction("View", "Wiki", new { title = wikiPage.Title });
+        }
+
+        [HttpPost("Wiki/IsValidPath")]
+        public IActionResult IsValidPath([FromBody]string path)
+        {
+            var wikiPage = wikiRepository.Get(path);
+
+            if (wikiPage == null)
+                return new OkObjectResult(JsonConvert.SerializeObject("NOTVALID"));
+            else
+                return new OkObjectResult(JsonConvert.SerializeObject(wikiPage.Path));
         }
 
         [HttpGet("Wiki/Delete/{title}")]

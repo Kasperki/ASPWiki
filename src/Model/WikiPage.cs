@@ -22,6 +22,28 @@ namespace ASPWiki.Model
         public WikiPage(string title)
         {
             this.Title = title;
+            Path = new List<string>(new string[]{ Title });
+        }
+
+        public void SetPath(List<string> ParentPath)
+        {
+            Path = new List<string>(ParentPath);
+            Path.Add(Title);
+        }
+
+        public string GetPathString()
+        {
+            string path = String.Empty;
+
+            for (int i = 0; i < Path.Count; i++)
+            {
+                path += Path[i];
+
+                if (i != Path.Count - 1)
+                    path += "/";
+            }
+
+            return path;
         }
 
         private const int SUMMARY_LENGTH = 200;

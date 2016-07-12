@@ -4,9 +4,17 @@ using ASPWiki.Model;
 using System;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ASPWiki.Controllers
 {
+    //TODO
+      //VALIDATE PATH ON SAVE, NO SAME PAHT NAME!!!!
+      //ASIDE
+      
+     //ADD WIKI SERVICE :) - MINIMIZE CONTROLLER LOGIC - UNIT TESTING
+      //ON DELETE WHAT TO DO TO ROUTES :D xddd? leave as is? do not allow itself on parent??
+
     public class WikiController : Controller
     {
         private readonly IRouteGenerator routeGenerator;
@@ -27,31 +35,33 @@ namespace ASPWiki.Controllers
             return RedirectToAction("Add", new { title = route });
         }
 
-        [HttpGet("Wiki/Add/{title}")]
+        [HttpGet("Wiki/Add/{title?}")]
         public IActionResult Add(string title)
         {
             var wikiPage = new WikiPage(title);
             return View("Edit", wikiPage);
         }
 
-        [HttpGet("Wiki/Edit/{title}")]
-        public IActionResult Edit(string title)
+        [HttpGet("Wiki/Edit/{*path}")]
+        public IActionResult Edit()
         {
-            var wikiPage = wikiRepository.Get(title);
+            var paths = GetParsedPath();
+            var wikiPage = wikiRepository.GetByPath(paths);
 
             if (wikiPage == null)
-                return RedirectToAction("Add", new { title = title }); 
+                return RedirectToAction("Add", new { title = paths?[paths.Length - 1] }); 
 
             return View("Edit", wikiPage);
         }
 
-        [HttpGet("Wiki/View/{title}")]
-        new public IActionResult View(string title)
+        [HttpGet("Wiki/View/{*path}")]
+        new public IActionResult View()
         {
-            var wikiPage = wikiRepository.Get(title);
+            var paths = GetParsedPath();
+            var wikiPage = wikiRepository.GetByPath(paths);
 
             if (wikiPage == null)
-                return RedirectToAction("NotFound", "Wiki", new { title = title });
+                return RedirectToAction("NotFound", "Wiki", new { title = paths?[paths.Length - 1] });
 
             return View("View", wikiPage);
         }
@@ -64,13 +74,17 @@ namespace ASPWiki.Controllers
             wikiPage.LastModified = DateTime.Now;
 
             string parent = wikiPage.Path[0];
-            wikiPage.Path = new List<string>(wikiRepository.Get(parent).Path);
-            wikiPage.Path.Add(parent);
+
+            if (parent != null)
+                wikiPage.SetPath(wikiRepository.Get(parent).Path);
+            else
+                wikiPage.Path = new List<string>(new string[] { wikiPage.Title });
 
             wikiRepository.Save(wikiPage.Title, wikiPage);
 
             this.FlashMessageSuccess("Wikipage: " + wikiPage.Title + " succesfully saved");
-            return RedirectToAction("View", "Wiki", new { title = wikiPage.Title });
+
+            return Redirect("/Wiki/View/"+wikiPage.GetPathString());
         }
 
         [HttpPost("Wiki/IsValidPath")]
@@ -93,10 +107,16 @@ namespace ASPWiki.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [HttpGet("Wiki/NotFound/{title}")]
+        [HttpGet("Wiki/NotFound/{title?}")]
         public IActionResult NotFound(string title)
         {
             return View("NotFound", title);
+        }
+
+        private string[] GetParsedPath()
+        {
+            var path = (string)RouteData.Values.Values.First();
+            return path?.Split('/');
         }
     }
 }

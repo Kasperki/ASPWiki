@@ -1,6 +1,14 @@
 ﻿@using ASPWiki.Model;
 @model WikiPage
 
+@{
+    string pathVar = string.Empty;
+    if (Model.Path.Count >= 2)
+    {
+        pathVar = @Model.Path[@Model.Path.Count - 2];
+    }
+}
+
 <form id="wikiForm" asp-action="Save" method="post">
     <div class="row" style="margin-top:20px;">
         <div class="col-md-4">
@@ -11,10 +19,18 @@
         <div class="col-md-5">
             <label for="path">Path:</label>
             <span id="pathString">
-                
+                @{
+                    string pathUrl = "/Wiki/View";
+                    for (int i = 0; i < @Model.Path.Count; i++)
+                    {
+                        pathUrl += "/" + @Model.Path[i];
+                        <a href="@pathUrl">@Model.Path[i]</a>
+                        <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                    }
+                }
             </span>
             <div class="input-group">
-                <input class="form-control" asp-for="Path" type="text" id="path" value="@Model.Path.Last()"/>
+                <input class="form-control" asp-for="Path" type="text" id="path" value="@pathVar"/>    
                 <span class="input-group-addon" id="pathIcon"></span>
             </div>
         </div>
@@ -46,16 +62,22 @@
       toolbar: "undo, redo | bold, italic, underline, strikethrough | alignleft, aligncenter, alignright, alignjustify | formatselect, fontselect, fontsizeselect | bullist, numlist, outdent, indent, blockquote, | codesample link image"
   });
 
- //TODO SET PATH AT START.
+  $(":input").on("keydown", function (event) {
+      if (event.which === 13 && !$(this).is("textarea, :button, :submit")) {
+          $(this).blur();
+      }
+  });
 
-  $("#path").on("change, blur", function () {
-      if(this.value !== "") {
+  $("#path, #title").on("change, blur", function () {
+      var pathVal = $("#path").val();
+
+      if (pathVal !== "") {
           $("#pathIcon").html("<i class=\"fa fa-spinner fa-spin fa-fw\"></i>");
 
           $.ajax({
               url: '/Wiki/IsValidPath',
               type: 'POST',
-              data: JSON.stringify(this.value),
+              data: JSON.stringify(pathVal),
               contentType: 'application/json; charset=utf-8',
               dataType: 'json',
               async: true,
@@ -63,7 +85,12 @@
                   if (msg !== "NOTVALID") {
 
                       var pathString = "";
-                      msg.forEach(function (obj) { pathString += obj + " <i class=\"fa fa-angle-double-right\" aria-hidden=\"true\"></i> " });
+                      var pathUrl = "/Wiki/View";
+                      msg.forEach(function (obj)
+                      {
+                          pathUrl += "/" + obj;
+                          pathString += "<a href=\"" + pathUrl + "\">" + obj + "</a> <i class=\"fa fa-angle-double-right\" aria-hidden=\"true\"></i> ";
+                      });
                       pathString += $("#title").val();
                       $("#pathString").html(pathString);
 

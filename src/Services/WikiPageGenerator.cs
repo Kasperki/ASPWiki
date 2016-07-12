@@ -29,14 +29,12 @@ namespace ASPWiki.Services
 
         public WikiPage Generate()
         {
-            WikiPage wikiPage = new WikiPage();
-
             List<string> nouns;
             using (StreamReader sr = new StreamReader(File.OpenRead("Resources/nouns.json")))
             {
                 nouns = JsonConvert.DeserializeObject<List<string>>(sr.ReadToEnd());
             }
-            wikiPage.Title = nouns[random.Next(0, nouns.Count)];
+            WikiPage wikiPage = new WikiPage(nouns[random.Next(0, nouns.Count)]);
 
             DateTime start = new DateTime(2010, 1, 1);
             wikiPage.LastModified = start.AddDays(random.Next(0, (DateTime.Today - start).Days));
@@ -49,11 +47,10 @@ namespace ASPWiki.Services
 
             wikiPage.Content += "</p>";
 
-            wikiPage.Path = new List<string>();
-
-            wikiPage.Path.Add(nouns[random.Next(0, nouns.Count)]);
-            wikiPage.Path.Add(nouns[random.Next(0, nouns.Count)]);
-            wikiPage.Path.Add(nouns[random.Next(0, nouns.Count)]);
+            if (random.Next(0, 100) > 80)
+            {
+                wikiPage.SetPath(GetRandomWikiPage().Path);
+            }
 
             return wikiPage;
         }
@@ -68,6 +65,11 @@ namespace ASPWiki.Services
             }
 
             return list;
+        }
+
+        private WikiPage GetRandomWikiPage()
+        {
+            return wikiRepo.GetAll()[random.Next(0, wikiRepo.GetAll().Count - 1)];
         }
     }
 }

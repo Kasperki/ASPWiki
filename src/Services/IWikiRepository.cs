@@ -9,6 +9,8 @@ namespace ASPWiki.Services
         void Delete(string title);
         bool Exists(string title);
         WikiPage Get(string title);
+        WikiPage GetByPath(string[] path);
         List<WikiPage> GetLatest(int number);
+        List<WikiPage> GetAll();
     }
 }

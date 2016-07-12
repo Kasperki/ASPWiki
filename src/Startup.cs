@@ -49,7 +49,7 @@ namespace ASPWiki
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IGarbageGenerator<WikiPage> wikiPageGenerator)
         {
-            wikiPageGenerator.GenerateToDatabase(40);
+            wikiPageGenerator.GenerateToDatabase(30);
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();

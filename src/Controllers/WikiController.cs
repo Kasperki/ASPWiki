@@ -9,8 +9,8 @@ using System.Linq;
 namespace ASPWiki.Controllers
 {
     //TODO
-      //VALIDATE PATH ON SAVE, NO SAME PAHT NAME!!!!
-      //ASIDE
+      //VALIDATE PATH ON SAVE, NO SAME PATH NAMES!
+      //ASIDE @PARAMETRIZE
       
      //ADD WIKI SERVICE :) - MINIMIZE CONTROLLER LOGIC - UNIT TESTING
       //ON DELETE WHAT TO DO TO ROUTES :D xddd? leave as is? do not allow itself on parent??
@@ -28,7 +28,7 @@ namespace ASPWiki.Controllers
             this.wikiRepository = wikiRepository;
         }
 
-        [HttpGet("Wiki/New/")]
+        [HttpGet("Wiki/New")]
         public IActionResult New(string title)
         {
             string route = routeGenerator.GenerateRoute();
@@ -87,17 +87,6 @@ namespace ASPWiki.Controllers
             return Redirect("/Wiki/View/"+wikiPage.GetPathString());
         }
 
-        [HttpPost("Wiki/IsValidPath")]
-        public IActionResult IsValidPath([FromBody]string path)
-        {
-            var wikiPage = wikiRepository.Get(path);
-
-            if (wikiPage == null)
-                return new OkObjectResult(JsonConvert.SerializeObject("NOTVALID"));
-            else
-                return new OkObjectResult(JsonConvert.SerializeObject(wikiPage.Path));
-        }
-
         [HttpGet("Wiki/Delete/{title}")]
         public IActionResult Delete(string title)
         {
@@ -111,6 +100,17 @@ namespace ASPWiki.Controllers
         public IActionResult NotFound(string title)
         {
             return View("NotFound", title);
+        }
+
+        [HttpPost("Wiki/IsValidPath")]
+        public IActionResult IsValidPath([FromBody]string path)
+        {
+            var wikiPage = wikiRepository.Get(path);
+
+            if (wikiPage == null)
+                return new OkObjectResult(JsonConvert.SerializeObject("NOTVALID"));
+            else
+                return new OkObjectResult(JsonConvert.SerializeObject(wikiPage.Path));
         }
 
         private string[] GetParsedPath()

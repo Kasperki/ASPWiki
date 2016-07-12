@@ -138,12 +138,25 @@ body {
 }
 
 /*
-#buttonContainer:hover {
-    animation: spin 0.4s ease-in-out;
+SIDE NAV
+*/
+
+.sideButton {
+    background-color:#3FB8AF;
+    padding: 6px;
+    margin-top: 1px;
 }
 
-@keyframes spin {
-    100% {
-        -moz-transform: rotate(40deg);
-    }
-}*/
+.sideButton:hover {
+    box-shadow: rgba(0,0,0,0.25) 0 4px 0,inset rgba(255,255,255,0.16) 0 4px 0;
+}
+
+.sideButton:active {
+    background-color:#3FBABF;
+    box-shadow: rgba(0,0,0,0.25) 0 4px 0,inset rgba(255,255,255,0.16) 0 4px 0;
+}
+
+.sideButtonChild {
+    background-color:#3FB8AF;
+    padding: 6px;
+}

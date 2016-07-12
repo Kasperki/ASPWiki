@@ -1,6 +1,10 @@
 ﻿@using ASPWiki.Model;
 @model WikiPage
 
+@{ 
+    ViewData["Title"] = Model.Title;
+}
+
 <form asp-action="Save" method="post">
     <div class="row" style="margin-top:20px;">
         <div class="col-md-6">

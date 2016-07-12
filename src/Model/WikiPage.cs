@@ -70,7 +70,7 @@ namespace ASPWiki.Model
             if (Content == null)
                 return "0 KB";
 
-            return (Content.Length * sizeof(char) / 1024).ToString("0.00") + " KB";
+            return (Content.Length * sizeof(char) / 1024f).ToString("0.00") + " KB";
         }
 
         public override string ToString()

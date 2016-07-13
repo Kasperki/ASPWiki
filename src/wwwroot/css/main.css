@@ -141,22 +141,44 @@ body {
 SIDE NAV
 */
 
+@media screen and (max-width:768px) {
+    #sidePanel {
+        display: none;
+    }
+}
+
 .sideButton {
     background-color:#3FB8AF;
     padding: 6px;
-    margin-top: 1px;
+    z-index: 10;
 }
 
 .sideButton:hover {
-    box-shadow: rgba(0,0,0,0.25) 0 4px 0,inset rgba(255,255,255,0.16) 0 4px 0;
+    box-shadow: rgba(0,0,0,0.25) 0 2px 0,inset rgba(255,255,255,0.16) 0 2px 0;
+    z-index: 10;
+    cursor: pointer;
 }
 
 .sideButton:active {
-    background-color:#3FBABF;
-    box-shadow: rgba(0,0,0,0.25) 0 4px 0,inset rgba(255,255,255,0.16) 0 4px 0;
+    background-color:#4FBFBF;
+    box-shadow: rgba(0,0,0,0.25) 0 2px 0,inset rgba(255,255,255,0.16) 0 2px 0;
+    cursor: pointer;
 }
 
 .sideButtonChild {
-    background-color:#3FB8AF;
+    background-color: RGBA(51, 187, 173, 0.92);
     padding: 6px;
+}
+
+.sideButtonChild:hover {
+    background-color:#4FBFBF;
+}
+
+.sideButtonChild p {
+    color: white;
+    padding-left: 20px;
+}
+
+.panel-heading h4 {
+    color: white;
 }

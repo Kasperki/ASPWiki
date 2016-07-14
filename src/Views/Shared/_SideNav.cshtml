@@ -9,19 +9,28 @@
 
 @Html.ScriptSection(
 @<script>
+
+$('#sidePanel').on('show.bs.collapse', function (e) {
+    if (e.target.id == $("#sidePanel").attr('id')) {
+        $("#asideContent").html("");
+        GetSideNavData();
+    }
+})
+
+function GetSideNavData() {
     $.ajax({
         url: '/Home/GetAsideWikiPages',
         type: 'GET',
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         async: true,
-        success: function(json) {
-            for (var i = 0; i < json.length; i++)
-            {
+        success: function (json) {
+            for (var i = 0; i < json.length; i++) {
                 GoTroughNodes(json[i], i, $("#asideContent"), 1);
             }
         }
     });
+}
 
 //Generates SideNav DOM
 function GoTroughNodes(Node, i, parent, recursion)
@@ -29,7 +38,11 @@ function GoTroughNodes(Node, i, parent, recursion)
     recursion++;
 
     var row = $("<div class='row' style='margin-right:0px;'></div>");
-    var link = $("<a href='/Wiki/View/" + replaceInString(Node.WikiPage.Path.toString(),",","/") + "'></a>");
+
+    if(Node.WikiPage != null)
+    var hrefLink = replaceInString(Node.WikiPage.Path.toString(), ",", "/");
+    
+    var link = $("<a href='/Wiki/View/" + hrefLink  + "'></a>");
     var sideButton = $("<div class='col-sm-7 panel-heading sideButtonLink'></div>").css("margin-left", recursion * 5)
     var title = $("<h4></h4>").addClass("panel-title").append(Node.Name);
 
@@ -62,7 +75,9 @@ function GoTroughNodes(Node, i, parent, recursion)
             if (childPanel.length <= 0)
                 childPanel = $("<div id='content" + i + "' class='panel-collapse collapse'>").css("margin-left", recursion * 5);
 
-            childPanel.append($("<a href='/Wiki/View/" + replaceInString(child.WikiPage.Path.toString(),",","/") + "'><div class='sideButtonChild'><p>" + child.WikiPage.Title + "</p></div></a>"));
+            if (child.WikiPage != null)
+                childPanel.append($("<a href='/Wiki/View/" + replaceInString(child.WikiPage.Path.toString(), ",", "/") + "'><div class='sideButtonChild'><p>" + child.WikiPage.Title + "</p></div></a>"));
+
             parent.append(childPanel);
         }
         else

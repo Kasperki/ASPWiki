@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace ASPWiki.Model
@@ -16,6 +17,19 @@ namespace ASPWiki.Model
         public DateTime LastModified { get; set; }
 
         public List<string> Path { get; set; }
+
+        public string Parent
+        {
+            get
+            {
+                string parent = string.Empty;
+                if (Path.Count >= 2)
+                {
+                    parent = Path[Path.Count - 2];
+                }
+                return Path.Last();
+            }
+        }
 
         public WikiPage() { }
 

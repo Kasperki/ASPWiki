@@ -8,6 +8,8 @@ namespace ASPWiki.Services
 {
     public interface IWikiService
     {
+        void Save(WikiPage wikiPage);
         List<Node> GetWikiTree(List<WikiPage> wikiPages);
+        bool IsValidPath(string parent, string title);
     }
 }

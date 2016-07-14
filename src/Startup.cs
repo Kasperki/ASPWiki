@@ -42,6 +42,7 @@ namespace ASPWiki
 
             services.AddSingleton<IRouteGenerator, RouteGenerator>();
             services.AddSingleton<IWikiRepository, WikiRepository>();
+            services.AddSingleton<IWikiService, WikiService>();
 
             services.AddSingleton<IGarbageGenerator<WikiPage>, WikiPageGenerator>();
         }
@@ -49,7 +50,7 @@ namespace ASPWiki
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IGarbageGenerator<WikiPage> wikiPageGenerator)
         {
-            wikiPageGenerator.GenerateToDatabase(40);
+            wikiPageGenerator.GenerateToDatabase(15);
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
@@ -61,7 +62,6 @@ namespace ASPWiki
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
-
             }
             else
             {

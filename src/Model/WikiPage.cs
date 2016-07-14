@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace ASPWiki.Model
 {
@@ -17,11 +15,35 @@ namespace ASPWiki.Model
 
         public DateTime LastModified { get; set; }
 
+        public List<string> Path { get; set; }
+
         public WikiPage() { }
 
         public WikiPage(string title)
         {
             this.Title = title;
+            Path = new List<string>(new string[]{ Title });
+        }
+
+        public void SetPath(List<string> ParentPath)
+        {
+            Path = new List<string>(ParentPath);
+            Path.Add(Title);
+        }
+
+        public string GetPathString()
+        {
+            string path = String.Empty;
+
+            for (int i = 0; i < Path.Count; i++)
+            {
+                path += Path[i];
+
+                if (i != Path.Count - 1)
+                    path += "/";
+            }
+
+            return path;
         }
 
         private const int SUMMARY_LENGTH = 200;
@@ -48,7 +70,7 @@ namespace ASPWiki.Model
             if (Content == null)
                 return "0 KB";
 
-            return (Content.Length * sizeof(char) / 1024).ToString("0.00") + " KB";
+            return (Content.Length * sizeof(char) / 1024f).ToString("0.00") + " KB";
         }
 
         public override string ToString()

@@ -138,12 +138,67 @@ body {
 }
 
 /*
-#buttonContainer:hover {
-    animation: spin 0.4s ease-in-out;
+SIDE NAV
+*/
+
+@media screen and (max-width:768px) {
+    #sidePanel {
+        display: none;
+    }
 }
 
-@keyframes spin {
-    100% {
-        -moz-transform: rotate(40deg);
-    }
-}*/
+.sideButtonLink {
+    width:60%; 
+    margin-left:10px; 
+    background-color:#3FB8AF;
+    height: 50px;
+}
+
+.sideButtonCollapse {
+    width:40%;  
+    margin-left:-10px; 
+    background-color:#3FB8AF;
+    height: 50px;
+}
+
+.sideButtonLink:hover {
+    border:solid;
+    border-width: 0 0 2px 2px;
+    border-color: #7FC7AF; 
+    cursor: pointer;
+}
+
+.sideButtonCollapse:hover {
+    border:solid;
+    border-width: 0 0 2px 0;
+    border-color: #7FC7AF; 
+    cursor: pointer;
+}
+
+.sideButtonLink:active {
+    background-color:#4FBFBF;
+    cursor: pointer;
+}
+
+.sideButtonCollapse:active {
+    background-color:#4FBFBF;
+    cursor: pointer;
+}
+
+.sideButtonChild {
+    background-color: RGBA(51, 187, 173, 0.92);
+    padding: 6px;
+}
+
+.sideButtonChild:hover {
+    background-color:#4FBFBF;
+}
+
+.sideButtonChild p {
+    color: white;
+    padding-left: 20px;
+}
+
+.panel-heading h4 {
+    color: white;
+}

@@ -1,13 +1,43 @@
 ﻿@using ASPWiki.Model;
 @model WikiPage
 
+@{
+    ViewData["Title"] = "New Page";
+
+    string pathVar = string.Empty;
+    if (Model.Path.Count >= 2)
+    {
+        pathVar = @Model.Path[@Model.Path.Count - 2];
+    }
+}
+
 <form id="wikiForm" asp-action="Save" method="post">
     <div class="row" style="margin-top:20px;">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label for="title">Title</label>
             <input class="form-control" asp-for="Title" type="text" id="title" value="@Model.Title"/>
         </div>
-        <div class="col-md-6">
+
+        <div class="col-md-5">
+            <label for="path">Path:</label>
+            <span id="pathString">
+                @{
+                    string pathUrl = "/Wiki/View";
+                    for (int i = 0; i < @Model.Path.Count; i++)
+                    {
+                        pathUrl += "/" + @Model.Path[i];
+                        <a href="@pathUrl">@Model.Path[i]</a>
+                        <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+                    }
+                }
+            </span>
+            <div class="input-group">
+                <input class="form-control" asp-for="Path" type="text" id="path" value="@pathVar"/>    
+                <span class="input-group-addon" id="pathIcon"></span>
+            </div>
+        </div>
+
+        <div class="col-md-3">
             <a asp-controller="Wiki" asp-action="Save" onclick="document.getElementById('wikiForm').submit(); return false;">
                 <div class="sm-btn" id="add" style="float:right;">
                     Save <i class="fa fa-floppy-o" aria-hidden="true"></i>
@@ -32,6 +62,53 @@
       height: 500,
       plugins: "codesample image imagetools link",
       toolbar: "undo, redo | bold, italic, underline, strikethrough | alignleft, aligncenter, alignright, alignjustify | formatselect, fontselect, fontsizeselect | bullist, numlist, outdent, indent, blockquote, | codesample link image"
+  });
+
+  $(":input").on("keydown", function (event) {
+      if (event.which === 13 && !$(this).is("textarea, :button, :submit")) {
+          $(this).blur();
+      }
+  });
+
+  $("#path, #title").on("change, blur", function () {
+      var pathVal = $("#path").val();
+
+      if (pathVal !== "") {
+          $("#pathIcon").html("<i class=\"fa fa-spinner fa-spin fa-fw\"></i>");
+
+          $.ajax({
+              url: '/Wiki/IsValidPath',
+              type: 'POST',
+              data: JSON.stringify(pathVal),
+              contentType: 'application/json; charset=utf-8',
+              dataType: 'json',
+              async: true,
+              success: function (msg) {
+                  if (msg !== "NOTVALID") {
+
+                      var pathString = "";
+                      var pathUrl = "/Wiki/View";
+                      msg.forEach(function (obj)
+                      {
+                          pathUrl += "/" + obj;
+                          pathString += "<a href=\"" + pathUrl + "\">" + obj + "</a> <i class=\"fa fa-angle-double-right\" aria-hidden=\"true\"></i> ";
+                      });
+                      pathString += $("#title").val();
+                      $("#pathString").html(pathString);
+
+                      $("#pathIcon").html("<i class=\"fa fa-check\"></i>");
+                  }
+                  else {
+                      $("#pathString").text("Not found");
+                      $("#pathIcon").html("<i class=\"fa fa-close\"></i>");
+                  }
+              }
+          });
+      }
+      else {
+          $("#pathString").text($("#title").val());
+          $("#pathIcon").html("<i class=\"fa fa-check\"></i>");
+      }
   });
 </script>
 }

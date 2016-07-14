@@ -1,0 +1,87 @@
+﻿<aside id="sidePanel" class="collapse" style="position:fixed;width:15%;z-index:1;">
+    <div style="background-color:#7FC7AF;height:100%;">
+        <div class="row">
+            <div id="asideContent" class="col-sm-12">
+            </div>
+        </div>
+    </div>
+</aside>
+
+@Html.ScriptSection(
+@<script>
+    $.ajax({
+        url: '/Home/GetAsideWikiPages',
+        type: 'GET',
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        async: true,
+        success: function(json) {
+            for (var i = 0; i < json.length; i++)
+            {
+                GoTroughNodes(json[i], i, $("#asideContent"), 1);
+            }
+        }
+    });
+
+//Generates SideNav DOM
+function GoTroughNodes(Node, i, parent, recursion)
+{
+    recursion++;
+
+    var row = $("<div class='row' style='margin-right:0px;'></div>");
+    var link = $("<a href='/Wiki/View/" + replaceInString(Node.WikiPage.Path.toString(),",","/") + "'></a>");
+    var sideButton = $("<div class='col-sm-7 panel-heading sideButtonLink'></div>").css("margin-left", recursion * 5)
+    var title = $("<h4></h4>").addClass("panel-title").append(Node.Name);
+
+    if (Node.ChildNode.length > 0)
+    {
+        var collapseLink = $("<div class='col-sm-5 panel-heading sideButtonCollapse'  data-toggle='collapse' href='#content" + i + "'></div>").css("margin-left", recursion * -5);
+        collapseLink.html("<h4><i class='fa fa-chevron-down' style='float:right;'  aria-hidden='true'></i></h4>");
+    }
+    else
+    {
+        sideButton.removeClass("col-sm-5");
+        sideButton.addClass("col-sm-12").css("width", "100%").css("margin-left", 0);
+        title.css("padding-left", 6);
+    }
+
+    sideButton.append(title);
+    link.append(sideButton);
+    row.append(link);
+    row.append(collapseLink);
+    parent.append(row);
+
+    for (var j = 0; j < Node.ChildNode.length; j++)
+    {
+        let child = Node.ChildNode[j];
+
+        //NoChilds
+        if (child.ChildNode.length == 0)
+        {
+            var childPanel = $("#content" + i);
+            if (childPanel.length <= 0)
+                childPanel = $("<div id='content" + i + "' class='panel-collapse collapse'>").css("margin-left", recursion * 5);
+
+            childPanel.append($("<a href='/Wiki/View/" + replaceInString(child.WikiPage.Path.toString(),",","/") + "'><div class='sideButtonChild'><p>" + child.WikiPage.Title + "</p></div></a>"));
+            parent.append(childPanel);
+        }
+        else
+        {
+            var childPanel = $("#content" + i);
+
+            if (childPanel.length <= 0)
+                childPanel = $("<div id='content" + i + "' class='panel-collapse collapse'>").css("margin-left", recursion * 5);
+
+            parent.append(childPanel);
+            GoTroughNodes(child, i + "_" + j + "" + child.Name, childPanel, recursion);
+        }
+    }
+}
+
+function replaceInString(str, target, replacement)
+{
+    return str.split(target).join(replacement);
+}
+
+</script>
+)

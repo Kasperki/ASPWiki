@@ -3,18 +3,14 @@ using ASPWiki.Services;
 using ASPWiki.Model;
 using System;
 using Newtonsoft.Json;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace ASPWiki.Controllers
 {
-    //TODO
-      //VALIDATE PATH ON SAVE, NO SAME PATH NAMES!
-      //ASIDE @PARAMETRIZE
-      
-     //ADD WIKI SERVICE :) - MINIMIZE CONTROLLER LOGIC - UNIT TESTING
-      //ON DELETE WHAT TO DO TO ROUTES :D xddd? leave as is? do not allow itself on parent??
-
+    //DRY - @PARAMETIRIZE
+    //SIDE NAV RAZOR NOT AJAX?
+    //PATH WITH SAME TITLE LITTLE FUNKY.
+    //MINIMIZE CONTROLLER LOGIC - UNIT TESTING - 
     public class WikiController : Controller
     {
         private readonly IRouteGenerator routeGenerator;
@@ -22,10 +18,13 @@ namespace ASPWiki.Controllers
         //TODO THIS WILL BE A REAL REPOSITORY_____ !!
         private readonly IWikiRepository wikiRepository;
 
-        public WikiController(IRouteGenerator routeGenerator, IWikiRepository wikiRepository)
+        private readonly IWikiService wikiService;
+
+        public WikiController(IRouteGenerator routeGenerator, IWikiRepository wikiRepository, IWikiService wikiService)
         {
             this.routeGenerator = routeGenerator;
             this.wikiRepository = wikiRepository;
+            this.wikiService = wikiService;
         }
 
         [HttpGet("Wiki/New")]
@@ -70,21 +69,25 @@ namespace ASPWiki.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Save(WikiPage wikiPage)
         {
-            System.Diagnostics.Debug.WriteLine(wikiPage.ToString());
-            wikiPage.LastModified = DateTime.Now;
-
-            string parent = wikiPage.Path[0];
-
-            if (parent != null)
-                wikiPage.SetPath(wikiRepository.Get(parent).Path);
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    wikiService.Save(wikiPage);
+                    this.FlashMessageSuccess("Wikipage: " + wikiPage.Title + " succesfully saved");
+                    return Redirect("/Wiki/View/" + wikiPage.GetPathString());
+                }
+                catch (Exception e)
+                {
+                    this.FlashMessageError(e.Message);
+                    return View("Edit", wikiPage);
+                }
+            }
             else
-                wikiPage.Path = new List<string>(new string[] { wikiPage.Title });
-
-            wikiRepository.Save(wikiPage.Title, wikiPage);
-
-            this.FlashMessageSuccess("Wikipage: " + wikiPage.Title + " succesfully saved");
-
-            return Redirect("/Wiki/View/"+wikiPage.GetPathString());
+            {
+                this.FlashMessageError("Model invalid");
+                return View("Edit", wikiPage);
+            }
         }
 
         [HttpGet("Wiki/Delete/{title}")]
@@ -103,14 +106,20 @@ namespace ASPWiki.Controllers
         }
 
         [HttpPost("Wiki/IsValidPath")]
-        public IActionResult IsValidPath([FromBody]string path)
+        public IActionResult IsValidPath([FromBody]string[] ajaxData)
         {
-            var wikiPage = wikiRepository.Get(path);
+            string pathValue = ajaxData[0];
+            string title = ajaxData[1];
 
-            if (wikiPage == null)
-                return new OkObjectResult(JsonConvert.SerializeObject("NOTVALID"));
-            else
-                return new OkObjectResult(JsonConvert.SerializeObject(wikiPage.Path));
+            try
+            {
+                wikiService.IsValidPath(pathValue, title);
+                return new OkObjectResult(JsonConvert.SerializeObject(wikiRepository.Get(pathValue).Path));
+            }
+            catch (Exception e)
+            {
+                return new OkObjectResult(JsonConvert.SerializeObject(e.Message));
+            }   
         }
 
         private string[] GetParsedPath()

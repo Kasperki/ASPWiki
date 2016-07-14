@@ -1,13 +1,18 @@
 ﻿using ASPWiki.Model;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using System;
 
 namespace ASPWiki.Services
 {
     public class WikiService : IWikiService
     {
+        private readonly IWikiRepository wikiRepository;
+
+        public WikiService(IWikiRepository wikiRepository)
+        {
+            this.wikiRepository = wikiRepository;
+        }
+
         public List<Node> GetWikiTree(List<WikiPage> wikiPages)
         {
             var wikiTree = new List<Node>();
@@ -49,6 +54,41 @@ namespace ASPWiki.Services
             {
                 BuildTreeNode(node.ChildNode[index], wikiPage, ++i);
             }
+        }
+
+        //TODO GetByPath is heavy?
+         //Should keep repo organized in treeshape by path?
+        public bool IsValidPath(string parent, string title)
+        {
+            WikiPage parentPage = wikiRepository.Get(parent);
+
+            if (parentPage == null)
+                throw new Exception("Parent not found");
+
+            List<string> path = new List<string>(parentPage.Path);
+            path.Add(title);
+
+            WikiPage wikiPage = wikiRepository.GetByPath(path.ToArray());
+
+            if (wikiPage != null && parent != wikiRepository.Get(title).Parent)
+                throw new Exception("Path already exists");
+
+            return true;
+        }
+
+        public void Save(WikiPage wikiPage)
+        {
+            wikiPage.LastModified = DateTime.Now;
+
+            string parent = wikiPage.Path[0];
+
+            if (parent != null)
+                wikiPage.SetPath(wikiRepository.Get(parent).Path);
+            else
+                wikiPage.Path = new List<string>(new string[] { wikiPage.Title });
+
+            IsValidPath(parent, wikiPage.Title);
+            wikiRepository.Save(wikiPage.Title, wikiPage);
         }
     }
 }

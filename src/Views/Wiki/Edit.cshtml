@@ -2,13 +2,7 @@
 @model WikiPage
 
 @{
-    ViewData["Title"] = "New Page";
-
-    string pathVar = string.Empty;
-    if (Model.Path.Count >= 2)
-    {
-        pathVar = @Model.Path[@Model.Path.Count - 2];
-    }
+    ViewData["Title"] = "Edit";
 }
 
 <form id="wikiForm" asp-action="Save" method="post">
@@ -18,26 +12,18 @@
             <input class="form-control" asp-for="Title" type="text" id="title" value="@Model.Title"/>
         </div>
 
-        <div class="col-md-5">
+        <div class="col-md-4">
             <label for="path">Path:</label>
             <span id="pathString">
-                @{
-                    string pathUrl = "/Wiki/View";
-                    for (int i = 0; i < @Model.Path.Count; i++)
-                    {
-                        pathUrl += "/" + @Model.Path[i];
-                        <a href="@pathUrl">@Model.Path[i]</a>
-                        <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-                    }
-                }
+                @Html.Partial("PathLink", Model.Path)
             </span>
             <div class="input-group">
-                <input class="form-control" asp-for="Path" type="text" id="path" value="@pathVar"/>    
+                <input class="form-control" asp-for="Path" type="text" id="path" value="@Model.Parent"/>    
                 <span class="input-group-addon" id="pathIcon"></span>
             </div>
         </div>
 
-        <div class="col-md-3">
+        <div class="col-md-4">
             <a asp-controller="Wiki" asp-action="Save" onclick="document.getElementById('wikiForm').submit(); return false;">
                 <div class="sm-btn" id="add" style="float:right;">
                     Save <i class="fa fa-floppy-o" aria-hidden="true"></i>
@@ -70,8 +56,11 @@
       }
   });
 
+  var startVal = $("#path").val();
   $("#path, #title").on("change, blur", function () {
+
       var pathVal = $("#path").val();
+      var title = $("#title").val();
 
       if (pathVal !== "") {
           $("#pathIcon").html("<i class=\"fa fa-spinner fa-spin fa-fw\"></i>");
@@ -79,12 +68,12 @@
           $.ajax({
               url: '/Wiki/IsValidPath',
               type: 'POST',
-              data: JSON.stringify(pathVal),
+              data: JSON.stringify([pathVal, title ]),
               contentType: 'application/json; charset=utf-8',
               dataType: 'json',
               async: true,
               success: function (msg) {
-                  if (msg !== "NOTVALID") {
+                  if (typeof(msg) !== "string") {
 
                       var pathString = "";
                       var pathUrl = "/Wiki/View";
@@ -99,7 +88,7 @@
                       $("#pathIcon").html("<i class=\"fa fa-check\"></i>");
                   }
                   else {
-                      $("#pathString").text("Not found");
+                      $("#pathString").text(msg);
                       $("#pathIcon").html("<i class=\"fa fa-close\"></i>");
                   }
               }

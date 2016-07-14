@@ -52,13 +52,10 @@
         </div>
     </header>
 
-    <div class="container">
-        @Html.Partial("Flash")
-    </div>
-
     <main class="container body-content">
         <div class="row">
             <div class="col-sm-offset-2 col-md-10">
+                @Html.Partial("Flash")
                 @RenderBody()
                 <hr />
                 <footer>

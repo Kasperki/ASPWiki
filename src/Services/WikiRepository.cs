@@ -34,7 +34,6 @@ namespace ASPWiki.Services
 
         public WikiPage GetByPath(string[] path)
         {
-
             if (path != null)
             {
                 foreach (KeyValuePair<string, WikiPage> entry in wikiRepository)

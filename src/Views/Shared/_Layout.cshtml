@@ -36,14 +36,7 @@
         </div>
     </nav>
 
-    <aside id="sidePanel" style="position:fixed;width:20%;height:100%;z-index:1;">
-        <div style="background-color:#7FC7AF;height:100%;">
-            <div class="row">
-                <div id="asideContent" class="col-sm-12">
-                </div>
-            </div>
-        </div>
-    </aside>
+    @Html.Partial("_SideNav")
 
     <header class="header">
         <div class="header-content">
@@ -75,7 +68,6 @@
         </div>
     </main>
    
-
     <environment names="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
@@ -95,59 +87,5 @@
 
     @RenderSection("scripts", required: false)
     @Html.RenderScriptsSection()
-
-
-
-    <script>
-
-
-            $.ajax({
-                url: '/Home/GetAsideWikiPages',
-                type: 'GET',
-                contentType: 'application/json; charset=utf-8',
-                dataType: 'json',
-                async: true,
-                success: function (json) {
-                    
-                    for (var i = 0; i < json.length; i++)
-                    {
-                        GoTroughNodes(json[i], i, $("#asideContent"), 0);
-                    }
-                }
-            });
-        
-            //Node and its parent DOM element
-            function GoTroughNodes(Node, i, parent, recursion)
-            {
-                var sideButton = $("<div class='sideButton' data-toggle='collapse' href='#content" + i + "'></div>").css("margin-left", recursion * 5);
-                var heading = $("<div></div>").addClass("panel-heading");
-                var title = $("<h4></h4>").addClass("panel-title").append(Node.Name);
-                
-                if (Node.ChildNode.length > 0)
-                    title.html(Node.Name + "<i class='fa fa-chevron-down' style='float:right;' aria-hidden='true'></i>");
-
-                heading.append(title); 
-                sideButton.append(heading);
-                parent.append(sideButton);
-
-                for (var j = 0; j < Node.ChildNode.length; j++) { //SecondRound wrong parent? it's there same id but not collapsing in:) Also Sort in by path? reeplace string
-                    let child = Node.ChildNode[j];
-
-                    //NoChilds
-                    if (child.ChildNode.length == 0) {
-                        var childPanel = $("<div id='content" + i + "' class='panel-collapse collapse'>").css("margin-left", recursion * 5);
-                        childPanel.append($("<a href='/Wiki/View/" + child.WikiPage.Path.toString().replace(",", "/") + "'><div class='sideButtonChild'><p>" + child.WikiPage.Title + "</p></div></a>"));
-                        parent.append(childPanel);
-                    }
-                    else {
-                        var childPanel = $("<div id='content" + i + "' class='panel-collapse collapse'>").css("margin-left", recursion * 5);
-                        parent.append(childPanel);
-                        GoTroughNodes(child, i + "_" + j + "" + child.Name, childPanel, ++recursion);
-                    }
-                }
-            }
-     
-    </script>
-
 </body>
 </html>

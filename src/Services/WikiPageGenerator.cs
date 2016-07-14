@@ -47,7 +47,7 @@ namespace ASPWiki.Services
 
             wikiPage.Content += "</p>";
 
-            if (random.Next(0, 100) > 40)
+            if (random.Next(0, 100) > 40 && wikiRepo.GetAll().Count > 0)
             {
                 wikiPage.SetPath(GetRandomWikiPage().Path);
             }
@@ -69,12 +69,7 @@ namespace ASPWiki.Services
 
         private WikiPage GetRandomWikiPage()
         {
-            int max = wikiRepo.GetAll().Count - 1;
-
-            if (max < 0)
-                max = 0;
-
-            return wikiRepo.GetAll()[random.Next(0, max)];
+            return wikiRepo.GetAll()[random.Next(0, wikiRepo.GetAll().Count - 1)];
         }
     }
 }

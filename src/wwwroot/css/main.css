@@ -147,21 +147,41 @@ SIDE NAV
     }
 }
 
-.sideButton {
+.sideButtonLink {
+    width:60%; 
+    margin-left:10px; 
     background-color:#3FB8AF;
-    padding: 6px;
-    z-index: 10;
+    height: 50px;
 }
 
-.sideButton:hover {
-    box-shadow: rgba(0,0,0,0.25) 0 2px 0,inset rgba(255,255,255,0.16) 0 2px 0;
-    z-index: 10;
+.sideButtonCollapse {
+    width:40%;  
+    margin-left:-10px; 
+    background-color:#3FB8AF;
+    height: 50px;
+}
+
+.sideButtonLink:hover {
+    border:solid;
+    border-width: 0 0 2px 2px;
+    border-color: #7FC7AF; 
     cursor: pointer;
 }
 
-.sideButton:active {
+.sideButtonCollapse:hover {
+    border:solid;
+    border-width: 0 0 2px 0;
+    border-color: #7FC7AF; 
+    cursor: pointer;
+}
+
+.sideButtonLink:active {
     background-color:#4FBFBF;
-    box-shadow: rgba(0,0,0,0.25) 0 2px 0,inset rgba(255,255,255,0.16) 0 2px 0;
+    cursor: pointer;
+}
+
+.sideButtonCollapse:active {
+    background-color:#4FBFBF;
     cursor: pointer;
 }
 

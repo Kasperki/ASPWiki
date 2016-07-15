@@ -24,13 +24,18 @@
         </div>
 
         <div class="col-md-4">
-            <a asp-controller="Wiki" asp-action="Save" onclick="document.getElementById('wikiForm').submit(); return false;">
-                <div class="sm-btn" id="add" style="float:right;">
+            <a id="saveButton" asp-controller="Wiki" asp-action="Save" onclick="document.getElementById('wikiForm').submit(); return false;">
+                <div class="sm-btn zoomIn" style="float:right;">
+                    Save <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                </div>
+            </a>
+            <a id="saveButtonDisabled">
+                <div class="sm-btn disabled" style="float:right;">
                     Save <i class="fa fa-floppy-o" aria-hidden="true"></i>
                 </div>
             </a>
             <a asp-controller="Wiki" asp-action="Delete" asp-route-title="@Model.Title">
-                <div class="sm-btn warning" id="add" style="float:right;">
+                <div class="sm-btn warning zoomIn" style="float:right;">
                     Delete <i class="fa fa-times" aria-hidden="true"></i>
                 </div>
             </a>
@@ -57,47 +62,59 @@
   });
 
   var startVal = $("#path").val();
-  $("#path, #title").on("change, blur", function () {
+  ValidatePath();
 
-      var pathVal = $("#path").val();
-      var title = $("#title").val();
+$("#path, #title").on("change, blur", function () {
+    ValidatePath();
+});
+ 
+function ValidatePath() {
+    var pathVal = $("#path").val();
+    var title = $("#title").val();
 
-      if (pathVal !== "") {
-          $("#pathIcon").html("<i class=\"fa fa-spinner fa-spin fa-fw\"></i>");
+    $("#pathIcon").html("<i class=\"fa fa-spinner fa-spin fa-fw\"></i>");
 
-          $.ajax({
-              url: '/Wiki/IsValidPath',
-              type: 'POST',
-              data: JSON.stringify([pathVal, title ]),
-              contentType: 'application/json; charset=utf-8',
-              dataType: 'json',
-              async: true,
-              success: function (msg) {
-                  if (typeof(msg) !== "string") {
+    $.ajax({
+        url: '/Wiki/IsValidPath',
+        type: 'POST',
+        data: JSON.stringify([pathVal, title]),
+        contentType: 'application/json; charset=utf-8',
+        dataType: 'json',
+        async: true,
+        success: function (msg) {
+            if (typeof (msg) !== "string") {
 
-                      var pathString = "";
-                      var pathUrl = "/Wiki/View";
-                      msg.forEach(function (obj)
-                      {
-                          pathUrl += "/" + obj;
-                          pathString += "<a href=\"" + pathUrl + "\">" + obj + "</a> <i class=\"fa fa-angle-double-right\" aria-hidden=\"true\"></i> ";
-                      });
-                      pathString += $("#title").val();
-                      $("#pathString").html(pathString);
+                var pathString = "";
+                var pathUrl = "/Wiki/View";
+                msg.forEach(function (obj) {
+                    pathUrl += "/" + obj;
+                    pathString += "<a href=\"" + pathUrl + "\">" + obj + "</a> <i class=\"fa fa-angle-double-right\" aria-hidden=\"true\"></i> ";
+                });
+                pathString += $("#title").val();
+                $("#pathString").html(pathString);
 
-                      $("#pathIcon").html("<i class=\"fa fa-check\"></i>");
-                  }
-                  else {
-                      $("#pathString").text(msg);
-                      $("#pathIcon").html("<i class=\"fa fa-close\"></i>");
-                  }
-              }
-          });
-      }
-      else {
-          $("#pathString").text($("#title").val());
-          $("#pathIcon").html("<i class=\"fa fa-check\"></i>");
-      }
-  });
+                $("#pathIcon").html("<i class=\"fa fa-check\"></i>");
+                enableSaveButton();
+            }
+            else {
+                $("#pathString").text(msg);
+                $("#pathIcon").html("<i class=\"fa fa-close\"></i>");
+                disableSaveButton();
+            }
+        }
+    });
+}
+
+//DISABLE SAVE BUTTON IF PATH NOT VALID.
+function disableSaveButton() {
+    $("#saveButton").hide();
+    $("#saveButtonDisabled").show();
+}
+
+function enableSaveButton() {
+    $("#saveButton").show();
+    $("#saveButtonDisabled").hide();
+}
+
 </script>
 }

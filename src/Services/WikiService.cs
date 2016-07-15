@@ -60,6 +60,18 @@ namespace ASPWiki.Services
          //Should keep repo organized in treeshape by path?
         public bool IsValidPath(string parent, string title)
         {
+            if (parent == null || parent == String.Empty)
+            {
+                if (wikiRepository.GetByPath(new string[] { title }) != null)
+                {
+                    throw new Exception("Path already exists");
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
             WikiPage parentPage = wikiRepository.Get(parent);
 
             if (parentPage == null)
@@ -81,13 +93,13 @@ namespace ASPWiki.Services
             wikiPage.LastModified = DateTime.Now;
 
             string parent = wikiPage.Path[0];
+            IsValidPath(parent, wikiPage.Title);
 
             if (parent != null)
                 wikiPage.SetPath(wikiRepository.Get(parent).Path);
             else
                 wikiPage.Path = new List<string>(new string[] { wikiPage.Title });
 
-            IsValidPath(parent, wikiPage.Title);
             wikiRepository.Save(wikiPage.Title, wikiPage);
         }
     }

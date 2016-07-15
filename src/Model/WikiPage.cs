@@ -27,7 +27,8 @@ namespace ASPWiki.Model
                 {
                     parent = Path[Path.Count - 2];
                 }
-                return Path.Last();
+
+                return parent;
             }
         }
 

@@ -8,8 +8,6 @@ using System.Linq;
 namespace ASPWiki.Controllers
 {
     //DRY - @PARAMETIRIZE
-    //SIDE NAV RAZOR NOT AJAX?
-    //PATH WITH SAME TITLE LITTLE FUNKY.
     //MINIMIZE CONTROLLER LOGIC - UNIT TESTING - 
     public class WikiController : Controller
     {
@@ -114,7 +112,11 @@ namespace ASPWiki.Controllers
             try
             {
                 wikiService.IsValidPath(pathValue, title);
-                return new OkObjectResult(JsonConvert.SerializeObject(wikiRepository.Get(pathValue).Path));
+
+                if (pathValue != String.Empty)
+                    return new OkObjectResult(JsonConvert.SerializeObject(wikiRepository.Get(pathValue).Path));
+                else 
+                    return new OkObjectResult(JsonConvert.SerializeObject(new string[] { "" }));
             }
             catch (Exception e)
             {

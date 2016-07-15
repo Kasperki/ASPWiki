@@ -82,12 +82,17 @@ body {
     text-shadow: 3px 4px rgba(0,0,0,0.25);
 }
 
-#add {
+.zoomIn {
     transition: all .2s ease-in-out; 
 }
 
-#add:hover {
+.zoomIn:hover {
     transform: scale(1.1);
+}
+
+.disabled {
+    background-color:dimgrey !important;
+    cursor: default !important;
 }
 
 .btn {

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace ASPWiki.Model
@@ -116,7 +117,7 @@ namespace ASPWiki.Model
             if (Content == null)
                 return "0 KB";
 
-            return (Content.Length * sizeof(char) / 1024f).ToString("0.00") + " KB";
+            return (Content.Length * sizeof(char) / 1024f).ToString("0.00", new CultureInfo("fi")) + " KB";
         }
 
         public override string ToString()

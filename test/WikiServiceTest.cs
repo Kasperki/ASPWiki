@@ -40,10 +40,8 @@ namespace ASPWiki.Tests
         }
 
         [Fact]
-        public void ValidatePath() 
+        public void ValidatePath_Should_return_path_if_path_is_valid() 
         {       
-        //PATH VALID
-
             //TEST SAVING TO SAME PAHT IS VALID.
             Assert.True(wikiService.IsValidPath(pathW1, w1.Id));    //W1  PATH: W1
             Assert.True(wikiService.IsValidPath(pathW2, w2.Id));    //W2  PATH: W1 > W2
@@ -54,9 +52,11 @@ namespace ASPWiki.Tests
             Assert.True(wikiService.IsValidPath(new string[] { "w3" }, w22.Id)); //W22 PATH: W3 
             Assert.True(wikiService.IsValidPath(new string[] { "w1" , "w4" }, w22.Id)); //W22 PATH: W1 > W4 
             Assert.True(wikiService.IsValidPath(new string[] { "w1", "w2", "w4" }, w22.Id)); //W22 PATH: W1 > W2 > W4
+        }
 
-        //PATH NOT VALID
-
+        [Fact]
+        public void ValidatePath_Should_Throw_Error_If_Path_Is_not_valid()
+        {
             //TEST THAT DUPLICATE PATHS ARE INVALID
             Exception e = Assert.Throws<Exception>(() => wikiService.IsValidPath(pathW1, w22.Id)); //W22 PATH: W1
             Assert.Equal("Path already exists", e.Message);

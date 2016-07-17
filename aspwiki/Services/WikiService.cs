@@ -1,6 +1,7 @@
 ﻿using ASPWiki.Model;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace ASPWiki.Services
 {
@@ -57,50 +58,49 @@ namespace ASPWiki.Services
         }
 
         //TODO GetByPath is heavy?
-         //Should keep repo organized in treeshape by path?
-        public bool IsValidPath(string parent, string title)
+        //Should keep repo organized in treeshape by path?
+        //CHANGING WIKIPAGE TO ITSELFS CHILD WOULD NOT BE VALID
+        //CHANGING WIKIPAGES PATH THAT HAS CHILDS WOULD NOT BE VALID OR WOULD CHANGE childs paths as well?
+        public bool IsValidPath(string[] path, Guid id)
         {
-            if (parent == null || parent == String.Empty)
+            if (path.Length > 1)
             {
-                if (wikiRepository.GetByPath(new string[] { title }) != null)
-                {
-                    throw new Exception("Path already exists");
-                }
-                else
-                {
-                    return true;
-                }
+                if (wikiRepository.GetByPath(path.Take(path.Length - 1).ToArray()) == null)
+                    throw new Exception("Parent not found");
             }
 
-            WikiPage parentPage = wikiRepository.Get(parent);
+            WikiPage wikiPage = wikiRepository.GetByPath(path);
 
-            if (parentPage == null)
-                throw new Exception("Parent not found");
-
-            List<string> path = new List<string>(parentPage.Path);
-            path.Add(title);
-
-            WikiPage wikiPage = wikiRepository.GetByPath(path.ToArray());
-
-            if (wikiPage != null && parent != wikiRepository.Get(title).Parent)
+            if (wikiPage != null && wikiPage.Id != id)
+            {
                 throw new Exception("Path already exists");
-
-            return true;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         public void Save(WikiPage wikiPage)
         {
+            //Path comes from form in path/as/url: 
+            //TODO Set as so also to model; and Path: get; parsed from that. makes this simpler
+            if (wikiPage.Path[0] != null)
+            {
+                string[] pathValue = wikiPage.Path[0].Split('/');
+                wikiPage.Path = new List<string>(pathValue);
+            }
+            else
+            {
+                wikiPage.Path = new List<string>();
+            }
+
+            wikiPage.SetPath(wikiPage.Path);
+            IsValidPath(wikiPage.Path.ToArray(), wikiPage.Id);
+
             wikiPage.LastModified = DateTime.Now;
 
-            string parent = wikiPage.Path[0];
-            IsValidPath(parent, wikiPage.Title);
-
-            if (parent != null)
-                wikiPage.SetPath(wikiRepository.Get(parent).Path);
-            else
-                wikiPage.Path = new List<string>(new string[] { wikiPage.Title });
-
-            wikiRepository.Save(wikiPage.Title, wikiPage);
+            wikiRepository.Save(wikiPage);
         }
     }
 }

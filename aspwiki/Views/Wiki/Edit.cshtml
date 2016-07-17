@@ -7,23 +7,15 @@
 
 <form id="wikiForm" asp-action="Save" method="post">
     <div class="row" style="margin-top:20px;">
-        <div class="col-md-4">
+        
+        @Html.HiddenFor(model => Model.Id)
+
+        <div class="col-md-6">
             <label for="title">Title</label>
             <input class="form-control" asp-for="Title" type="text" id="title" value="@Model.Title"/>
         </div>
 
-        <div class="col-md-4">
-            <label for="path">Path:</label>
-            <span id="pathString">
-                @Html.Partial("PathLink", Model.Path)
-            </span>
-            <div class="input-group">
-                <input class="form-control" asp-for="Path" type="text" id="path" value="@Model.Parent"/>    
-                <span class="input-group-addon" id="pathIcon"></span>
-            </div>
-        </div>
-
-        <div class="col-md-4">
+        <div class="col-md-6">
             <a id="saveButton" asp-controller="Wiki" asp-action="Save" onclick="document.getElementById('wikiForm').submit(); return false;">
                 <div class="sm-btn zoomIn" style="float:right;">
                     Save <i class="fa fa-floppy-o" aria-hidden="true"></i>
@@ -34,11 +26,24 @@
                     Save <i class="fa fa-floppy-o" aria-hidden="true"></i>
                 </div>
             </a>
-            <a asp-controller="Wiki" asp-action="Delete" asp-route-title="@Model.Title">
+            <a asp-controller="Wiki" asp-action="Delete">
                 <div class="sm-btn warning zoomIn" style="float:right;">
                     Delete <i class="fa fa-times" aria-hidden="true"></i>
                 </div>
             </a>
+        </div>
+
+        <div class="col-md-12">
+            <label for="path">Path:</label>
+            <span id="pathString">
+                @Html.Partial("PathLink", Model.Path)
+            </span>
+            <div class="input-group">
+                <span class="input-group-addon">Wiki/View/</span>
+                <input class="form-control" asp-for="Path" type="text" id="path" placeholder="page/path/here/..." value="@Model.GetPathToParent()" />
+                <span class="input-group-addon" id="pathEnding"></span>
+                <span class="input-group-addon" id="pathIcon"></span>
+            </div>
         </div>
     </div>
 
@@ -64,6 +69,10 @@
   var startVal = $("#path").val();
   ValidatePath();
 
+  $("#title").on("keydown", function () {
+      pathEnding();
+  });
+
 $("#path, #title").on("change, blur", function () {
     ValidatePath();
 });
@@ -71,13 +80,19 @@ $("#path, #title").on("change, blur", function () {
 function ValidatePath() {
     var pathVal = $("#path").val();
     var title = $("#title").val();
+    var path;
+
+    if (pathVal != "" && pathVal != null)
+        path = pathVal + "/" + title;
+    else
+        path = title;
 
     $("#pathIcon").html("<i class=\"fa fa-spinner fa-spin fa-fw\"></i>");
 
     $.ajax({
         url: '/Wiki/IsValidPath',
         type: 'POST',
-        data: JSON.stringify([pathVal, title]),
+        data: JSON.stringify({ Path: path, Id: "@Model.Id" }),
         contentType: 'application/json; charset=utf-8',
         dataType: 'json',
         async: true,
@@ -86,23 +101,35 @@ function ValidatePath() {
 
                 var pathString = "";
                 var pathUrl = "/Wiki/View";
-                msg.forEach(function (obj) {
-                    pathUrl += "/" + obj;
-                    pathString += "<a href=\"" + pathUrl + "\">" + obj + "</a> <i class=\"fa fa-angle-double-right\" aria-hidden=\"true\"></i> ";
-                });
-                pathString += $("#title").val();
-                $("#pathString").html(pathString);
 
+                for (let i = 0; i < msg.length; i++) {
+                    if (i != msg.length - 1) {
+                        pathUrl += "/" + msg[i];
+                        pathString += "<a href=\"" + pathUrl + "\">" + msg[i] + "</a> <i class=\"fa fa-angle-double-right\" aria-hidden=\"true\"></i> ";
+                    }
+                    else {
+                        pathString += msg[i];
+                    }
+                }
+
+                $("#pathString").html(pathString);
+                pathEnding();
                 $("#pathIcon").html("<i class=\"fa fa-check\"></i>");
                 enableSaveButton();
             }
             else {
                 $("#pathString").text(msg);
+                pathEnding();
                 $("#pathIcon").html("<i class=\"fa fa-close\"></i>");
                 disableSaveButton();
             }
         }
     });
+}
+
+function pathEnding()
+{
+    $("#pathEnding").html("/" + $("#title").val());
 }
 
 //DISABLE SAVE BUTTON IF PATH NOT VALID.

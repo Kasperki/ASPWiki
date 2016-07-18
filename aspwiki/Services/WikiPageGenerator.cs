@@ -52,6 +52,8 @@ namespace ASPWiki.Services
                 wikiPage.SetPath(GetRandomWikiPage().Path);
             }
 
+            wikiPage.label = (Label)random.Next(0, Enum.GetNames(typeof(Label)).Length);
+
             return wikiPage;
         }
 

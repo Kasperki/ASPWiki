@@ -10,6 +10,8 @@
         <div class="col-md-6">
             <h1>@Model.Title</h1>
 
+            @Html.Partial("~/Views/Wiki/Label.cshtml", Model.label)
+
             <span>
                 @Html.Partial("PathLink", Model.Path)
             </span>

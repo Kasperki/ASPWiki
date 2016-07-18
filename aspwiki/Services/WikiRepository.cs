@@ -41,7 +41,7 @@ namespace ASPWiki.Services
 
         public void Save(WikiPage wikiPage)
         {
-            var wiki = wikiRepository.FirstOrDefault(w => w.Id == wikiPage.Id);
+            var wiki = GetById(wikiPage.Id);
 
             if (wiki != null)
             {
@@ -54,6 +54,11 @@ namespace ASPWiki.Services
         public void Delete(string[] path)
         {
             wikiRepository.Remove(GetByPath(path));
+        }
+
+        public WikiPage GetById(Guid id)
+        {
+            return wikiRepository.FirstOrDefault(w => w.Id == id);
         }
     }
 }

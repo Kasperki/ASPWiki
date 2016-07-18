@@ -111,6 +111,28 @@ body {
     transform: scale(1.1);
 }
 
+.zoomInHide{
+    color: #000000;
+}
+
+.zoomInHide:hover {
+    color: rgba(0,0,0,0);
+    transform: scale(0.8);
+    transition: all .2s ease-in-out; 
+    cursor: pointer;
+}
+
+.zoomInShow{
+    color: rgba(0,0,0,0);
+}
+
+.zoomInShow:hover {
+    color: #3FB8AF;
+    transform: scale(1.2);
+    transition: all .3s ease-in-out; 
+    cursor: pointer;
+}
+
 .disabled {
     background-color:dimgrey !important;
     cursor: default !important;
@@ -153,6 +175,10 @@ body {
 .sm-btn:hover {
   background: #3FB8AF;
   text-decoration: none;
+}
+
+.success {
+    color: #3FB8AF;
 }
 
 .warning {

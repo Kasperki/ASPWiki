@@ -52,10 +52,14 @@ namespace ASPWiki.Controllers
         }
 
         [HttpGet("Wiki/View/{*path}")]
-        new public IActionResult View(string path = null)
+        new public IActionResult View(string path, string version)
         {
             var paths = path?.Split('/');
             var wikiPage = wikiRepository.GetByPath(paths);
+
+            int versionNum;
+            if (version != null && int.TryParse(version, out versionNum))
+                wikiPage.Content = wikiPage.ContentHistory[Convert.ToInt32(versionNum)];
 
             if (wikiPage == null)
                 return RedirectToAction("NotFound", "Wiki", new { title = paths?[paths.Length - 1] });

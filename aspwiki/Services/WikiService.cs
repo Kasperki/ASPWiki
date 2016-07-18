@@ -98,8 +98,12 @@ namespace ASPWiki.Services
             wikiPage.SetPath(wikiPage.Path);
             IsValidPath(wikiPage.Path.ToArray(), wikiPage.Id);
 
-            wikiPage.LastModified = DateTime.Now;
+            wikiPage.ContentHistory = wikiRepository.GetById(wikiPage.Id)?.ContentHistory ?? new List<string>();
 
+            if (wikiPage.ContentHistory.Count == 0 || !String.Equals(wikiPage.ContentHistory.Last(), wikiPage.Content))
+                wikiPage.ContentHistory.Add(wikiPage.Content);
+
+            wikiPage.LastModified = DateTime.Now;
             wikiRepository.Save(wikiPage);
         }
     }

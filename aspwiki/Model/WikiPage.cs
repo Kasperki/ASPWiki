@@ -17,8 +17,12 @@ namespace ASPWiki.Model
 
         public Label label { get; set; }
 
+        [BindNever]
+        public List<string> ContentHistory { get; set; }
+
         public string Content { get; set; }
 
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime LastModified { get; set; }
 
         public List<string> Path { get; set; }
@@ -43,7 +47,12 @@ namespace ASPWiki.Model
             {
                 Id = Guid.NewGuid();
             }
-        }
+
+            if (ContentHistory == null)
+            {
+                ContentHistory = new List<string>();
+            }
+        } 
 
         public WikiPage(string title)
         {
@@ -51,6 +60,7 @@ namespace ASPWiki.Model
 
             this.Title = title;
             Path = new List<string>(new string[]{ Title });
+            ContentHistory = new List<string>();
         }
 
         public void SetPath(List<string> ParentPath)

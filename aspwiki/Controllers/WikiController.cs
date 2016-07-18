@@ -26,7 +26,7 @@ namespace ASPWiki.Controllers
         }
 
         [HttpGet("Wiki/New")]
-        public IActionResult New(string title)
+        public IActionResult New()
         {
             string route = routeGenerator.GenerateRoute();
             return RedirectToAction("Add", new { title = route });
@@ -52,9 +52,9 @@ namespace ASPWiki.Controllers
         }
 
         [HttpGet("Wiki/View/{*path}")]
-        new public IActionResult View()
+        new public IActionResult View(string path = null)
         {
-            var paths = this.GetParsedPath();
+            var paths = path?.Split('/');
             var wikiPage = wikiRepository.GetByPath(paths);
 
             if (wikiPage == null)

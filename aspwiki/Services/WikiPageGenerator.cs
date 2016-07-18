@@ -23,7 +23,7 @@ namespace ASPWiki.Services
             for (int i = 0; i < count; i++)
             {
                 var wikiPage = Generate();
-                wikiRepo.Save(wikiPage.Title, wikiPage);
+                wikiRepo.Save(wikiPage);
             }
         }
 

@@ -79,6 +79,10 @@ namespace ASPWiki
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
+
+                routes.MapRoute(
+                    "View",
+                    template: "{controller=Wiki}/{action=View}/{*path}");
             });
         }
     }

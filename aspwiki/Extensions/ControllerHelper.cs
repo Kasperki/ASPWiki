@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace ASPWiki
 {
@@ -29,5 +30,25 @@ namespace ASPWiki
             controller.TempData["FlashMessageClass"] = "alert-warning";
         }
         #endregion
+
+        public static string GetModelStateErrors(this Controller controller)
+        {
+            string errorString = string.Empty;
+            foreach (var modelState in controller.ModelState.Values)
+            {
+                foreach (var error in modelState.Errors)
+                {
+                    errorString += error.ErrorMessage;
+                }
+            }
+
+            return errorString;
+        }
+
+        public static string[] GetParsedPath(this Controller controller)
+        {
+            var path = (string)controller.RouteData.Values.Values.First();
+            return path?.Split('/');
+        }
     }
 }

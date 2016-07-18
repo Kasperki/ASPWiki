@@ -3,12 +3,12 @@ using ASPWiki.Services;
 using ASPWiki.Model;
 using System;
 using Newtonsoft.Json;
-using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace ASPWiki.Controllers
 {
     //DRY - @PARAMETIRIZE
-    //MINIMIZE CONTROLLER LOGIC - UNIT TESTING - 
+    //MINIMIZE CONTROLLER LOGIC - UNIT TESTING - :)
     public class WikiController : Controller
     {
         private readonly IRouteGenerator routeGenerator;
@@ -26,7 +26,7 @@ namespace ASPWiki.Controllers
         }
 
         [HttpGet("Wiki/New")]
-        public IActionResult New(string title)
+        public IActionResult New()
         {
             string route = routeGenerator.GenerateRoute();
             return RedirectToAction("Add", new { title = route });
@@ -42,7 +42,7 @@ namespace ASPWiki.Controllers
         [HttpGet("Wiki/Edit/{*path}")]
         public IActionResult Edit()
         {
-            var paths = GetParsedPath();
+            var paths = this.GetParsedPath();
             var wikiPage = wikiRepository.GetByPath(paths);
 
             if (wikiPage == null)
@@ -52,9 +52,9 @@ namespace ASPWiki.Controllers
         }
 
         [HttpGet("Wiki/View/{*path}")]
-        new public IActionResult View()
+        new public IActionResult View(string path = null)
         {
-            var paths = GetParsedPath();
+            var paths = path?.Split('/');
             var wikiPage = wikiRepository.GetByPath(paths);
 
             if (wikiPage == null)
@@ -83,17 +83,18 @@ namespace ASPWiki.Controllers
             }
             else
             {
-                this.FlashMessageError("Model invalid");
+                this.FlashMessageError("Model invalid: " + this.GetModelStateErrors());
                 return View("Edit", wikiPage);
             }
         }
 
-        [HttpGet("Wiki/Delete/{title}")]
-        public IActionResult Delete(string title)
+        [HttpGet("Wiki/Delete/{*path}")]
+        public IActionResult Delete()
         {
-            wikiRepository.Delete(title);
+            var paths = this.GetParsedPath();
+            wikiRepository.Delete(paths);
 
-            this.FlashMessageError("Wikipage: " + title + " deleted"); //TODO ADD UNDO.
+            this.FlashMessageError("Wikipage: " + paths?[paths.Length - 1] + " deleted"); //TODO ADD UNDO.
             return RedirectToAction("Index", "Home");
         }
 
@@ -104,30 +105,24 @@ namespace ASPWiki.Controllers
         }
 
         [HttpPost("Wiki/IsValidPath")]
-        public IActionResult IsValidPath([FromBody]string[] ajaxData)
+        public IActionResult IsValidPath([FromBody]object ajaxData)
         {
-            string pathValue = ajaxData[0];
-            string title = ajaxData[1];
+            JObject data = ajaxData as JObject;
+
+            var path = data.Value<string>("Path");
+            var Id = data.Value<string>("Id");
+
+            string[] pathValue = path.Split('/');
 
             try
             {
-                wikiService.IsValidPath(pathValue, title);
-
-                if (pathValue != String.Empty)
-                    return new OkObjectResult(JsonConvert.SerializeObject(wikiRepository.Get(pathValue).Path));
-                else 
-                    return new OkObjectResult(JsonConvert.SerializeObject(new string[] { "" }));
+                wikiService.IsValidPath(pathValue, new Guid(Id));
+                return new OkObjectResult(JsonConvert.SerializeObject(pathValue));
             }
             catch (Exception e)
             {
                 return new OkObjectResult(JsonConvert.SerializeObject(e.Message));
             }   
-        }
-
-        private string[] GetParsedPath()
-        {
-            var path = (string)RouteData.Values.Values.First();
-            return path?.Split('/');
         }
     }
 }

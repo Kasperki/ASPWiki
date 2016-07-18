@@ -1,13 +1,16 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
+using System.Globalization;
 using System.Text.RegularExpressions;
 
 namespace ASPWiki.Model
 {
     public class WikiPage
     {
+        public Guid Id { get; set; }
+
         [Required]
         [MaxLength(100)]
         public string Title { get; set; }
@@ -32,18 +35,32 @@ namespace ASPWiki.Model
             }
         }
 
-        public WikiPage() { }
+        public WikiPage()
+        {
+            if (Id == null)
+            {
+                Id = Guid.NewGuid();
+            }
+        }
 
         public WikiPage(string title)
         {
+            Id = Guid.NewGuid();
+
             this.Title = title;
             Path = new List<string>(new string[]{ Title });
         }
 
         public void SetPath(List<string> ParentPath)
         {
-            Path = new List<string>(ParentPath);
-            Path.Add(Title);
+            if (ParentPath != null) {
+                Path = new List<string>(ParentPath);
+                Path.Add(Title);
+            }
+            else
+            {
+                Path = new List<string>(new string[] { Title });
+            }
         }
 
         public string GetPathString()
@@ -61,6 +78,21 @@ namespace ASPWiki.Model
             return path;
         }
 
+        public string GetPathToParent()
+        {
+            string path = String.Empty;
+
+            for (int i = 0; i < Path.Count - 1; i++)
+            {
+                path += Path[i];
+
+                if (i != Path.Count - 2)
+                    path += "/";
+            }
+
+            return path;
+        }
+
         private const int SUMMARY_LENGTH = 200;
         public string GetContentSummary()
         {
@@ -69,7 +101,7 @@ namespace ASPWiki.Model
 
             int length = Content.Length < SUMMARY_LENGTH ? Content.Length : SUMMARY_LENGTH;
 
-            Regex rgx = new Regex(@"<\/.*>");
+            Regex rgx = new Regex(@"<\/[a-zA-Z""]*>");
             var match = rgx.Match(Content.Substring(length));
             string s = Content.Substring(0, length + match.Index + match.Length);
 
@@ -85,12 +117,12 @@ namespace ASPWiki.Model
             if (Content == null)
                 return "0 KB";
 
-            return (Content.Length * sizeof(char) / 1024f).ToString("0.00") + " KB";
+            return (Content.Length * sizeof(char) / 1024f).ToString("0.00", new CultureInfo("fi")) + " KB";
         }
 
         public override string ToString()
         {
-            return "Title: " + Title + " Content: " + Content;
+            return "Title: " + Title + " Content: " + Content + " Path: " + GetPathString();
         }
     }
 }

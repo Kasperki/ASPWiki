@@ -28,7 +28,7 @@ body {
 
 .navbar-inverse {
  border: solid;
- border-width: 0px 0px 5px 0;
+ border-width: 0 0 5px 0;
  border-color: #7FC7AF; /*7FC7AF*/
 }
 
@@ -61,10 +61,7 @@ body {
     color: #fff;
     background-image: url(http://inevitablesteps.com/wp-content/uploads/2015/06/typewriter-801921_1280.jpg);
     background-position: center; 
-    -webkit-background-size: cover;
-    -moz-background-size: cover;
     background-size: cover;
-    -o-background-size: cover;
 }
 
 .header-content {
@@ -96,8 +93,8 @@ body {
 }
 
 .btn {
-  -webkit-border-radius: 4;
-  -moz-border-radius: 4;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
   border-radius: 4px;
   font-family: Arial;
   color: #ffffff;
@@ -115,8 +112,8 @@ body {
 }
 
 .sm-btn {
-  -webkit-border-radius: 4;
-  -moz-border-radius: 4;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
   border-radius: 4px;
   font-family: Arial;
   color: #ffffff;
@@ -191,6 +188,7 @@ SIDE NAV
 }
 
 .sideButtonChild {
+    background-color: RGB(51, 187, 173);
     background-color: RGBA(51, 187, 173, 0.92);
     padding: 6px;
 }

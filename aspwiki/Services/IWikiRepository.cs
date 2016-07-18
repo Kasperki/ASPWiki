@@ -5,10 +5,8 @@ namespace ASPWiki.Services
 {
     public interface IWikiRepository
     {
-        void Save(string title, WikiPage wikiPage);
-        void Delete(string title);
-        bool Exists(string title);
-        WikiPage Get(string title);
+        void Save(WikiPage wikiPage);
+        void Delete(string[] path);
         WikiPage GetByPath(string[] path);
         List<WikiPage> GetLatest(int number);
         List<WikiPage> GetAll();

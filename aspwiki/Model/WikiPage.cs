@@ -15,6 +15,8 @@ namespace ASPWiki.Model
         [MaxLength(100)]
         public string Title { get; set; }
 
+        public Label label { get; set; }
+
         public string Content { get; set; }
 
         public DateTime LastModified { get; set; }

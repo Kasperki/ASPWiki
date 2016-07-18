@@ -1,0 +1,28 @@
+﻿@using ASPWiki.Model
+@model Label
+
+
+@{
+    switch ((int)@Model)
+    {
+        case 0:
+            break;
+        case 1:
+            <span class="label label-web">Web</span>
+            break;
+        case 2:
+            <span class="label label-games">Games</span>
+            break;
+        case 3:
+            <span class="label label-other">Other</span>
+            break;
+        case 4:
+            <span class="label label-info">Info</span>
+            break;
+        case 5:
+            <span class="label label-exclamation"><i class="fa fa-exclamation" aria-hidden="true"></i></span>
+            break;
+        default:
+            break;
+    }
+}

@@ -10,12 +10,18 @@
         
         @Html.HiddenFor(model => Model.Id)
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             <label for="title">Title</label>
             <input class="form-control" asp-for="Title" type="text" id="title" value="@Model.Title"/>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
+            <label for="label">Label</label>
+            <select class="form-control" asp-for="label" asp-items="Html.GetEnumSelectList<Label>()">
+                
+            </select>
+        </div>
+        <div class="col-md-4">
             <a id="saveButton" asp-controller="Wiki" asp-action="Save" onclick="document.getElementById('wikiForm').submit(); return false;">
                 <div class="sm-btn zoomIn" style="float:right;">
                     Save <i class="fa fa-floppy-o" aria-hidden="true"></i>

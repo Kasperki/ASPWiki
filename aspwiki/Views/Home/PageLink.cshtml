@@ -6,7 +6,7 @@
     
     @Html.Raw(@Model.GetContentSummary())
     
-    <span class="label label-info">Info</span>
+    @Html.Partial("~/Views/Wiki/Label.cshtml", Model.label)
     <span>Written by: Unknown - Size: @Model.GetSizeKiloBytes() - @Model.LastModified</span> 
     <a href="#">5 <i class="fa fa-comment-o" aria-hidden="true"></i></a>
 </article>

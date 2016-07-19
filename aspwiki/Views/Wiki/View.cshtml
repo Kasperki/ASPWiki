@@ -29,36 +29,9 @@
             </a>
         </div>
 
-        <!--Version history-->
-        <div class="col-md-12">
-            <div style="margin:15px;">
-                @{bool focus = false; }
-
-                @for (int i = 0; i < Model.ContentHistory.Count; i++)
-                {
-                    string focused = "";
-                    if (i.ToString() == Context.Request.Query["version"] || !focus && i == Model.ContentHistory.Count - 1)
-                    {
-                        focused = "success";
-                        focus = true;
-                    }
-
-                    <span style="margin-right:32px;">
-                        <a href="/Wiki/View/@Model.GetPathString()?version=@i">
-                        <i class="fa fa-circle-thin fa-2x @focused zoomInHide" style="position:absolute;" aria-hidden="true"></i>
-                        <i class="fa fa-circle fa-2x zoomInShow" style="position:absolute;" aria-hidden="true"></i>
-                        </a>
-                    </span>
-
-                    if (i != Model.ContentHistory.Count - 1)
-                    {
-                        <i class="fa fa-minus fa-2x" aria-hidden="true"></i>
-                    }
-                }
-            </div>
-        </div>
+        @Html.Partial("Versions")
 
     </div>
-
+    
     @Html.Raw(@Model.Content)
 </article>

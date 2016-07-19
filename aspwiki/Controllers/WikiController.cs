@@ -52,7 +52,7 @@ namespace ASPWiki.Controllers
         }
 
         [HttpGet("Wiki/View/{*path}")]
-        public IActionResult View(string path, string version)
+        public IActionResult ViewPage(string path, string version)
         {
             var paths = path?.Split('/');
             var wikiPage = wikiRepository.GetByPath(paths);
@@ -96,9 +96,23 @@ namespace ASPWiki.Controllers
         public IActionResult Delete(string path)
         {
             var paths = path?.Split('/');
+
             wikiRepository.Delete(paths);
 
-            this.FlashMessageError("Wikipage: " + paths?[paths.Length - 1] + " deleted"); //TODO ADD UNDO.
+            this.FlashMessageError("Wikipage: " + paths?[paths.Length - 1] + 
+                " deleted: <a style='float:right;' href='/Wiki/Revert/" + path + 
+                "'><b><i class='fa fa-reply' aria-hidden='true'></i>UNDO </b></a>");
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet("Wiki/Revert/{*path}")]
+        public IActionResult Revert(string path)
+        {
+            var paths = path?.Split('/');
+
+            if (wikiRepository.Recover(paths))
+                this.FlashMessageSuccess("Wikipage: " + paths?[paths.Length - 1] + " recovered");
+
             return RedirectToAction("Index", "Home");
         }
 

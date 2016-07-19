@@ -7,10 +7,12 @@ namespace ASPWiki.Services
 {
     public class WikiRepository : IWikiRepository
     {
+        private Dictionary<DateTime, WikiPage> temporalWikiDir;
         private List<WikiPage> wikiRepository;
 
         public WikiRepository()
         {
+            temporalWikiDir = new Dictionary<DateTime, WikiPage>();
             wikiRepository = new List<WikiPage>();
         }
 
@@ -53,7 +55,38 @@ namespace ASPWiki.Services
 
         public void Delete(string[] path)
         {
+            temporalWikiDir.Add(DateTime.Now, GetByPath(path));
+
             wikiRepository.Remove(GetByPath(path));
+        }
+
+        public bool Recover(string[] path)
+        {
+            bool recovered = false;
+            List<DateTime> wikiPageToBeRemoved = new List<DateTime>();
+
+            foreach (KeyValuePair<DateTime, WikiPage> wikiPage in temporalWikiDir)
+            {
+                if (wikiPage.Key.AddDays(1) < DateTime.Now)
+                {
+                    wikiPageToBeRemoved.Add(wikiPage.Key);
+                    continue;
+                }
+
+                if (Enumerable.SequenceEqual(wikiPage.Value.Path.ToArray(), path))
+                {
+                    Save(wikiPage.Value);
+                    wikiPageToBeRemoved.Add(wikiPage.Key);
+                    recovered = true;
+                }
+            }
+
+            foreach(var key in wikiPageToBeRemoved)
+            {
+                temporalWikiDir.Remove(key);
+            }
+
+            return recovered;
         }
 
         public WikiPage GetById(Guid id)

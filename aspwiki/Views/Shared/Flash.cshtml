@@ -6,7 +6,7 @@
     {
         <div class="alert @messageClass alert-dismissible" style="margin-top:10px;" role="alert">
             <button type="button" class="close" id="CloseFlashMessage"><span aria-hidden="true">&times;</span></button>
-            @message
+            @Html.Raw(@message)
         </div>
 
         @Html.ScriptSection(

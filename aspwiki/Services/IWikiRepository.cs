@@ -8,6 +8,7 @@ namespace ASPWiki.Services
     {
         void Save(WikiPage wikiPage);
         void Delete(string[] path);
+        bool Recover(string[] path);
         WikiPage GetById(Guid id);
         WikiPage GetByPath(string[] path);
         List<WikiPage> GetLatest(int number);

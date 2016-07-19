@@ -123,7 +123,7 @@ namespace ASPWiki.Tests
             var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
 
             // Act
-            var result = controller.View(wikiPageRoute, null);
+            var result = controller.ViewPage(wikiPageRoute, null);
 
             // Assert
             RedirectToActionResult redirectResult = Assert.IsType<RedirectToActionResult>(result);
@@ -150,7 +150,7 @@ namespace ASPWiki.Tests
             var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
 
             // Act
-            var result = controller.View(wikiPageRoute, null);
+            var result = controller.ViewPage(wikiPageRoute, null);
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
@@ -179,7 +179,7 @@ namespace ASPWiki.Tests
             var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
 
             // Act
-            var result = controller.View(wikiPageRoute, "1");
+            var result = controller.ViewPage(wikiPageRoute, "1");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);

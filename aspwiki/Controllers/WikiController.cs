@@ -40,9 +40,9 @@ namespace ASPWiki.Controllers
         }
 
         [HttpGet("Wiki/Edit/{*path}")]
-        public IActionResult Edit()
+        public IActionResult Edit(string path)
         {
-            var paths = this.GetParsedPath();
+            var paths = path?.Split('/');
             var wikiPage = wikiRepository.GetByPath(paths);
 
             if (wikiPage == null)
@@ -52,7 +52,7 @@ namespace ASPWiki.Controllers
         }
 
         [HttpGet("Wiki/View/{*path}")]
-        new public IActionResult View(string path, string version)
+        public IActionResult View(string path, string version)
         {
             var paths = path?.Split('/');
             var wikiPage = wikiRepository.GetByPath(paths);
@@ -93,9 +93,9 @@ namespace ASPWiki.Controllers
         }
 
         [HttpGet("Wiki/Delete/{*path}")]
-        public IActionResult Delete()
+        public IActionResult Delete(string path)
         {
-            var paths = this.GetParsedPath();
+            var paths = path?.Split('/');
             wikiRepository.Delete(paths);
 
             this.FlashMessageError("Wikipage: " + paths?[paths.Length - 1] + " deleted"); //TODO ADD UNDO.

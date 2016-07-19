@@ -94,9 +94,9 @@ namespace ASPWiki.Tests
             var mockWikiRepo = new Mock<IWikiRepository>();
 
             WikiPage wikiPage = new WikiPage(expectedTitle);
-            wikiPage.Path = new List<string>(pathArray);
+            wikiPage.Path = path;
 
-            mockWikiRepo.Setup(repo => repo.GetByPath(pathArray)).Returns(wikiPage);
+            mockWikiRepo.Setup(repo => repo.GetByPath(path)).Returns(wikiPage);
             var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
 
             // Act
@@ -135,7 +135,6 @@ namespace ASPWiki.Tests
         public void View_Should_Show_WikiPage()
         {
             string wikiPageRoute = "Omg/This/Exists";
-            string[] path = new string[] { "Omg", "This", "Exists" };
 
             // Arrange
             var mockRouteGen = new Mock<IRouteGenerator>();
@@ -146,7 +145,7 @@ namespace ASPWiki.Tests
             wikiPage.ContentHistory = new List<string>(new string[] { "v0", "v1", "current" });
             wikiPage.Content = "current";
 
-            mockWikiRepo.Setup(repo => repo.GetByPath(path)).Returns(wikiPage);
+            mockWikiRepo.Setup(repo => repo.GetByPath(wikiPageRoute)).Returns(wikiPage);
             var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
 
             // Act
@@ -165,7 +164,6 @@ namespace ASPWiki.Tests
         public void View_Should_Show_WikiPage_With_Right_Version()
         {
             string wikiPageRoute = "Omg/This/Exists";
-            string[] path = new string[] { "Omg", "This", "Exists" };
 
             // Arrange
             var mockRouteGen = new Mock<IRouteGenerator>();
@@ -175,7 +173,7 @@ namespace ASPWiki.Tests
             WikiPage wikiPage = new WikiPage("Exists");
             wikiPage.ContentHistory = new List<string>(new string[] { "v0", "v1", "current" });
 
-            mockWikiRepo.Setup(repo => repo.GetByPath(path)).Returns(wikiPage);
+            mockWikiRepo.Setup(repo => repo.GetByPath(wikiPageRoute)).Returns(wikiPage);
             var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
 
             // Act

@@ -30,6 +30,23 @@ namespace ASPWiki.Tests
         }
 
         [Fact]
+        public void PathArray_Should_Return_Path_As_Array()
+        {
+            WikiPage W0 = new WikiPage("W0");
+            W0.Path = null;
+            WikiPage W1 = new WikiPage("W1");
+            WikiPage W2 = new WikiPage("W2");
+            WikiPage W3 = new WikiPage("W3");
+            W2.SetPath(W1.Path);
+            W3.SetPath(W2.Path);
+
+            Assert.Equal(null, W0.PathArray);
+            Assert.Equal(new string[] { "W1" }, W1.PathArray);
+            Assert.Equal(new string[] { "W1", "W2" }, W2.PathArray);
+            Assert.Equal(new string[] { "W1", "W2", "W3" }, W3.PathArray);
+        }
+
+        [Fact]
         public void SetPath_And_Cotr_Should_set_path()
         {
             WikiPage W1 = new WikiPage("W1");
@@ -38,9 +55,9 @@ namespace ASPWiki.Tests
             W2.SetPath(W1.Path);
             W3.SetPath(W2.Path);
 
-            Assert.Equal(new List<string>() { "W1" }, W1.Path);
-            Assert.Equal(new List<string>() { "W1", "W2" }, W2.Path);
-            Assert.Equal(new List<string>() { "W1", "W2", "W3" }, W3.Path);
+            Assert.Equal("W1", W1.Path);
+            Assert.Equal("W1/W2", W2.Path);
+            Assert.Equal("W1/W2/W3", W3.Path);
         }
 
         [Fact]
@@ -60,12 +77,15 @@ namespace ASPWiki.Tests
         [Fact]
         public void GetPathToParent_Should_return_path_to_parent_in_url()
         {
+            WikiPage W0 = new WikiPage("W0");
+            W0.Path = null;
             WikiPage W1 = new WikiPage("W1");
             WikiPage W2 = new WikiPage("W2");
             WikiPage W3 = new WikiPage("W3");
             W2.SetPath(W1.Path);
             W3.SetPath(W2.Path);
 
+            Assert.Equal(string.Empty, W0.GetPathToParent());
             Assert.Equal(string.Empty, W1.GetPathToParent());
             Assert.Equal("W1", W2.GetPathToParent());
             Assert.Equal("W1/W2", W3.GetPathToParent());

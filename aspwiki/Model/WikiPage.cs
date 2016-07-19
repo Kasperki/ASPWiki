@@ -25,19 +25,31 @@ namespace ASPWiki.Model
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}", ApplyFormatInEditMode = true)]
         public DateTime LastModified { get; set; }
 
-        public List<string> Path { get; set; }
+        public string Path { get; set; }
+
+        public string[] PathArray
+        {
+            get
+            {
+                return Path?.Split('/');
+            }
+        }
 
         public string Parent
         {
             get
             {
-                string parent = string.Empty;
-                if (Path.Count >= 2)
+                string pathToParent = GetPathToParent();
+
+                int lastIndex = pathToParent.LastIndexOf("/");
+
+                if (lastIndex != -1)
                 {
-                    parent = Path[Path.Count - 2];
+                    lastIndex++;
+                    return pathToParent.Substring(lastIndex, pathToParent.Length - lastIndex);
                 }
 
-                return parent;
+                return pathToParent;
             }
         }
 
@@ -59,50 +71,38 @@ namespace ASPWiki.Model
             Id = Guid.NewGuid();
 
             this.Title = title;
-            Path = new List<string>(new string[]{ Title });
+            Path = Title;
             ContentHistory = new List<string>();
         }
 
-        public void SetPath(List<string> ParentPath)
+        public void SetPath(string ParentPath)
         {
-            if (ParentPath != null) {
-                Path = new List<string>(ParentPath);
-                Path.Add(Title);
+            if (ParentPath != null && ParentPath != String.Empty)
+            {
+                Path = ParentPath + "/" + Title;
             }
             else
             {
-                Path = new List<string>(new string[] { Title });
+                Path = Title;
             }
         }
 
         public string GetPathString()
         {
-            string path = String.Empty;
-
-            for (int i = 0; i < Path.Count; i++)
-            {
-                path += Path[i];
-
-                if (i != Path.Count - 1)
-                    path += "/";
-            }
-
-            return path;
+            return Path;
         }
 
         public string GetPathToParent()
         {
-            string path = String.Empty;
+            if (Path == null || Path == string.Empty)
+                return string.Empty;
 
-            for (int i = 0; i < Path.Count - 1; i++)
-            {
-                path += Path[i];
+            int lastIndex = Path.LastIndexOf("/");
 
-                if (i != Path.Count - 2)
-                    path += "/";
-            }
+            if (lastIndex == -1)
+                return string.Empty;
 
-            return path;
+            return Path.Substring(0, lastIndex);
         }
 
         private const int SUMMARY_LENGTH = 200;

@@ -10,6 +10,6 @@ namespace ASPWiki.Services
     {
         void Save(WikiPage wikiPage);
         List<Node> GetWikiTree(List<WikiPage> wikiPages);
-        bool IsValidPath(string[] path, Guid id);
+        bool IsValidPath(string path, Guid id);
     }
 }

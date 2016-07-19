@@ -42,11 +42,10 @@ namespace ASPWiki.Controllers
         [HttpGet("Wiki/Edit/{*path}")]
         public IActionResult Edit(string path)
         {
-            var paths = path?.Split('/');
-            var wikiPage = wikiRepository.GetByPath(paths);
+            var wikiPage = wikiRepository.GetByPath(path);
 
             if (wikiPage == null)
-                return RedirectToAction("Add", new { title = paths?[paths.Length - 1] }); 
+                return RedirectToAction("Add", new { title = getLastItemFromPath(path) }); 
 
             return View("Edit", wikiPage);
         }
@@ -54,15 +53,14 @@ namespace ASPWiki.Controllers
         [HttpGet("Wiki/View/{*path}")]
         public IActionResult ViewPage(string path, string version)
         {
-            var paths = path?.Split('/');
-            var wikiPage = wikiRepository.GetByPath(paths);
+            var wikiPage = wikiRepository.GetByPath(path);
 
             int versionNum;
             if (version != null && int.TryParse(version, out versionNum))
                 wikiPage.Content = wikiPage.ContentHistory[Convert.ToInt32(versionNum)];
 
             if (wikiPage == null)
-                return RedirectToAction("NotFound", "Wiki", new { title = paths?[paths.Length - 1] });
+                return RedirectToAction("NotFound", "Wiki", new { title = getLastItemFromPath(path) });
 
             return View("View", wikiPage);
         }
@@ -95,11 +93,9 @@ namespace ASPWiki.Controllers
         [HttpGet("Wiki/Delete/{*path}")]
         public IActionResult Delete(string path)
         {
-            var paths = path?.Split('/');
+            wikiRepository.Delete(path);
 
-            wikiRepository.Delete(paths);
-
-            this.FlashMessageError("Wikipage: " + paths?[paths.Length - 1] + 
+            this.FlashMessageError("Wikipage: " + getLastItemFromPath(path) + 
                 " deleted: <a style='float:right;' href='/Wiki/Revert/" + path + 
                 "'><b><i class='fa fa-reply' aria-hidden='true'></i>UNDO </b></a>");
             return RedirectToAction("Index", "Home");
@@ -108,10 +104,8 @@ namespace ASPWiki.Controllers
         [HttpGet("Wiki/Revert/{*path}")]
         public IActionResult Revert(string path)
         {
-            var paths = path?.Split('/');
-
-            if (wikiRepository.Recover(paths))
-                this.FlashMessageSuccess("Wikipage: " + paths?[paths.Length - 1] + " recovered");
+            if (wikiRepository.Recover(path))
+                this.FlashMessageSuccess("Wikipage: " + getLastItemFromPath(path) + " recovered");
 
             return RedirectToAction("Index", "Home");
         }
@@ -134,13 +128,19 @@ namespace ASPWiki.Controllers
 
             try
             {
-                wikiService.IsValidPath(pathValue, new Guid(Id));
+                wikiService.IsValidPath(path, new Guid(Id));
                 return new OkObjectResult(JsonConvert.SerializeObject(pathValue));
             }
             catch (Exception e)
             {
                 return new OkObjectResult(JsonConvert.SerializeObject(e.Message));
             }   
+        }
+
+        private string getLastItemFromPath(string path)
+        {
+            var paths = path?.Split('/');
+            return paths?[paths.Length - 1];
         }
     }
 }

@@ -87,11 +87,6 @@ namespace ASPWiki.Model
             }
         }
 
-        public string GetPathString()
-        {
-            return Path;
-        }
-
         public string GetPathToParent()
         {
             if (Path == null || Path == string.Empty)
@@ -134,7 +129,7 @@ namespace ASPWiki.Model
 
         public override string ToString()
         {
-            return "Title: " + Title + " Content: " + Content + " Path: " + GetPathString();
+            return "Title: " + Title + " Content: " + Content + " Path: " + Path;
         }
     }
 }

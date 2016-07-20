@@ -7,8 +7,6 @@ using Newtonsoft.Json.Linq;
 
 namespace ASPWiki.Controllers
 {
-    //DRY - @PARAMETIRIZE
-    //MINIMIZE CONTROLLER LOGIC - UNIT TESTING - :)
     public class WikiController : Controller
     {
         private readonly IRouteGenerator routeGenerator;
@@ -45,7 +43,7 @@ namespace ASPWiki.Controllers
             var wikiPage = wikiRepository.GetByPath(path);
 
             if (wikiPage == null)
-                return RedirectToAction("Add", new { title = getLastItemFromPath(path) }); 
+                return RedirectToAction("Add", new { title = this.GetLastItemFromPath(path) }); 
 
             return View("Edit", wikiPage);
         }
@@ -60,7 +58,7 @@ namespace ASPWiki.Controllers
                 wikiPage.Content = wikiPage.ContentHistory[Convert.ToInt32(versionNum)];
 
             if (wikiPage == null)
-                return RedirectToAction("NotFound", "Wiki", new { title = getLastItemFromPath(path) });
+                return RedirectToAction("NotFound", "Wiki", new { title = this.GetLastItemFromPath(path) });
 
             return View("View", wikiPage);
         }
@@ -75,7 +73,7 @@ namespace ASPWiki.Controllers
                 {
                     wikiService.Save(wikiPage);
                     this.FlashMessageSuccess("Wikipage: " + wikiPage.Title + " succesfully saved");
-                    return Redirect("/Wiki/View/" + wikiPage.GetPathString());
+                    return Redirect("/Wiki/View/" + wikiPage.Path);
                 }
                 catch (Exception e)
                 {
@@ -95,7 +93,7 @@ namespace ASPWiki.Controllers
         {
             wikiRepository.Delete(path);
 
-            this.FlashMessageError("Wikipage: " + getLastItemFromPath(path) + 
+            this.FlashMessageError("Wikipage: " + this.GetLastItemFromPath(path) + 
                 " deleted: <a style='float:right;' href='/Wiki/Revert/" + path + 
                 "'><b><i class='fa fa-reply' aria-hidden='true'></i>UNDO </b></a>");
             return RedirectToAction("Index", "Home");
@@ -105,7 +103,7 @@ namespace ASPWiki.Controllers
         public IActionResult Revert(string path)
         {
             if (wikiRepository.Recover(path))
-                this.FlashMessageSuccess("Wikipage: " + getLastItemFromPath(path) + " recovered");
+                this.FlashMessageSuccess("Wikipage: " + this.GetLastItemFromPath(path) + " recovered");
 
             return RedirectToAction("Index", "Home");
         }
@@ -135,12 +133,6 @@ namespace ASPWiki.Controllers
             {
                 return new OkObjectResult(JsonConvert.SerializeObject(e.Message));
             }   
-        }
-
-        private string getLastItemFromPath(string path)
-        {
-            var paths = path?.Split('/');
-            return paths?[paths.Length - 1];
         }
     }
 }

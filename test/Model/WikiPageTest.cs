@@ -61,7 +61,7 @@ namespace ASPWiki.Tests
         }
 
         [Fact]
-        public void GetPathString_Should_return_path_in_url()
+        public void Path_Should_return_path_in_url()
         {
             WikiPage W1 = new WikiPage("W1");
             WikiPage W2 = new WikiPage("W2");
@@ -69,9 +69,9 @@ namespace ASPWiki.Tests
             W2.SetPath(W1.Path);
             W3.SetPath(W2.Path);
 
-            Assert.Equal("W1", W1.GetPathString());
-            Assert.Equal("W1/W2", W2.GetPathString());
-            Assert.Equal("W1/W2/W3", W3.GetPathString());
+            Assert.Equal("W1", W1.Path);
+            Assert.Equal("W1/W2", W2.Path);
+            Assert.Equal("W1/W2/W3", W3.Path);
         }
 
         [Fact]

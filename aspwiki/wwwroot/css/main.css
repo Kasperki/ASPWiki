@@ -50,30 +50,6 @@ body {
 
 
 /*
-    Labels
-*/
-
-.label-other {
-    background-color: #A7DBD8;
-}
-
-.label-info {
-    background-color: #69D2E7;
-}
-
-.label-games {
-    background-color: #FF9E9D;
-}
-
-.label-web {
-    background-color: #F38630;
-}
-
-.label-exclamation {
-    background-color: #FA6900;
-}
-
-/*
    LANDING PAGE
 */
 
@@ -254,4 +230,28 @@ SIDE NAV
 
 .panel-heading h4 {
     color: white;
+}
+
+/*
+    Labels
+*/
+
+.label-other {
+    background-color: #A7DBD8;
+}
+
+.label-info {
+    background-color: #69D2E7;
+}
+
+.label-games {
+    background-color: #FF9E9D;
+}
+
+.label-web {
+    background-color: #F38630;
+}
+
+.label-exclamation {
+    background-color: #FA6900;
 }

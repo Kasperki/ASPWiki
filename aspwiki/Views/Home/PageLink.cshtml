@@ -1,12 +1,18 @@
 ﻿@using ASPWiki.Model
 @model WikiPage
 
-<article style="margin:15px;word-break:break-all;">
-    <a href="/Wiki/View/@Model.GetPathString()"><h3>@Model.Title</h3></a>
-    
-    @Html.Raw(@Model.GetContentSummary())
-    
-    @Html.Partial("~/Views/Wiki/Label.cshtml", Model.label)
-    <span>Written by: Unknown - Size: @Model.GetSizeKiloBytes() - @Model.LastModified</span> 
-    <a href="#">5 <i class="fa fa-comment-o" aria-hidden="true"></i></a>
+<article class="row" style="margin:15px;word-break:break-all;">
+    <div class="col-sm-12">
+        <a href="/Wiki/View/@Model.Path"><h3>@Model.Title</h3></a>
+    </div>
+
+    <div class="col-sm-12">
+        @Html.Raw(@Model.GetContentSummary())
+    </div>
+
+    <div class="col-sm-12">
+        @Html.Partial("~/Views/Wiki/Label.cshtml", Model.label)
+        <span>Written by: Unknown - Size: @Model.GetSizeKiloBytes() - @Html.DisplayFor(model => model.LastModified)</span>
+        <a href="#">5 <i class="fa fa-comment-o" aria-hidden="true"></i></a>
+    </div>
 </article>

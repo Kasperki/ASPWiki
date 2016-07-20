@@ -54,6 +54,15 @@ namespace ASPWiki.Services
 
             wikiPage.label = (Label)random.Next(0, Enum.GetNames(typeof(Label)).Length);
 
+            var versions = random.Next(1, 12);
+            for (int i = 0; i < versions; i++)
+            {
+                if (i != versions - 1)
+                    wikiPage.ContentHistory.Add(i.ToString());
+                else
+                    wikiPage.ContentHistory.Add(wikiPage.Content);
+            }
+
             return wikiPage;
         }
 

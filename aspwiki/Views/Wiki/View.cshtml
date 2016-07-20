@@ -7,16 +7,16 @@
 
 <article>
     <div class="row" style="margin-top:20px;">
-        <div class="col-md-6">
+        <div class="col-md-8">
             <h1>@Model.Title</h1>
 
             @Html.Partial("~/Views/Wiki/Label.cshtml", Model.label)
 
             <span>
-                @Html.Partial("PathLink", Model.Path)
+                @Html.Partial("PathLink", Model.PathArray)
             </span>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <a asp-controller="Wiki" asp-action="Edit">
                 <div class="sm-btn zoomIn" style="float:right;">
                     Edit <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
@@ -27,8 +27,49 @@
                     Delete <i class="fa fa-times" aria-hidden="true"></i>
                 </div>
             </a>
+            <a href="#" id="diff">
+                <div class="sm-btn label-info zoomIn" style="float:right;">
+                    Diff <i class="fa fa-tasks" aria-hidden="true"></i>
+                </div>
+            </a>
         </div>
+
+        @Html.Partial("Versions")
+    </div>
+    
+    <div id="content">
+        @Html.Raw(@Model.Content)
     </div>
 
-    @Html.Raw(@Model.Content)
+    <div id="diffDisplay"></div>
 </article>
+
+@section scripts{ 
+<script>
+    var other = String("@Model.ContentHistory[Convert.ToInt32(Context.Request.Query["version"])]"),
+    one = String("@Model.ContentHistory[Convert.ToInt32(Context.Request.Query["version"]) > 0 ? Convert.ToInt32(Context.Request.Query["version"]) - 1 : Convert.ToInt32(Context.Request.Query["version"])]"),
+    color = '', 
+    span = null; 
+
+    var diff = JsDiff.diffWords(one, other),
+    display = document.getElementById('diffDisplay'),
+    fragment = document.createDocumentFragment();
+
+diff.forEach(function(part){
+  color = part.added ? '#3FB8AF' : part.removed ? '#FF3D7F' : 'grey';
+  span = document.createElement('span');
+  span.style.color = color;
+  span.appendChild(document.createTextNode(part.value));
+  fragment.appendChild(span);
+});
+
+display.appendChild(fragment);
+
+$("#diffDisplay").hide();
+
+$("#diff").on("click", function () {
+    $("#content").toggle("slow", function () { });
+    $("#diffDisplay").toggle("slow", function () { });
+});
+</script>
+}

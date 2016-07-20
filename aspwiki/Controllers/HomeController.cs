@@ -25,7 +25,6 @@ namespace ASPWiki.Controllers
         public IActionResult GetAsideWikiPages()
         {
             var wikiPages = wikiRepository.GetAll();
-            //wikiPages.Sort((emp1, emp2) => emp1.Path.Count.CompareTo(emp2.Path.Count));
             var wikiTree = wikiService.GetWikiTree(wikiPages);
 
             Response.ContentType = "application/json";

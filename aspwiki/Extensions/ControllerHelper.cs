@@ -50,5 +50,11 @@ namespace ASPWiki
             var path = (string)controller.RouteData.Values.Values.First();
             return path?.Split('/');
         }
+
+        public static string GetLastItemFromPath(this Controller controller, string path)
+        {
+            var paths = path?.Split('/');
+            return paths?[paths.Length - 1];
+        }
     }
 }

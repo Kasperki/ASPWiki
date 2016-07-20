@@ -20,15 +20,15 @@ namespace ASPWiki.Services
 
             foreach (var wikiPage in wikiPages)
             {
-                var node = wikiTree.Find(n => n.Name == wikiPage.Path[0]);
+                var node = wikiTree.Find(n => n.Name == wikiPage.PathArray[0]);
 
                 if (node == null)
                 {
-                    node = new Node(wikiPage.Path[0]);
+                    node = new Node(wikiPage.PathArray[0]);
                     wikiTree.Add(node);
                 }
 
-                if (wikiPage.Path.Count == 1)
+                if (wikiPage.PathArray.Length == 1)
                     node.WikiPage = wikiPage;
                 else
                 {
@@ -41,16 +41,16 @@ namespace ASPWiki.Services
 
         private void BuildTreeNode(Node node, WikiPage wikiPage, int i)
         {
-            int index = node.ChildNode.FindIndex(n => n.Name == wikiPage.Path[i]);
+            int index = node.ChildNode.FindIndex(n => n.Name == wikiPage.PathArray[i]);
 
             if (index == -1)
             {
-                node.ChildNode.Add(new Node(wikiPage.Path[i]));
+                node.ChildNode.Add(new Node(wikiPage.PathArray[i]));
                 index = 0;
             }
 
-            if (i == wikiPage.Path.Count - 1)
-                node.ChildNode.Find(n => n.Name == wikiPage.Path[i]).WikiPage = wikiPage;
+            if (i == wikiPage.PathArray.Length - 1)
+                node.ChildNode.Find(n => n.Name == wikiPage.PathArray[i]).WikiPage = wikiPage;
             else
             {
                 BuildTreeNode(node.ChildNode[index], wikiPage, ++i);
@@ -61,11 +61,12 @@ namespace ASPWiki.Services
         //Should keep repo organized in treeshape by path?
         //CHANGING WIKIPAGE TO ITSELFS CHILD WOULD NOT BE VALID
         //CHANGING WIKIPAGES PATH THAT HAS CHILDS WOULD NOT BE VALID OR WOULD CHANGE childs paths as well?
-        public bool IsValidPath(string[] path, Guid id)
+        public bool IsValidPath(string path, Guid id)
         {
-            if (path.Length > 1)
+            if (path.IndexOf('/') != -1)
             {
-                if (wikiRepository.GetByPath(path.Take(path.Length - 1).ToArray()) == null)
+                string parentPath = path.Substring(0, path.LastIndexOf('/'));
+                if (wikiRepository.GetByPath(parentPath) == null)
                     throw new Exception("Parent not found");
             }
 
@@ -83,23 +84,15 @@ namespace ASPWiki.Services
 
         public void Save(WikiPage wikiPage)
         {
-            //Path comes from form in path/as/url: 
-            //TODO Set as so also to model; and Path: get; parsed from that. makes this simpler
-            if (wikiPage.Path[0] != null)
-            {
-                string[] pathValue = wikiPage.Path[0].Split('/');
-                wikiPage.Path = new List<string>(pathValue);
-            }
-            else
-            {
-                wikiPage.Path = new List<string>();
-            }
-
             wikiPage.SetPath(wikiPage.Path);
-            IsValidPath(wikiPage.Path.ToArray(), wikiPage.Id);
+            IsValidPath(wikiPage.Path, wikiPage.Id);
+
+            wikiPage.ContentHistory = wikiRepository.GetById(wikiPage.Id)?.ContentHistory ?? new List<string>();
+
+            if (wikiPage.ContentHistory.Count == 0 || !String.Equals(wikiPage.ContentHistory.Last(), wikiPage.Content))
+                wikiPage.ContentHistory.Add(wikiPage.Content);
 
             wikiPage.LastModified = DateTime.Now;
-
             wikiRepository.Save(wikiPage);
         }
     }

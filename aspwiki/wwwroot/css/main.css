@@ -50,30 +50,6 @@ body {
 
 
 /*
-    Labels
-*/
-
-.label-other {
-    background-color: #A7DBD8;
-}
-
-.label-info {
-    background-color: #69D2E7;
-}
-
-.label-games {
-    background-color: #FF9E9D;
-}
-
-.label-web {
-    background-color: #F38630;
-}
-
-.label-exclamation {
-    background-color: #FA6900;
-}
-
-/*
    LANDING PAGE
 */
 
@@ -109,6 +85,28 @@ body {
 
 .zoomIn:hover {
     transform: scale(1.1);
+}
+
+.zoomInHide{
+    color: #000000;
+}
+
+.zoomInHide:hover {
+    color: rgba(0,0,0,0);
+    transform: scale(0.8);
+    transition: all .2s ease-in-out; 
+    cursor: pointer;
+}
+
+.zoomInShow{
+    color: rgba(0,0,0,0);
+}
+
+.zoomInShow:hover {
+    color: #3FB8AF;
+    transform: scale(1.2);
+    transition: all .3s ease-in-out; 
+    cursor: pointer;
 }
 
 .disabled {
@@ -153,6 +151,10 @@ body {
 .sm-btn:hover {
   background: #3FB8AF;
   text-decoration: none;
+}
+
+.success {
+    color: #3FB8AF;
 }
 
 .warning {
@@ -228,4 +230,28 @@ SIDE NAV
 
 .panel-heading h4 {
     color: white;
+}
+
+/*
+    Labels
+*/
+
+.label-other {
+    background-color: #A7DBD8;
+}
+
+.label-info {
+    background-color: #69D2E7;
+}
+
+.label-games {
+    background-color: #FF9E9D;
+}
+
+.label-web {
+    background-color: #F38630;
+}
+
+.label-exclamation {
+    background-color: #FA6900;
 }

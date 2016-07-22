@@ -7,6 +7,8 @@ using Moq;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace ASPWiki.Tests
 {
@@ -21,10 +23,11 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
 
             mockRouteGen.Setup(gen => gen.GenerateRoute()).Returns(expectedTitle);
 
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object);
 
             // Act
             var result = controller.New();
@@ -44,8 +47,9 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
 
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object);
 
             // Act
             var result = controller.Add(expectedTitle);
@@ -68,8 +72,9 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
 
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object);
 
             // Act
             var result = controller.Edit(path);
@@ -92,12 +97,13 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
 
             WikiPage wikiPage = new WikiPage(expectedTitle);
             wikiPage.Path = path;
 
             mockWikiRepo.Setup(repo => repo.GetByPath(path)).Returns(wikiPage);
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object);
 
             // Act
             var result = controller.Edit(path);
@@ -119,8 +125,9 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
 
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object);
 
             // Act
             var result = controller.ViewPage(wikiPageRoute, null);
@@ -140,13 +147,14 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
 
             WikiPage wikiPage = new WikiPage("Exists");
             wikiPage.ContentHistory = new List<string>(new string[] { "v0", "v1", "current" });
             wikiPage.Content = "current";
 
             mockWikiRepo.Setup(repo => repo.GetByPath(wikiPageRoute)).Returns(wikiPage);
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object);
 
             // Act
             var result = controller.ViewPage(wikiPageRoute, null);
@@ -169,12 +177,13 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
 
             WikiPage wikiPage = new WikiPage("Exists");
             wikiPage.ContentHistory = new List<string>(new string[] { "v0", "v1", "current" });
 
             mockWikiRepo.Setup(repo => repo.GetByPath(wikiPageRoute)).Returns(wikiPage);
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object);
 
             // Act
             var result = controller.ViewPage(wikiPageRoute, "1");
@@ -196,9 +205,9 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
 
-
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object);
             controller.TempData = new TempDataDictionary(new Mock<HttpContext>().Object, new Mock<ITempDataProvider>().Object);
 
             // Act

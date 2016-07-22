@@ -47,9 +47,17 @@ namespace ASPWiki.Services
 
             wikiPage.Content += "</p>";
 
-            if (random.Next(0, 100) > 40 && wikiRepo.GetAll().Count > 0)
+            wikiPage.Public = true;
+
+            if (random.Next(0, 10) > 5)
             {
-                wikiPage.SetPath(GetRandomWikiPage().Path);
+                wikiPage.Public = false;
+                wikiPage.Author = nouns[random.Next(0, nouns.Count)];
+            }
+
+            if (random.Next(0, 100) > 40 && wikiRepo.GetAll(!wikiPage.Public).Count > 0)
+            {
+                wikiPage.SetPath(GetRandomWikiPage(!wikiPage.Public).Path);
             }
 
             wikiPage.label = (Label)random.Next(0, Enum.GetNames(typeof(Label)).Length);
@@ -78,9 +86,9 @@ namespace ASPWiki.Services
             return list;
         }
 
-        private WikiPage GetRandomWikiPage()
+        private WikiPage GetRandomWikiPage(bool authenticated)
         {
-            return wikiRepo.GetAll()[random.Next(0, wikiRepo.GetAll().Count - 1)];
+            return wikiRepo.GetAll(authenticated)[random.Next(0, wikiRepo.GetAll(authenticated).Count - 1)];
         }
     }
 }

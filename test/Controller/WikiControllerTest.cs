@@ -7,6 +7,7 @@ using Moq;
 using Xunit;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ASPWiki.Tests
 {
@@ -21,10 +22,11 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
 
             mockRouteGen.Setup(gen => gen.GenerateRoute()).Returns(expectedTitle);
 
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object);
 
             // Act
             var result = controller.New();
@@ -44,8 +46,9 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new Mock<IAuthorizationService>();
 
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object);
 
             // Act
             var result = controller.Add(expectedTitle);
@@ -68,14 +71,15 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new AuthorizeStub(true);
 
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth);
 
             // Act
             var result = controller.Edit(path);
 
             // Assert
-            var redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            var redirectResult = Assert.IsType<RedirectToActionResult>(result.Result);
 
             Assert.Equal("Add", redirectResult.ActionName);
             Assert.Equal(expectedTitle, redirectResult.RouteValues["title"]);
@@ -86,28 +90,52 @@ namespace ASPWiki.Tests
         {
             string expectedTitle = "BlueBanana";
             string path = "Heh/This/Is/" + expectedTitle;
-            string[] pathArray = path.Split('/');
 
             // Arrange
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new AuthorizeStub(true);
 
             WikiPage wikiPage = new WikiPage(expectedTitle);
             wikiPage.Path = path;
 
             mockWikiRepo.Setup(repo => repo.GetByPath(path)).Returns(wikiPage);
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth);
 
             // Act
             var result = controller.Edit(path);
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
+            var viewResult = Assert.IsType<ViewResult>(result.Result);
 
             var model = Assert.IsAssignableFrom<WikiPage>(viewResult.ViewData.Model);
             Assert.Equal(expectedTitle, model.Title);
             Assert.Equal("Edit", viewResult.ViewName);
+        }
+
+        [Fact]
+        public void Edit_Should_return_Challenge_result_if_not_authenticated()
+        {
+            string expectedTitle = "BlueBanana";
+            string path = "Heh/This/Is/" + expectedTitle;
+
+            // Arrange
+            var mockRouteGen = new Mock<IRouteGenerator>();
+            var mockWikiService = new Mock<IWikiService>();
+            var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new AuthorizeStub(false);
+
+            WikiPage wikiPage = new WikiPage(expectedTitle);
+
+            mockWikiRepo.Setup(repo => repo.GetByPath(path)).Returns(wikiPage);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth);
+
+            // Act
+            var result = controller.Edit(path);
+
+            // Assert
+            ChallengeResult redirectResult = Assert.IsType<ChallengeResult>(result.Result);
         }
 
         [Fact]
@@ -119,14 +147,15 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new AuthorizeStub(true);
 
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth);
 
             // Act
             var result = controller.ViewPage(wikiPageRoute, null);
 
             // Assert
-            RedirectToActionResult redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            RedirectToActionResult redirectResult = Assert.IsType<RedirectToActionResult>(result.Result);
             Assert.Equal("NotFound", redirectResult.ActionName);
             Assert.Equal("Not", redirectResult.RouteValues["title"]);
         }
@@ -140,19 +169,20 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new AuthorizeStub(true);
 
             WikiPage wikiPage = new WikiPage("Exists");
             wikiPage.ContentHistory = new List<string>(new string[] { "v0", "v1", "current" });
             wikiPage.Content = "current";
 
             mockWikiRepo.Setup(repo => repo.GetByPath(wikiPageRoute)).Returns(wikiPage);
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth);
 
             // Act
             var result = controller.ViewPage(wikiPageRoute, null);
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
+            var viewResult = Assert.IsType<ViewResult>(result.Result);
 
             var model = Assert.IsAssignableFrom<WikiPage>(viewResult.ViewData.Model);
             Assert.Equal("Exists", model.Title);
@@ -169,22 +199,47 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new AuthorizeStub(true);
 
             WikiPage wikiPage = new WikiPage("Exists");
             wikiPage.ContentHistory = new List<string>(new string[] { "v0", "v1", "current" });
 
             mockWikiRepo.Setup(repo => repo.GetByPath(wikiPageRoute)).Returns(wikiPage);
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth);
 
             // Act
             var result = controller.ViewPage(wikiPageRoute, "1");
 
             // Assert
-            var viewResult = Assert.IsType<ViewResult>(result);
+            var viewResult = Assert.IsType<ViewResult>(result.Result);
 
             var model = Assert.IsAssignableFrom<WikiPage>(viewResult.ViewData.Model);
             Assert.Equal(wikiPage.ContentHistory[1], model.Content);
             Assert.Equal("View", viewResult.ViewName);
+        }
+
+        [Fact]
+        public void View_should_return_ChallengeResult_if_not_authenticated()
+        {
+            string wikiPageRoute = "Omg/This/Exists";
+
+            // Arrange
+            var mockRouteGen = new Mock<IRouteGenerator>();
+            var mockWikiService = new Mock<IWikiService>();
+            var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new AuthorizeStub(false);
+
+            WikiPage wikiPage = new WikiPage("Exists");
+            wikiPage.ContentHistory = new List<string>(new string[] { "v0", "v1", "current" });
+
+            mockWikiRepo.Setup(repo => repo.GetByPath(wikiPageRoute)).Returns(wikiPage);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth);
+
+            // Act
+            var result = controller.ViewPage(wikiPageRoute, "1");
+
+            // Assert
+            ChallengeResult redirectResult = Assert.IsType<ChallengeResult>(result.Result);
         }
 
         [Fact]
@@ -196,18 +251,38 @@ namespace ASPWiki.Tests
             var mockRouteGen = new Mock<IRouteGenerator>();
             var mockWikiService = new Mock<IWikiService>();
             var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new AuthorizeStub(true);
 
-
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object);
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth);
             controller.TempData = new TempDataDictionary(new Mock<HttpContext>().Object, new Mock<ITempDataProvider>().Object);
 
             // Act
             var result = controller.Delete(pathToDelete);
 
             // Assert
-            RedirectToActionResult redirectResult = Assert.IsType<RedirectToActionResult>(result);
+            RedirectToActionResult redirectResult = Assert.IsType<RedirectToActionResult>(result.Result);
             Assert.Equal("Index", redirectResult.ActionName);
         }
 
+        [Fact]
+        public void Delete_should_return_ChallengeResult_if_not_authenticated()
+        {
+            string pathToDelete = "Delete/This/Page";
+
+            // Arrange
+            var mockRouteGen = new Mock<IRouteGenerator>();
+            var mockWikiService = new Mock<IWikiService>();
+            var mockWikiRepo = new Mock<IWikiRepository>();
+            var mockAuth = new AuthorizeStub(false);
+
+            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth);
+            controller.TempData = new TempDataDictionary(new Mock<HttpContext>().Object, new Mock<ITempDataProvider>().Object);
+
+            // Act
+            var result = controller.Delete(pathToDelete);
+
+            // Assert
+            ChallengeResult redirectResult = Assert.IsType<ChallengeResult>(result.Result);
+        }
     }
 }

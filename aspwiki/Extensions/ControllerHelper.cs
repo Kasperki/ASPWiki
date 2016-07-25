@@ -45,12 +45,6 @@ namespace ASPWiki
             return errorString;
         }
 
-        public static string[] GetParsedPath(this Controller controller)
-        {
-            var path = (string)controller.RouteData.Values.Values.First();
-            return path?.Split('/');
-        }
-
         public static string GetLastItemFromPath(this Controller controller, string path)
         {
             var paths = path?.Split('/');

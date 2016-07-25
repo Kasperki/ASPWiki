@@ -15,6 +15,10 @@ namespace ASPWiki.Model
         [MaxLength(100)]
         public string Title { get; set; }
 
+        public string Author { get; set; }
+
+        public bool Public { get; set; }
+
         public Label label { get; set; }
 
         [BindNever]

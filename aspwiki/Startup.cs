@@ -5,6 +5,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using ASPWiki.Services;
 using ASPWiki.Model;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ASPWiki
 {
@@ -41,6 +43,8 @@ namespace ASPWiki
             services.AddMvc();
 
             services.AddSingleton<IRouteGenerator, RouteGenerator>();
+            services.AddSingleton<IAuthenticationService, AuthenticationService>();
+            services.AddSingleton<IAuthorizationHandler, WikiPageHandler>();
             services.AddSingleton<IWikiRepository, WikiRepository>();
             services.AddSingleton<IWikiService, WikiService>();
 
@@ -65,7 +69,7 @@ namespace ASPWiki
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Wiki/Error");
             }
 
             app.UseApplicationInsightsExceptionTelemetry();
@@ -73,6 +77,17 @@ namespace ASPWiki
             app.UseStaticFiles();
 
             app.UseSession();
+
+            app.UseStatusCodePagesWithReExecute("/Wiki/Error/{0}");
+
+            app.UseCookieAuthentication(new CookieAuthenticationOptions()
+            {
+                AuthenticationScheme = Constants.AuthenticationScheme,
+                LoginPath = new PathString("/Wiki/Error"),
+                AccessDeniedPath = new PathString("/Wiki/Forbidden"),
+                AutomaticAuthenticate = true,
+                AutomaticChallenge = true
+            });
 
             app.UseMvc(routes =>
             {

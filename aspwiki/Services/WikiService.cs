@@ -82,7 +82,7 @@ namespace ASPWiki.Services
             }
         }
 
-        public void Save(WikiPage wikiPage)
+        public void Save(WikiPage wikiPage, string name)
         {
             wikiPage.SetPath(wikiPage.Path);
             IsValidPath(wikiPage.Path, wikiPage.Id);
@@ -92,8 +92,16 @@ namespace ASPWiki.Services
             if (wikiPage.ContentHistory.Count == 0 || !String.Equals(wikiPage.ContentHistory.Last(), wikiPage.Content))
                 wikiPage.ContentHistory.Add(wikiPage.Content);
 
+            if (name != null && name != String.Empty)
+                wikiPage.Author = name;
+
             wikiPage.LastModified = DateTime.Now;
             wikiRepository.Save(wikiPage);
+        }
+
+        public List<WikiPage> FilterPublic(List<WikiPage> wikiPages)
+        {
+            return (from entry in wikiPages where entry.Public == true select entry).ToList();
         }
     }
 }

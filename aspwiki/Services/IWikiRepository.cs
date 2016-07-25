@@ -11,7 +11,7 @@ namespace ASPWiki.Services
         bool Recover(string path);
         WikiPage GetById(Guid id);
         WikiPage GetByPath(string path);
-        List<WikiPage> GetLatest(int number);
-        List<WikiPage> GetAll();
+        List<WikiPage> GetLatest(int number, bool authenticated);
+        List<WikiPage> GetAll(bool authenticated);
     }
 }

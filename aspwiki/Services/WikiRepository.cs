@@ -30,15 +30,28 @@ namespace ASPWiki.Services
             return null;
         }
 
-        public List<WikiPage> GetLatest(int number)
+        public List<WikiPage> GetLatest(int number, bool authenticated)
         {
-            var sortedList = (from entry in wikiRepository orderby entry.LastModified descending select entry).Take(number).ToList();
-            return sortedList;
+            var query = from wikiPage in wikiRepository select wikiPage;
+
+            if (!authenticated)
+                query = query.Where(wikiPage => wikiPage.Public == true);
+
+            query.OrderByDescending(wikiPage => wikiPage.LastModified);
+
+            return query.Take(number).ToList();
         }
 
-        public List<WikiPage> GetAll()
+        public List<WikiPage> GetAll(bool authenticated)
         {
-            return wikiRepository.ToList();
+            if (authenticated)
+            {
+                return wikiRepository.ToList();
+            }
+            else
+            {
+                return (from wikiPage in wikiRepository where wikiPage.Public == true select wikiPage).ToList();
+            }
         }
 
         public void Save(WikiPage wikiPage)

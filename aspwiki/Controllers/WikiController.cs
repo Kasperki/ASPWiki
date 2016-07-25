@@ -4,6 +4,8 @@ using ASPWiki.Model;
 using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Authorization;
+using System.Threading.Tasks;
 
 namespace ASPWiki.Controllers
 {
@@ -16,11 +18,14 @@ namespace ASPWiki.Controllers
 
         private readonly IWikiService wikiService;
 
-        public WikiController(IRouteGenerator routeGenerator, IWikiRepository wikiRepository, IWikiService wikiService)
+        private readonly IAuthorizationService authorizationService;
+
+        public WikiController(IRouteGenerator routeGenerator, IWikiRepository wikiRepository, IWikiService wikiService, IAuthorizationService authorizationService)
         {
             this.routeGenerator = routeGenerator;
             this.wikiRepository = wikiRepository;
             this.wikiService = wikiService;
+            this.authorizationService = authorizationService;
         }
 
         [HttpGet("Wiki/New")]
@@ -38,18 +43,25 @@ namespace ASPWiki.Controllers
         }
 
         [HttpGet("Wiki/Edit/{*path}")]
-        public IActionResult Edit(string path)
+        public async Task<IActionResult> Edit(string path)
         {
             var wikiPage = wikiRepository.GetByPath(path);
 
             if (wikiPage == null)
-                return RedirectToAction("Add", new { title = this.GetLastItemFromPath(path) }); 
+                return RedirectToAction("Add", new { title = this.GetLastItemFromPath(path) });
 
-            return View("Edit", wikiPage);
+            if (await authorizationService.AuthorizeAsync(User, wikiPage, new WikiPageEditRequirement()))
+            {
+                return View("Edit", wikiPage);
+            }
+            else
+            {
+                return new ChallengeResult();
+            }
         }
 
         [HttpGet("Wiki/View/{*path}")]
-        public IActionResult ViewPage(string path, string version)
+        public async Task<IActionResult> ViewPage(string path, string version)
         {
             var wikiPage = wikiRepository.GetByPath(path);
 
@@ -60,18 +72,34 @@ namespace ASPWiki.Controllers
             if (wikiPage == null)
                 return RedirectToAction("NotFound", "Wiki", new { title = this.GetLastItemFromPath(path) });
 
-            return View("View", wikiPage);
+            if (await authorizationService.AuthorizeAsync(User, wikiPage, new WikiPageEditRequirement()))
+            {
+                return View("View", wikiPage);
+            }
+            else
+            {
+                return new ChallengeResult();
+            }
         }
 
         [HttpPost("Wiki/Save")]
         [ValidateAntiForgeryToken]
-        public IActionResult Save(WikiPage wikiPage)
+        public async Task<IActionResult> Save(WikiPage wikiPage)
         {
             if (ModelState.IsValid)
             {
+                var wiki = wikiRepository.GetByPath(wikiPage.Path);
+                if (wiki != null)
+                {
+                   if(!await authorizationService.AuthorizeAsync(User, wiki, new WikiPageEditRequirement()))
+                    {
+                        return new ChallengeResult();
+                    }
+                }
+
                 try
                 {
-                    wikiService.Save(wikiPage);
+                    wikiService.Save(wikiPage, User.Identity.Name);
                     this.FlashMessageSuccess("Wikipage: " + wikiPage.Title + " succesfully saved");
                     return Redirect("/Wiki/View/" + wikiPage.Path);
                 }
@@ -88,17 +116,27 @@ namespace ASPWiki.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("Wiki/Delete/{*path}")]
-        public IActionResult Delete(string path)
+        public async Task<IActionResult> Delete(string path)
         {
-            wikiRepository.Delete(path);
+            if (await authorizationService.AuthorizeAsync(User, wikiRepository.GetByPath(path), new WikiPageEditRequirement()))
+            {
+                wikiRepository.Delete(path);
 
-            this.FlashMessageError("Wikipage: " + this.GetLastItemFromPath(path) + 
-                " deleted: <a style='float:right;' href='/Wiki/Revert/" + path + 
-                "'><b><i class='fa fa-reply' aria-hidden='true'></i>UNDO </b></a>");
-            return RedirectToAction("Index", "Home");
+                this.FlashMessageError("Wikipage: " + this.GetLastItemFromPath(path) +
+                    " deleted: <a style='float:right;' href='/Wiki/Revert/" + path +
+                    "'><b><i class='fa fa-reply' aria-hidden='true'></i>UNDO </b></a>");
+
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                return new ChallengeResult();
+            }
         }
 
+        [Authorize]
         [HttpGet("Wiki/Revert/{*path}")]
         public IActionResult Revert(string path)
         {

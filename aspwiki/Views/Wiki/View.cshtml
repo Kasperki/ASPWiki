@@ -1,5 +1,4 @@
-﻿@using ASPWiki.Model;
-@model WikiPage
+﻿@model WikiPage
 
 @{ 
     ViewData["Title"] = Model.Title;
@@ -8,13 +7,16 @@
 <article>
     <div class="row" style="margin-top:20px;">
         <div class="col-md-8">
-            <h1>@Model.Title</h1>
-
-            @Html.Partial("~/Views/Wiki/Label.cshtml", Model.label)
-
-            <span>
-                @Html.Partial("PathLink", Model.PathArray)
-            </span>
+            <div style="display:block;">
+                <h1 style="float:left">@Model.Title</h1>
+                <span>
+                    @if (!Model.Public)
+                    {
+                        <i class="fa fa-eye-slash fa-2x" aria-hidden="true" style="color:orange" data-toggle="tooltip" title="Hidden"></i>
+                    }
+                </span>
+                @Html.Partial("~/Views/Wiki/Label.cshtml", Model.label)
+            </div>
         </div>
         <div class="col-md-4">
             <a asp-controller="Wiki" asp-action="Edit">
@@ -22,11 +24,14 @@
                     Edit <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                 </div>
             </a>
-            <a asp-controller="Wiki" asp-action="Delete">
-                <div class="sm-btn warning zoomIn" style="float:right;">
-                    Delete <i class="fa fa-times" aria-hidden="true"></i>
-                </div>
-            </a>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a asp-controller="Wiki" asp-action="Delete">
+                    <div class="sm-btn warning zoomIn" style="float:right;">
+                        Delete <i class="fa fa-times" aria-hidden="true"></i>
+                    </div>
+                </a>
+            }
             <a href="#" id="diff">
                 <div class="sm-btn label-info zoomIn" style="float:right;">
                     Diff <i class="fa fa-tasks" aria-hidden="true"></i>
@@ -44,32 +49,64 @@
     <div id="diffDisplay"></div>
 </article>
 
+<br />
+<div class="row">
+    <div class="col-sm-12">
+        <span>Written by: @(@Model.Author == null ? "Uknown" : @Model.Author) - Size: @Model.GetSizeKiloBytes() - @Html.DisplayFor(model => model.LastModified)</span>
+    </div>
+</div>
+
 @section scripts{ 
 <script>
-    var other = String("@Model.ContentHistory[Convert.ToInt32(Context.Request.Query["version"])]"),
-    one = String("@Model.ContentHistory[Convert.ToInt32(Context.Request.Query["version"]) > 0 ? Convert.ToInt32(Context.Request.Query["version"]) - 1 : Convert.ToInt32(Context.Request.Query["version"])]"),
-    color = '', 
-    span = null; 
+
+    @if (@Model.ContentHistory.Count > 1) {
+        int version = Convert.ToInt32(Context.Request.Query["version"]);
+        string other = "";
+        string one = "";
+
+        if (version > 0)
+        {
+            other = Model.ContentHistory[version];
+            one = Model.ContentHistory[version - 1];
+        }
+        else
+        {
+            other = Model.ContentHistory[Model.ContentHistory.Count - 1];
+            one = Model.ContentHistory[Model.ContentHistory.Count - 2];
+        }
+
+        <text>
+        var other = String("@other");
+        var one = String("@one");
+        </text>
+    }
+
+    var color = '',
+    span = null;
 
     var diff = JsDiff.diffWords(one, other),
     display = document.getElementById('diffDisplay'),
     fragment = document.createDocumentFragment();
 
-diff.forEach(function(part){
-  color = part.added ? '#3FB8AF' : part.removed ? '#FF3D7F' : 'grey';
-  span = document.createElement('span');
-  span.style.color = color;
-  span.appendChild(document.createTextNode(part.value));
-  fragment.appendChild(span);
-});
+    diff.forEach(function(part){
+        color = part.added ? '#3FB8AF' : part.removed ? '#FF3D7F' : 'grey';
+        span = document.createElement('span');
+        span.style.color = color;
+        span.appendChild(document.createTextNode(part.value));
+        fragment.appendChild(span);
+    });
 
-display.appendChild(fragment);
+    display.appendChild(fragment);
 
 $("#diffDisplay").hide();
 
 $("#diff").on("click", function () {
     $("#content").toggle("slow", function () { });
     $("#diffDisplay").toggle("slow", function () { });
+});
+
+$(document).ready(function () {
+    $('[data-toggle="tooltip"]').tooltip();
 });
 </script>
 }

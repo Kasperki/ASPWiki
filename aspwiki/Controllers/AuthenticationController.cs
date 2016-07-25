@@ -1,27 +1,44 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ASPWiki.Services;
+using ASPWiki.Model;
+using Microsoft.AspNetCore.Hosting;
+using System;
+using System.Security.Claims;
 
 namespace ASPWiki.Controllers
 {
     public class AuthenticationController : Controller
     {
         private readonly IAuthenticationService authenticationService;
-        public AuthenticationController(IAuthenticationService authenticationService)
+        private readonly IHostingEnvironment env;
+
+        public AuthenticationController(IAuthenticationService authenticationService, IHostingEnvironment env)
         {
             this.authenticationService = authenticationService;
+            this.env = env;
         }
 
         [HttpGet("Login")]
         public async Task<IActionResult> Login()
         {
-            string authToken = HttpContext.Request.Cookies["authToken"];
-            string sessionId = HttpContext.Request.Cookies["sessionId"];
+            bool isValid = false;
 
-            if (authToken == null || sessionId == null)
-                return Redirect("http://127.0.0.1:8081/login");
+            if (env.IsProduction())
+            {
+                string authToken = HttpContext.Request.Cookies["authToken"];
+                string sessionId = HttpContext.Request.Cookies["sessionId"];
 
-            bool isValid = await authenticationService.ValidateToken(HttpContext, authToken, sessionId);
+                if (authToken == null || sessionId == null)
+                    return Redirect("https://127.0.0.1:8081/login");
+
+                isValid = await authenticationService.ValidateToken(authToken, sessionId);
+            }
+            else
+            {
+                isValid = await authenticationService.CreateDevSession();
+            }
+                
 
             if (!isValid)
             {
@@ -29,7 +46,7 @@ namespace ASPWiki.Controllers
                 return View("Error");
             }
 
-            this.FlashMessageSuccess("Welcome: " + User.Identity.Name);
+            this.FlashMessageSuccess("Welcome!");
             return Redirect("/");
         }
 

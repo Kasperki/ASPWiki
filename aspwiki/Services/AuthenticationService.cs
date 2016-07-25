@@ -12,20 +12,24 @@ using System.Threading.Tasks;
 namespace ASPWiki.Services
 {
     public class AuthenticationService : IAuthenticationService
-    {  
+    {
+        private readonly IHttpContextAccessor httpContextAccessor;
+
         private HttpClient client;
 
-        private const string validationUrl = "http://127.0.0.1:8081/test";
+        private const string validationUrl = "https://127.0.0.1:8081/test";
 
-        public AuthenticationService()
+        public AuthenticationService(IHttpContextAccessor httpContextAccessor)
         {
+            this.httpContextAccessor = httpContextAccessor;
+
             client = new HttpClient();
             client.BaseAddress = new Uri(validationUrl);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async Task<bool> ValidateToken(HttpContext contxt, string authToken, string sessionId)
+        public async Task<bool> ValidateToken(string authToken, string sessionId)
         {
             HttpResponseMessage responseMessage = await client.GetAsync(validationUrl + "?authToken=" + authToken + "&sessionId=" + sessionId);
 
@@ -40,14 +44,24 @@ namespace ASPWiki.Services
                 else
                 {
                     Session session = JsonConvert.DeserializeObject<Session>(responseData);
-                    await CreateClaim(contxt, session);
+                    await CreateClaim(session);
                 }
             }
 
             return true;
         }
 
-        private async Task CreateClaim(HttpContext contxt, Session session)
+        public async Task<bool> CreateDevSession()
+        {
+            Session developementSession = new Session();
+            developementSession.Username = "DevUser";
+            developementSession.Expires = DateTime.Now.AddDays(1);
+            await CreateClaim(developementSession);
+
+            return true;
+        }
+
+        private async Task CreateClaim(Session session)
         {
             const string Issuer = "https://contoso.com";
             var claims = new List<Claim>();
@@ -56,7 +70,7 @@ namespace ASPWiki.Services
             userIdentity.AddClaims(claims);
             var userPrincipal = new ClaimsPrincipal(userIdentity);
 
-            await contxt.Authentication.SignInAsync(Constants.AuthenticationScheme, userPrincipal,
+            await httpContextAccessor.HttpContext.Authentication.SignInAsync(Constants.AuthenticationScheme, userPrincipal,
             new AuthenticationProperties
             {
                 ExpiresUtc = session.Expires,

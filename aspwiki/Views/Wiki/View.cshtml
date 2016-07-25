@@ -58,24 +58,45 @@
 
 @section scripts{ 
 <script>
-    var other = String("@Model.ContentHistory[Convert.ToInt32(Context.Request.Query["version"])]"),
-    one = String("@Model.ContentHistory[Convert.ToInt32(Context.Request.Query["version"]) > 0 ? Convert.ToInt32(Context.Request.Query["version"]) - 1 : Convert.ToInt32(Context.Request.Query["version"])]"),
-    color = '', 
-    span = null; 
+
+    @if (@Model.ContentHistory.Count > 1) {
+        int version = Convert.ToInt32(Context.Request.Query["version"]);
+        string other = "";
+        string one = "";
+
+        if (version > 0)
+        {
+            other = Model.ContentHistory[version];
+            one = Model.ContentHistory[version - 1];
+        }
+        else
+        {
+            other = Model.ContentHistory[Model.ContentHistory.Count - 1];
+            one = Model.ContentHistory[Model.ContentHistory.Count - 2];
+        }
+
+        <text>
+        var other = String("@other");
+        var one = String("@one");
+        </text>
+    }
+
+    var color = '',
+    span = null;
 
     var diff = JsDiff.diffWords(one, other),
     display = document.getElementById('diffDisplay'),
     fragment = document.createDocumentFragment();
 
-diff.forEach(function(part){
-  color = part.added ? '#3FB8AF' : part.removed ? '#FF3D7F' : 'grey';
-  span = document.createElement('span');
-  span.style.color = color;
-  span.appendChild(document.createTextNode(part.value));
-  fragment.appendChild(span);
-});
+    diff.forEach(function(part){
+        color = part.added ? '#3FB8AF' : part.removed ? '#FF3D7F' : 'grey';
+        span = document.createElement('span');
+        span.style.color = color;
+        span.appendChild(document.createTextNode(part.value));
+        fragment.appendChild(span);
+    });
 
-display.appendChild(fragment);
+    display.appendChild(fragment);
 
 $("#diffDisplay").hide();
 

@@ -8,6 +8,7 @@
     "jquery-validation-unobtrusive": "3.2.6",
     "font-awesome": "4.6.1",
     "tinymce": "4.4.x",
-    "jsdiff": "2.2.2"
+    "jsdiff": "2.2.2",
+    "selectize": "0.12.x"
   }
 }

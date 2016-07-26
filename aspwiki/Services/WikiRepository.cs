@@ -37,7 +37,7 @@ namespace ASPWiki.Services
             if (!authenticated)
                 query = query.Where(wikiPage => wikiPage.Public == true);
 
-            query.OrderByDescending(wikiPage => wikiPage.LastModified);
+            query = query.OrderByDescending(wikiPage => wikiPage.LastModified);
 
             return query.Take(number).ToList();
         }
@@ -105,6 +105,14 @@ namespace ASPWiki.Services
         public WikiPage GetById(Guid id)
         {
             return wikiRepository.FirstOrDefault(w => w.Id == id);
+        }
+
+        public List<WikiPage> SearchByTitle(string keywords, bool authenticated)
+        {
+            if (authenticated)
+                return (from wikiPage in wikiRepository where wikiPage.Title.Contains(keywords) select wikiPage).ToList();
+
+            return (from wikiPage in wikiRepository where wikiPage.Title.Contains(keywords) && wikiPage.Public == true select wikiPage).ToList();
         }
     }
 }

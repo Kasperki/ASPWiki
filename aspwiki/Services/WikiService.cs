@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using System.Security.Principal;
 
 namespace ASPWiki.Services
 {
@@ -82,7 +83,7 @@ namespace ASPWiki.Services
             }
         }
 
-        public void Save(WikiPage wikiPage, string name)
+        public void Save(WikiPage wikiPage, IIdentity indetity)
         {
             wikiPage.SetPath(wikiPage.Path);
             IsValidPath(wikiPage.Path, wikiPage.Id);
@@ -92,8 +93,11 @@ namespace ASPWiki.Services
             if (wikiPage.ContentHistory.Count == 0 || !String.Equals(wikiPage.ContentHistory.Last(), wikiPage.Content))
                 wikiPage.ContentHistory.Add(wikiPage.Content);
 
-            if (name != null && name != String.Empty)
-                wikiPage.Author = name;
+            if (indetity.Name != null && indetity.Name != String.Empty)
+                wikiPage.Author = indetity.Name;
+
+            if (!indetity.IsAuthenticated)
+                wikiPage.Public = true;
 
             wikiPage.LastModified = DateTime.Now;
             wikiRepository.Save(wikiPage);

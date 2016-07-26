@@ -175,6 +175,9 @@ SIDE NAV
     #sidePanel {
         display: none;
     }
+    .hideNarrow {
+        display: none;
+    }
 }
 
 .sideButtonLink {

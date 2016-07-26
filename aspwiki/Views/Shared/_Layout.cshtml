@@ -10,6 +10,7 @@
     <environment names="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/lib/font-awesome/css/font-awesome.css" />
+        <link rel="stylesheet" type="text/css" href="~/lib/selectize/dist/css/selectize.bootstrap3.css" />
         <link rel="stylesheet" href="~/css/main.css" />
     </environment>
     <environment names="Staging,Production">
@@ -25,26 +26,41 @@
 <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-            <div class="navbar-header">
+            <div class="navbar-header pull-left">
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">WIKI</a>
-            </div>
-            <div class="navbar-collapse collapse">
-                <ul class="nav navbar-nav">
-                    <li><a data-toggle="collapse" href="#sidePanel"><i class="fa fa-list" aria-hidden="true"></i></a></li>
+
+                <ul class="nav navbar-nav pull-left">
+                    <li><a data-toggle="collapse" href="#sidePanel"><i class="fa fa-list hideNarrow" aria-hidden="true"></i></a></li>
+                    
+                    <li>
+                        <div class="control-group" style="padding-top:8px;width:400px;">
+                            <select id="searchBox" placeholder="Search..."></select>
+                        </div>
+                    </li>
                 </ul>
-                <ul class="nav navbar-nav navbar-right">
+
+            </div>
+
+            <div class="navbar-header pull-right">
+                <ul class="nav navbar-nav pull-left" style="margin-right:15px;">
                     @if (!User.Identities.Any(u => u.IsAuthenticated))
                     {
-                        <li style="float:right"><a href="/Login">Login</a></li>
+                        <li><a href="/Login">Login</a></li>
                     }
                     else
                     {
-                        <li style="float:right">
+                        <li>
                             <a href="/Logout">
                                 Logout: @User.Identity.Name
                             </a>
                         </li>
                     }
+                </ul>
+            </div>
+
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav pull-left">
+
                 </ul>
             </div>
         </div>
@@ -83,6 +99,7 @@
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
         <script src="~/lib/jsdiff/diff.js"></script>
+        <script src="~/lib/selectize/dist/js/standalone/selectize.js"></script>
         <script src="~/js/main.js" asp-append-version="true"></script>
     </environment>
     <environment names="Staging,Production">
@@ -94,11 +111,48 @@
                 asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
                 asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal">
         </script>
-        <script src="~/lib/jsdiff/diff.js"></script>
+        <script src="~/lib/jsdiff/diff.min.js"></script>
+        <script src="~/lib/selectize/dist/js/standalone/selectize.min.js"></script>
         <script src="~/js/main.min.js" asp-append-version="true"></script>
     </environment>
 
     @RenderSection("scripts", required: false)
     @Html.RenderScriptsSection()
+
+    <script>
+        $('#searchBox').selectize({
+            valueField: 'Path',
+            labelField: 'Title',
+            searchField:'Title',
+            create: false,
+            render: {
+                option: function (item, escape) {
+                    return '<div><span class="title">' +
+                            '<span class="by">' + item.Title + '</span>' +
+                        '</span></div>';
+                }
+            },
+            load: function (query, callback) {
+                if (!query.length) return callback();
+                $.ajax({
+                    url: '/Wiki/Search',
+                    type: 'POST',
+                    data: JSON.stringify({ data: query }),
+                    contentType: 'application/json; charset=utf-8',
+                    dataType: 'json',
+                    async: true,
+                    error: function () {
+                        callback();
+                    },
+                    success: function (res) {
+                        callback(res);
+                    }
+                });
+            },
+            onChange: function (value) {
+                window.location.href = '/Wiki/View/' + value;
+            }
+        });
+    </script>
 </body>
 </html>

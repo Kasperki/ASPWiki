@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace ASPWiki.Controllers
 {
@@ -99,7 +100,7 @@ namespace ASPWiki.Controllers
 
                 try
                 {
-                    wikiService.Save(wikiPage, User.Identity.Name);
+                    wikiService.Save(wikiPage, User.Identity);
                     this.FlashMessageSuccess("Wikipage: " + wikiPage.Title + " succesfully saved");
                     return Redirect("/Wiki/View/" + wikiPage.Path);
                 }
@@ -171,6 +172,19 @@ namespace ASPWiki.Controllers
             {
                 return new OkObjectResult(JsonConvert.SerializeObject(e.Message));
             }   
+        }
+
+        [HttpPost("Wiki/Search")]
+        public IActionResult Search([FromBody]object searchKeyword)
+        {
+            JObject data = searchKeyword as JObject;
+
+            var searchData = data.Value<string>("data");
+
+            List<WikiPage> wikipages = wikiRepository.SearchByTitle(searchData, User.Identity.IsAuthenticated);
+
+            Response.ContentType = "text/javascript";
+            return new OkObjectResult(JsonConvert.SerializeObject(wikipages));
         }
     }
 }

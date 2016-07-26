@@ -176,7 +176,7 @@ SIDE NAV
         display: none;
     }
     .hideNarrow {
-        display: none;
+        display: none !important;
     }
 }
 
@@ -259,4 +259,9 @@ SIDE NAV
 
 .label-exclamation {
     background-color: #FA6900;
+}
+
+
+.removePadding {
+    padding: 0px;
 }

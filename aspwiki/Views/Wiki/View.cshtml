@@ -38,9 +38,9 @@
                     }
                     <div class="col-sm-4 removePadding">
                         <a href="#" id="diff">
-                        <div class="sm-btn label-info zoomIn">
-                            Diff <i class="fa fa-tasks" aria-hidden="true"></i>
-                        </div>
+                            <div class="sm-btn label-info zoomIn">
+                                Diff <i class="fa fa-tasks" aria-hidden="true"></i>
+                            </div>
                         </a>
                     </div>
                 </div>
@@ -51,6 +51,10 @@
         </div>
     </div>
     
+    <section>
+        @Html.Partial("Attachments", Model)
+    </section>
+
     <div id="content">
         @Html.Raw(@Model.Content)
     </div>

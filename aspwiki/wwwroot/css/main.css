@@ -167,6 +167,18 @@ body {
     background-color: #FF3D7F;
 }
 
+.error {
+    color: #FF9E9D;
+}
+
+.error:hover {
+    color: #FF3D7F;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
 /*
 SIDE NAV
 */

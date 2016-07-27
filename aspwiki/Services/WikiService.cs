@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Security.Principal;
+using Microsoft.AspNetCore.Http;
 
 namespace ASPWiki.Services
 {
@@ -83,24 +84,67 @@ namespace ASPWiki.Services
             }
         }
 
-        public void Save(WikiPage wikiPage, IIdentity indetity)
+        public void Save(WikiPage wikiPage, IEnumerable<IFormFile> uploads, IIdentity indetity)
         {
+            //Path
             wikiPage.SetPath(wikiPage.Path);
             IsValidPath(wikiPage.Path, wikiPage.Id);
 
+            //Version history
             wikiPage.ContentHistory = wikiRepository.GetById(wikiPage.Id)?.ContentHistory ?? new List<string>();
 
             if (wikiPage.ContentHistory.Count == 0 || !String.Equals(wikiPage.ContentHistory.Last(), wikiPage.Content))
                 wikiPage.ContentHistory.Add(wikiPage.Content);
 
+            //Author Name
             if (indetity.Name != null && indetity.Name != String.Empty)
                 wikiPage.Author = indetity.Name;
 
+            //Public for not autheticated users
             if (!indetity.IsAuthenticated)
                 wikiPage.Public = true;
 
+            //Attachments
+            var attachments = BindUploadsToAttacments(uploads, indetity.IsAuthenticated);     
+            wikiPage.Attachments = attachments;
+
+            var oldAttachments = wikiRepository.GetById(wikiPage.Id)?.Attachments;
+
+            if (oldAttachments != null)
+                wikiPage.Attachments = wikiPage.Attachments.Concat(oldAttachments).ToList();
+
+            //ModifiedTime
             wikiPage.LastModified = DateTime.Now;
+
+            //Persist and save
             wikiRepository.Save(wikiPage);
+        }
+
+        private List<Attachment> BindUploadsToAttacments(IEnumerable<IFormFile> uploads, bool isAuthenticated)
+        {
+            var attachments = new List<Attachment>();
+
+            if (uploads != null && isAuthenticated)
+            {
+                foreach (var upload in uploads)
+                {
+                    var attachment = new Attachment
+                    {
+                        FileId = Guid.NewGuid(),
+                        FileName = System.IO.Path.GetFileName(upload.FileName),
+                        ContentType = upload.ContentType
+                    };
+                    using (var reader = new System.IO.BinaryReader(upload.OpenReadStream()))
+                    {
+                        attachment.Content = reader.ReadBytes((int)upload.Length);
+                    }
+
+
+                    attachments.Add(attachment);
+                }
+            }
+
+            return attachments;
         }
 
         public List<WikiPage> FilterPublic(List<WikiPage> wikiPages)

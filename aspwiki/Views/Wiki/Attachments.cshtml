@@ -1,0 +1,41 @@
+﻿@model WikiPage
+
+<div>
+    @if (Model.Attachments != null)
+    {
+        if (Model.Attachments.Count > 0)
+        {
+            <h4>Attachments:</h4>
+        }
+
+        foreach (var attachment in Model.Attachments)
+        {
+            <a href="/Wiki/File/View/@Model.Id/@attachment.FileId">@attachment.FileName</a>
+            <a id="deleteAttacment @attachment.FileId" class="pointer">
+                <i class="fa fa-trash error" aria-hidden="true"></i>
+            </a>
+        }
+    }
+</div>
+
+@Html.ScriptSection(
+@<script>
+    $("[id^=deleteAttacment]").click(function () {
+        $(this).prev().hide("fast");
+        $(this).hide("fast");
+
+        var attachmentId = $(this).attr('id').substr(16);
+
+        $.ajax({
+            url: '/Wiki/File/Delete',
+            type: 'POST',
+            data: JSON.stringify({ WikiId: "@Model.Id", Id: attachmentId }),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            async: true,
+            success: function (msg) {
+            }
+        });
+    });
+</script>
+)

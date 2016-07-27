@@ -5,7 +5,7 @@
     ViewData["Title"] = "Edit";
 }
 
-<form id="wikiForm" asp-action="Save" method="post">
+<form id="wikiForm" asp-action="Save" method="post" enctype="multipart/form-data">
     <div class="row" style="margin-top:20px;">
 
         @Html.HiddenFor(model => Model.Id)
@@ -35,6 +35,20 @@
         <div class="col-xs-12">
             <textarea asp-for="Content" id="mytextarea">Hello, World!</textarea>
         </div>
+
+        <section>
+            <div class="col-xs-12">
+                @Html.Partial("Attachments", Model)
+            </div>
+        </section>
+
+        <div class="form-group">
+            <div id="newFiles" class="col-xs-12" style="margin:10px 0 10px 0">
+                <a id="addFile" class="pointer"><i class="fa fa-2x fa-plus-square"></i> ADD FILE</a>
+                <input type="file" asp-for="Attachments" name="uploads"/>
+            </div>
+        </div>
+
         <div class="col-xs-12">
             <div class="row">
                 @if (User.Identity.IsAuthenticated)
@@ -82,6 +96,11 @@
       height: 500,
       plugins: "codesample image imagetools link",
       toolbar: "undo, redo | bold, italic, underline, strikethrough | alignleft, aligncenter, alignright, alignjustify | formatselect, fontselect, fontsizeselect | bullist, numlist, outdent, indent, blockquote, | codesample link image"
+  });
+
+  //ADD NEW FILE
+  $("#addFile").click(function () {
+      $("#newFiles").append("<input type='file' asp-for='Attachments' name='uploads'/>");
   });
 
   //SET HIDDEN CHECKBOX TO COOL BUTTON

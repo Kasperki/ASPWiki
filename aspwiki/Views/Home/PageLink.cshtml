@@ -13,6 +13,6 @@
     <div class="col-sm-12">
         @Html.Partial("~/Views/Wiki/Label.cshtml", Model.label)
         <span>Written by: @(@Model.Author == null ? "Uknown" : @Model.Author) - Size: @Model.GetSizeKiloBytes() - @Html.DisplayFor(model => model.LastModified)</span>
-        <a href="#">5 <i class="fa fa-comment-o" aria-hidden="true"></i></a>
+        <span>@Model.Attachments.Count <i class="fa fa-paperclip" aria-hidden="true"></i></span>
     </div>
 </article>

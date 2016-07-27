@@ -10,11 +10,19 @@ namespace ASPWiki.Services
     {
         private Random random;
 
+        private List<string> nouns;
+
         private readonly IWikiRepository wikiRepo;
 
         public WikiPageGenerator(IWikiRepository wikiRepo)
         {
             random = new Random();
+
+            using (StreamReader sr = new StreamReader(File.OpenRead("Resources/nouns.json")))
+            {
+                nouns = JsonConvert.DeserializeObject<List<string>>(sr.ReadToEnd());
+            }
+
             this.wikiRepo = wikiRepo;
         }
 
@@ -29,11 +37,6 @@ namespace ASPWiki.Services
 
         public WikiPage Generate()
         {
-            List<string> nouns;
-            using (StreamReader sr = new StreamReader(File.OpenRead("Resources/nouns.json")))
-            {
-                nouns = JsonConvert.DeserializeObject<List<string>>(sr.ReadToEnd());
-            }
             WikiPage wikiPage = new WikiPage(nouns[random.Next(0, nouns.Count)]);
 
             DateTime start = new DateTime(2010, 1, 1);
@@ -71,6 +74,14 @@ namespace ASPWiki.Services
                     wikiPage.ContentHistory.Add(wikiPage.Content);
             }
 
+            wikiPage.Attachments = new List<Attachment>();
+
+            var attachmentCount = random.Next(0, 5);
+            for (int i = 0; i < attachmentCount; i++)
+            {
+                wikiPage.Attachments.Add(GenerateAttachment());
+            }
+
             return wikiPage;
         }
 
@@ -90,6 +101,25 @@ namespace ASPWiki.Services
         {
             return wikiRepo.GetAll(authenticated)[random.Next(0, wikiRepo.GetAll(authenticated).Count - 1)];
         }
+
+        private Attachment GenerateAttachment()
+        {
+            Attachment attachment = new Attachment();
+            attachment.FileId = Guid.NewGuid();
+            attachment.FileName = nouns[random.Next(0, nouns.Count)];
+
+            attachment.Content = ConvertStringToByteArray("CONTENT");
+            attachment.ContentType = "text/plain";
+
+            return attachment;
+        }
+
+        private byte[] ConvertStringToByteArray(string str)
+        {
+            byte[] bytes = new byte[str.Length * sizeof(char)];
+            System.Buffer.BlockCopy(str.ToCharArray(), 0, bytes, 0, bytes.Length);
+            return bytes;   
+        } 
     }
 }
  

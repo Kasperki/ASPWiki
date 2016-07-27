@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace ASPWiki.Controllers
 {
@@ -68,7 +69,10 @@ namespace ASPWiki.Controllers
 
             int versionNum;
             if (version != null && int.TryParse(version, out versionNum))
-                wikiPage.Content = wikiPage.ContentHistory[Convert.ToInt32(versionNum)];
+            {
+                if(versionNum >= 0 && versionNum < wikiPage.ContentHistory.Count)
+                    wikiPage.Content = wikiPage.ContentHistory[Convert.ToInt32(versionNum)];
+            }
 
             if (wikiPage == null)
                 return RedirectToAction("NotFound", "Wiki", new { title = this.GetLastItemFromPath(path) });
@@ -85,28 +89,28 @@ namespace ASPWiki.Controllers
 
         [HttpPost("Wiki/Save")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Save(WikiPage wikiPage)
+        public async Task<IActionResult> Save(WikiPage wikiPage, IEnumerable<IFormFile> uploads)
         {
             if (ModelState.IsValid)
             {
                 var wiki = wikiRepository.GetByPath(wikiPage.Path);
                 if (wiki != null)
                 {
-                   if(!await authorizationService.AuthorizeAsync(User, wiki, new WikiPageEditRequirement()))
-                    {
-                        return new ChallengeResult();
-                    }
+                   if (!await authorizationService.AuthorizeAsync(User, wiki, new WikiPageEditRequirement()))
+                   {
+                       return new ChallengeResult();
+                   }
                 }
 
                 try
                 {
-                    wikiService.Save(wikiPage, User.Identity);
+                    wikiService.Save(wikiPage, uploads, User.Identity);
                     this.FlashMessageSuccess("Wikipage: " + wikiPage.Title + " succesfully saved");
                     return Redirect("/Wiki/View/" + wikiPage.Path);
                 }
                 catch (Exception e)
                 {
-                    this.FlashMessageError(e.Message);
+                    this.FlashMessageError(e.Message); //This should not print every single error
                     return View("Edit", wikiPage);
                 }
             }

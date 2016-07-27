@@ -31,6 +31,8 @@ namespace ASPWiki.Model
 
         public string Path { get; set; }
 
+        public List<Attachment> Attachments { get; set; }
+
         public string[] PathArray
         {
             get

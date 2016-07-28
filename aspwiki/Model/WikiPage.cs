@@ -137,5 +137,15 @@ namespace ASPWiki.Model
         {
             return "Title: " + Title + " Content: " + Content + " Path: " + Path;
         }
+
+        public Attachment GetAttacment(Guid attacmentId)
+        {
+            return Attachments.Find(x => x.FileId == attacmentId);
+        }
+
+        public void RemoveAttacment(Guid attacmentId)
+        {
+            Attachments.RemoveAll(x => x.FileId == attacmentId);
+        }
     }
 }

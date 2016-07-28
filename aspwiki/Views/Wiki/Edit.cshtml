@@ -42,12 +42,15 @@
             </div>
         </section>
 
-        <div class="form-group">
-            <div id="newFiles" class="col-xs-12" style="margin:10px 0 10px 0">
-                <a id="addFile" class="pointer"><i class="fa fa-2x fa-plus-square"></i> ADD FILE</a>
-                <input type="file" asp-for="Attachments" name="uploads"/>
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="form-group">
+                <div id="newFiles" class="col-xs-12" style="margin:10px 0 10px 0">
+                    <a id="addFile" class="pointer"><i class="fa fa-2x fa-plus-square"></i> ADD FILE</a>
+                    <input type="file" asp-for="Attachments" name="uploads"/>
+                </div>
             </div>
-        </div>
+        }
 
         <div class="col-xs-12">
             <div class="row">

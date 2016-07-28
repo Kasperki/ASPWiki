@@ -11,9 +11,13 @@
         foreach (var attachment in Model.Attachments)
         {
             <a href="/Wiki/File/View/@Model.Id/@attachment.FileId">@attachment.FileName</a>
-            <a id="deleteAttacment @attachment.FileId" class="pointer">
-                <i class="fa fa-trash error" aria-hidden="true"></i>
-            </a>
+
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a id="deleteAttacment @attachment.FileId" class="pointer">
+                    <i class="fa fa-trash error" aria-hidden="true"></i>
+                </a>
+            }
         }
     }
 </div>

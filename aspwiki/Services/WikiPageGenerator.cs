@@ -76,6 +76,8 @@ namespace ASPWiki.Services
 
             wikiPage.Attachments = new List<Attachment>();
 
+            wikiPage.Visits = random.Next(0, 10);
+
             var attachmentCount = random.Next(0, 5);
             for (int i = 0; i < attachmentCount; i++)
             {

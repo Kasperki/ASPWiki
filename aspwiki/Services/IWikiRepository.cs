@@ -12,6 +12,7 @@ namespace ASPWiki.Services
         WikiPage GetById(Guid id);
         WikiPage GetByPath(string path);
         List<WikiPage> GetLatest(int number, bool authenticated);
+        List<WikiPage> GetPopular(int number, bool authenticated);
         List<WikiPage> GetAll(bool authenticated);
         List<WikiPage> SearchByTitle(string keywords, bool authenticated);
     }

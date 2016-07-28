@@ -79,6 +79,7 @@ namespace ASPWiki.Controllers
 
             if (await authorizationService.AuthorizeAsync(User, wikiPage, new WikiPageEditRequirement()))
             {
+                wikiService.AddVisit(wikiPage);
                 return View("View", wikiPage);
             }
             else

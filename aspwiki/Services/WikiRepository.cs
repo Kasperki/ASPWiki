@@ -114,5 +114,17 @@ namespace ASPWiki.Services
 
             return (from wikiPage in wikiRepository where wikiPage.Title.Contains(keywords) && wikiPage.Public == true select wikiPage).ToList();
         }
+
+        public List<WikiPage> GetPopular(int number, bool authenticated)
+        {
+            var query = from wikiPage in wikiRepository select wikiPage;
+
+            if (!authenticated)
+                query = query.Where(wikiPage => wikiPage.Public == true);
+
+            query = query.OrderByDescending(wikiPage => wikiPage.Visits);
+
+            return query.Take(number).ToList();
+        }
     }
 }

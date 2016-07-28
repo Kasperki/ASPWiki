@@ -151,5 +151,11 @@ namespace ASPWiki.Services
         {
             return (from entry in wikiPages where entry.Public == true select entry).ToList();
         }
+
+        public void AddVisit(WikiPage wikiPage)
+        {
+            wikiPage.Visits++;
+            //TODO PERSISTS & SAVE TO DATABASE
+        }
     }
 }

@@ -21,6 +21,8 @@ namespace ASPWiki.Model
 
         public Label label { get; set; }
 
+        public int Visits { get; set; }
+
         [BindNever]
         public List<string> ContentHistory { get; set; }
 

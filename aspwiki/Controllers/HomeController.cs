@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ASPWiki.Services;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using ASPWiki.Model;
 
 namespace ASPWiki.Controllers
 {
@@ -18,8 +20,9 @@ namespace ASPWiki.Controllers
         // GET: /<controller>/
         public IActionResult Index()
         {
-            var wikiPages = wikiRepository.GetLatest(5, User.Identity.IsAuthenticated);
-            return View("Index", wikiPages);
+            var wikiPagesLatests = wikiRepository.GetLatest(5, User.Identity.IsAuthenticated);
+            var wikiPagesPopular = wikiRepository.GetPopular(5, User.Identity.IsAuthenticated);
+            return View("Index", new List<List<WikiPage>>{ wikiPagesLatests, wikiPagesPopular });
         }
 
         public IActionResult GetAsideWikiPages()

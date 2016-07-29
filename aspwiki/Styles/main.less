@@ -1,0 +1,246 @@
+﻿/*
+   Pallette: http://www.colourlovers.com/palette/932683/Compatible
+*/
+
+@AboveTheWorld:  #3FB8AF;
+@Release:        #7FC7AF;
+@crustedmud:     #DAD8A7;
+@BABYPINK:       #FF9E9D;
+@HighHeel:       #FF3D7F;
+@BgWhite:        #FFFFFF;
+
+body {
+ margin-top: 55px;
+ background-color: @BgWhite;
+}
+
+.navbar {
+ background-color: @AboveTheWorld;
+}
+
+.navbar-inverse {
+ border: solid;
+ border-width: 0 0 5px 0;
+ border-color: @Release;
+}
+
+.navbar .navbar-nav > li > a {
+ color: @BgWhite;
+}
+
+.navbar .navbar-nav > li > a:hover {
+ color: @crustedmud;
+}
+
+.navbar-brand {
+ color: @BgWhite !important;
+}
+
+.navbar-brand:hover {
+  color: @crustedmud !important;
+}
+
+
+/*
+   LANDING PAGE
+*/
+
+.header {
+    position: relative;
+    width: 100%;
+    min-height: 60%;
+    text-align: center;
+    color: #fff;
+    background-image: url(http://inevitablesteps.com/wp-content/uploads/2015/06/typewriter-801921_1280.jpg);
+    background-position: center; 
+    background-size: cover;
+}
+
+.header-content {
+    position: relative;
+    width: 100%;
+    padding: 175px 15px;
+    text-align: center;
+}
+
+.header-content-inner h1 {
+    margin-top: 0;
+    margin-bottom: 0;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-shadow: 3px 4px rgba(0,0,0,0.25);
+}
+
+.zoomIn {
+    transition: all .2s ease-in-out; 
+
+    &:hover { 
+        transform: scale(1.1);
+    }
+}
+
+.zoomInHide {
+    color: #000000;
+    &:hover {
+        color: rgb(0,0,0);
+        color: rgba(0,0,0,0);
+        transform: scale(0.8);
+        transition: all .2s ease-in-out; 
+        cursor: pointer;
+    }
+}
+
+.zoomInShow {
+    color: rgb(0,0,0);
+    color: rgba(0,0,0,0);
+    &:hover {
+        color: @AboveTheWorld;
+        transform: scale(1.2);
+        transition: all .3s ease-in-out; 
+        cursor: pointer;
+    }
+}
+
+.btn {
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  border-radius: 4px;
+  font-family: Arial;
+  color: @BgWhite;
+  font-size: 20px;
+  background: @Release;
+  padding: 10px 20px 10px 20px;
+  border: dotted @AboveTheWorld 2px;
+  text-decoration: none;
+  text-align: center;
+
+  &:hover {
+    background: @AboveTheWorld;
+    text-decoration: none;
+  }
+}
+
+.sm-btn {
+  .btn;
+  font-size: 15px;
+  margin: 5px;
+}
+
+.success {
+    color: @AboveTheWorld;
+}
+
+.warning {
+    background-color: @BABYPINK;
+}
+
+.warning:hover {
+    background-color: @HighHeel;
+}
+
+.error {
+    color: @BABYPINK;
+}
+
+.error:hover {
+    color: @HighHeel;
+}
+
+.disabled {
+    background-color:dimgrey !important;
+    cursor: default !important;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+/*
+SIDE NAV
+*/
+
+@media screen and (max-width:768px) {
+    .hideNarrow {
+        display: none !important;
+    }
+}
+
+.sideButtonLink {
+    width:60%; 
+    margin-left:10px; 
+    background-color:#3FB8AF;
+    height: 50px;
+    &:hover{
+        border:solid;
+        border-width: 0 0 2px 2px;
+        border-color: #7FC7AF; 
+        cursor: pointer;
+    }
+    &:active {
+        background-color:#4FBFBF;
+        cursor: pointer;
+    }
+}
+
+.sideButtonCollapse {
+    width:40%;  
+    margin-left:-10px; 
+    background-color:#3FB8AF;
+    height: 50px;
+    &:hover{
+        border:solid;
+        border-width: 0 0 2px 0;
+        border-color: #7FC7AF; 
+        cursor: pointer;
+    }
+    &:active {
+        background-color:#4FBFBF;
+        cursor: pointer;
+    }
+}
+
+.sideButtonChild {
+    background-color: RGB(51, 187, 173);
+    background-color: RGBA(51, 187, 173, 0.92);
+    padding: 6px;
+    &:hover{
+        background-color:#4FBFBF;
+    }
+}
+
+.sideButtonChild p {
+    color: white;
+    padding-left: 20px;
+}
+
+.panel-heading h4 {
+    color: white;
+}
+
+/*
+    Labels
+*/
+
+.label-other {
+    background-color: #A7DBD8;
+}
+
+.label-info {
+    background-color: #69D2E7;
+}
+
+.label-games {
+    background-color: #FF9E9D;
+}
+
+.label-web {
+    background-color: #F38630;
+}
+
+.label-exclamation {
+    background-color: #FA6900;
+}
+
+.removePadding {
+    padding: 0px;
+}

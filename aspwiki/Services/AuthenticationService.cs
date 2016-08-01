@@ -29,7 +29,7 @@ namespace ASPWiki.Services
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public async Task<bool> ValidateToken(string authToken, string sessionId)
+        public async Task<Session> ValidateToken(string authToken, string sessionId)
         {
             HttpResponseMessage responseMessage = await client.GetAsync(validationUrl + "?authToken=" + authToken + "&sessionId=" + sessionId);
 
@@ -39,26 +39,27 @@ namespace ASPWiki.Services
 
                 if (responseData == "NotValid")
                 {
-                    return false;
+                    throw new Exception("Token not valid");
                 }
                 else
                 {
                     Session session = JsonConvert.DeserializeObject<Session>(responseData);
                     await CreateClaim(session);
+                    return session;
                 }
             }
 
-            return true;
+            throw new Exception("Could not validate");
         }
 
-        public async Task<bool> CreateDevSession()
+        public async Task<Session> CreateDevSession()
         {
             Session developementSession = new Session();
             developementSession.Username = "DevUser";
             developementSession.Expires = DateTime.Now.AddDays(1);
             await CreateClaim(developementSession);
 
-            return true;
+            return developementSession;
         }
 
         private async Task CreateClaim(Session session)

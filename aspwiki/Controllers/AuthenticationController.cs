@@ -1,10 +1,10 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ASPWiki.Services;
-using ASPWiki.Model;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
+using ASPWiki.Model;
 using System;
-using System.Security.Claims;
 
 namespace ASPWiki.Controllers
 {
@@ -12,17 +12,19 @@ namespace ASPWiki.Controllers
     {
         private readonly IAuthenticationService authenticationService;
         private readonly IHostingEnvironment env;
+        private readonly ILogger<AuthenticationController> logger;
 
-        public AuthenticationController(IAuthenticationService authenticationService, IHostingEnvironment env)
+        public AuthenticationController(IAuthenticationService authenticationService, IHostingEnvironment env, ILogger<AuthenticationController> logger)
         {
             this.authenticationService = authenticationService;
             this.env = env;
+            this.logger = logger;
         }
 
         [HttpGet("Login")]
         public async Task<IActionResult> Login()
         {
-            bool isValid = false;
+            Session session;
 
             if (env.IsProduction())
             {
@@ -32,21 +34,25 @@ namespace ASPWiki.Controllers
                 if (authToken == null || sessionId == null)
                     return Redirect("https://127.0.0.1:8081/login");
 
-                isValid = await authenticationService.ValidateToken(authToken, sessionId);
+                try
+                {
+                    session = await authenticationService.ValidateToken(authToken, sessionId);
+                }
+                catch (Exception e)
+                {
+                    logger.LogWarning(new EventId(100), e, "Login failed from ip:" + HttpContext.Connection.RemoteIpAddress.MapToIPv4());
+
+                    this.FlashMessageError("401");
+                    return View("Error");
+                }
             }
             else
             {
-                isValid = await authenticationService.CreateDevSession();
-            }
-                
-
-            if (!isValid)
-            {
-                this.FlashMessageError("401");
-                return View("Error");
+                session = await authenticationService.CreateDevSession();
             }
 
-            this.FlashMessageSuccess("Welcome!");
+            logger.LogInformation(session.Username + " logged in");
+            this.FlashMessageSuccess("Welcome: " + session.Username + "!");
             return Redirect("/");
         }
 

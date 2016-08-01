@@ -7,6 +7,8 @@ using ASPWiki.Services;
 using ASPWiki.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
+using Serilog;
+using System.IO;
 
 namespace ASPWiki
 {
@@ -25,6 +27,13 @@ namespace ASPWiki
                 // This will push telemetry data through Application Insights pipeline faster, allowing you to view results immediately.
                 builder.AddApplicationInsightsSettings(developerMode: true);
             }
+
+            string path = "Logs";
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+            Log.Logger = new LoggerConfiguration().Enrich.FromLogContext().WriteTo.File(path + "/log.txt").CreateLogger();
 
             Configuration = builder.Build();
         }
@@ -52,13 +61,19 @@ namespace ASPWiki
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IGarbageGenerator<WikiPage> wikiPageGenerator)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApplicationLifetime appLifetime, IGarbageGenerator<WikiPage> wikiPageGenerator)
         {
             wikiPageGenerator.GenerateToDatabase(15);
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-            
+
+            loggerFactory.AddSerilog();
+
+            // Ensure any buffered events are sent at shutdown
+            appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
+      
+
             app.UseApplicationInsightsRequestTelemetry();
 
             if (env.IsDevelopment())

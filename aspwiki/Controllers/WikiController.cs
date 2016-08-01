@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace ASPWiki.Controllers
 {
@@ -22,12 +23,15 @@ namespace ASPWiki.Controllers
 
         private readonly IAuthorizationService authorizationService;
 
-        public WikiController(IRouteGenerator routeGenerator, IWikiRepository wikiRepository, IWikiService wikiService, IAuthorizationService authorizationService)
+        private readonly ILogger<WikiController> logger;
+
+        public WikiController(IRouteGenerator routeGenerator, IWikiRepository wikiRepository, IWikiService wikiService, IAuthorizationService authorizationService, ILogger<WikiController> logger)
         {
             this.routeGenerator = routeGenerator;
             this.wikiRepository = wikiRepository;
             this.wikiService = wikiService;
             this.authorizationService = authorizationService;
+            this.logger = logger;
         }
 
         [HttpGet("Wiki/New")]
@@ -106,17 +110,20 @@ namespace ASPWiki.Controllers
                 try
                 {
                     wikiService.Save(wikiPage, uploads, User.Identity);
+                    logger.LogInformation(User.Identity?.Name + " saved new wikipage:" + wikiPage.Title);
                     this.FlashMessageSuccess("Wikipage: " + wikiPage.Title + " succesfully saved");
                     return Redirect("/Wiki/View/" + wikiPage.Path);
                 }
                 catch (Exception e)
                 {
+                    logger.LogError(new EventId(101), e, "Error saving wikipage");
                     this.FlashMessageError(e.Message); //This should not print every single error
                     return View("Edit", wikiPage);
                 }
             }
             else
             {
+                logger.LogError("Error saving wikipage model state not valid:" + this.GetModelStateErrors());
                 this.FlashMessageError("Model invalid: " + this.GetModelStateErrors());
                 return View("Edit", wikiPage);
             }
@@ -130,6 +137,7 @@ namespace ASPWiki.Controllers
             {
                 wikiRepository.Delete(path);
 
+                logger.LogInformation(User.Identity?.Name + " deleted wikipage:" + path);
                 this.FlashMessageError("Wikipage: " + this.GetLastItemFromPath(path) +
                     " deleted: <a style='float:right;' href='/Wiki/Revert/" + path +
                     "'><b><i class='fa fa-reply' aria-hidden='true'></i>UNDO </b></a>");

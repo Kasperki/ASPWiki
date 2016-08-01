@@ -19,16 +19,16 @@ namespace ASPWiki.Controllers
             this.authorizationService = authorizationService;
         }
 
-        [HttpGet("Wiki/File/View/{wikiPageId}/{id}")]
-        public async Task<IActionResult> GetFile(string wikiPageId, string id)
+        [HttpGet("Wiki/File/View/{wikiPageId:guid}/{id:guid}")]
+        public async Task<IActionResult> GetFile(Guid wikiPageId, Guid id)
         {
             try
             {
-                var wikiPage = wikiRepository.GetById(new Guid(wikiPageId));
+                var wikiPage = wikiRepository.GetById(wikiPageId);
 
                 if (wikiPage != null && await authorizationService.AuthorizeAsync(User, wikiPage, new WikiPageEditRequirement()))
                 {
-                    var fileToRetrieve = wikiPage.GetAttacment(new Guid(id));
+                    var fileToRetrieve = wikiPage.GetAttacment(id);
                     return File(fileToRetrieve.Content, fileToRetrieve.ContentType, fileToRetrieve.FileName);
                 }
             }

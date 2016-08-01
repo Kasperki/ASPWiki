@@ -12,7 +12,7 @@ namespace ASPWiki.Tests
     public class FileControllerTest
     {
         [Fact]
-        public void Get_File__Should_Return_Challenge_Result_If_Not_Authorized()
+        public void Get_File__Should_Return_ForbidResult_If_Not_Authorized()
         {
             // Arrange
             var mockWikiRepo = new Mock<IWikiRepository>();
@@ -21,23 +21,33 @@ namespace ASPWiki.Tests
             var controller = new FileController(mockWikiRepo.Object, mockAuth);
 
             // Act
-            var result = controller.GetFile(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+            var result = controller.GetFile(Guid.NewGuid(), Guid.NewGuid());
 
             // Assert
             ForbidResult forbidResult = Assert.IsType<ForbidResult>(result.Result);
         }
 
         [Fact]
-        public void Get_File__Should_Return_Bad_Request_If_Not_Valid_Guid()
+        public void Get_File_Should_Return_Bad_Request_If_Attachment_Is_Not_OK()
         {
+            WikiPage wikiPage = new WikiPage();
+            wikiPage.Id = Guid.NewGuid();
+
+            Attachment attacment = new Attachment();
+            attacment.FileId = Guid.NewGuid();
+            wikiPage.Attachments = new List<Attachment>();
+            wikiPage.Attachments.Add(attacment);
+
             // Arrange
             var mockWikiRepo = new Mock<IWikiRepository>();
             var mockAuth = new AuthorizeStub(true);
 
+            mockWikiRepo.Setup(x => x.GetById(wikiPage.Id)).Returns(wikiPage);
+
             var controller = new FileController(mockWikiRepo.Object, mockAuth);
 
             // Act
-            var result = controller.GetFile("kek", Guid.NewGuid().ToString());
+            var result = controller.GetFile(wikiPage.Id, attacment.FileId);
 
             // Assert
             BadRequestResult badReqest = Assert.IsType<BadRequestResult>(result.Result);
@@ -69,7 +79,7 @@ namespace ASPWiki.Tests
             var controller = new FileController(mockWikiRepo.Object, mockAuth);
 
             // Act
-            var result = controller.GetFile(wikiPage.Id.ToString(), attacment.FileId.ToString());
+            var result = controller.GetFile(wikiPage.Id, attacment.FileId);
 
             // Assert
             FileContentResult fileContentResult = Assert.IsType<FileContentResult>(result.Result);

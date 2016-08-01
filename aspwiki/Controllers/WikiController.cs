@@ -137,7 +137,7 @@ namespace ASPWiki.Controllers
             {
                 wikiRepository.Delete(path);
 
-                logger.LogInformation(User.Identity?.Name + " deleted wikipage:" + path);
+                logger.LogInformation(User?.Identity?.Name + " deleted wikipage:" + path);
                 this.FlashMessageError("Wikipage: " + this.GetLastItemFromPath(path) +
                     " deleted: <a style='float:right;' href='/Wiki/Revert/" + path +
                     "'><b><i class='fa fa-reply' aria-hidden='true'></i>UNDO </b></a>");

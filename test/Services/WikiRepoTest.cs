@@ -40,7 +40,7 @@ namespace test.Services
             if (expected.Id != actual.Id)
                 return false;
 
-            if (expected.label != actual.label)
+            if (expected.Label != actual.Label)
                 return false;
 
             if (expected.Path != actual.Path)

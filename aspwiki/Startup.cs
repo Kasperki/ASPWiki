@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authorization;
 using Serilog;
 using System.IO;
 using ASPWiki.Services.Generators;
+using AutoMapper;
+using ASPWiki.Mapping;
 
 namespace ASPWiki
 {
@@ -47,6 +49,9 @@ namespace ASPWiki
         {
             //ApplicationInsightsTelemetry
             services.AddApplicationInsightsTelemetry(Configuration);
+
+            AutoMapperConfiguration.Configure();
+            services.AddSingleton(Mapper.Instance);
 
             services.AddSession();
 

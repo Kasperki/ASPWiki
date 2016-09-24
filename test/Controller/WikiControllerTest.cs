@@ -9,26 +9,37 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
+using ASPWiki.ViewModels;
 
 namespace ASPWiki.Tests
 {
     public class WikiControllerTest
     {
+        Mock<IMapper> mapperMock;
+        Mock<IRouteGenerator> mockRouteGen;
+        Mock<IWikiService> mockWikiService;
+        Mock<IWikiRepository> mockWikiRepo;
+        Mock<IAuthorizationService> mockAuth;
+        Mock<ILogger<WikiController>> mockLogger;
+
+        public WikiControllerTest()
+        {
+            mapperMock = new Mock<IMapper>();
+            mockRouteGen = new Mock<IRouteGenerator>();
+            mockWikiService = new Mock<IWikiService>();
+            mockWikiRepo = new Mock<IWikiRepository>();
+            mockAuth = new Mock<IAuthorizationService>();
+            mockLogger = new Mock<ILogger<WikiController>>();
+        }
+
         [Fact]
         public void New_Should_Redirect_to_Add_Action()
         {
             string expectedTitle = "RedBanana";
-            
-            // Arrange
-            var mockRouteGen = new Mock<IRouteGenerator>();
-            var mockWikiService = new Mock<IWikiService>();
-            var mockWikiRepo = new Mock<IWikiRepository>();
-            var mockAuth = new Mock<IAuthorizationService>();
-            var mockLogger = new Mock<ILogger<WikiController>>();
 
             mockRouteGen.Setup(gen => gen.GenerateRoute()).Returns(expectedTitle);
-
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object, mockLogger.Object);
+            var controller = new WikiController(mapperMock.Object, mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object, mockLogger.Object);
 
             // Act
             var result = controller.New();
@@ -42,25 +53,13 @@ namespace ASPWiki.Tests
         [Fact]
         public void Add_Should_Create_New_WikiPage_And_Load_Edit_View_With_Model()
         {
-            string expectedTitle = "BlueBanana";
-
-            // Arrange
-            var mockRouteGen = new Mock<IRouteGenerator>();
-            var mockWikiService = new Mock<IWikiService>();
-            var mockWikiRepo = new Mock<IWikiRepository>();
-            var mockAuth = new Mock<IAuthorizationService>();
-            var mockLogger = new Mock<ILogger<WikiController>>();
-
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object, mockLogger.Object);
+            var controller = new WikiController(mapperMock.Object, mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth.Object, mockLogger.Object);
 
             // Act
-            var result = controller.Add(expectedTitle);
+            var result = controller.Add("ThisMapperHereNeedsMockingToCheckTitle");
 
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result);
-            
-            var model = Assert.IsAssignableFrom<WikiPage>(viewResult.ViewData.Model);
-            Assert.Equal(expectedTitle, model.Title);
             Assert.Equal("Edit", viewResult.ViewName);
         }
 
@@ -70,14 +69,7 @@ namespace ASPWiki.Tests
             string expectedTitle = "Reall";
             string path = "Heh/This/Is/Not/" + expectedTitle;
 
-            // Arrange
-            var mockRouteGen = new Mock<IRouteGenerator>();
-            var mockWikiService = new Mock<IWikiService>();
-            var mockWikiRepo = new Mock<IWikiRepository>();
-            var mockAuth = new AuthorizeStub(true);
-            var mockLogger = new Mock<ILogger<WikiController>>();
-
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth, mockLogger.Object);
+            var controller = new WikiController(mapperMock.Object, mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, new AuthorizeStub(true), mockLogger.Object);
 
             // Act
             var result = controller.Edit(path);
@@ -95,18 +87,14 @@ namespace ASPWiki.Tests
             string expectedTitle = "BlueBanana";
             string path = "Heh/This/Is/" + expectedTitle;
 
-            // Arrange
-            var mockRouteGen = new Mock<IRouteGenerator>();
-            var mockWikiService = new Mock<IWikiService>();
-            var mockWikiRepo = new Mock<IWikiRepository>();
-            var mockAuth = new AuthorizeStub(true);
-            var mockLogger = new Mock<ILogger<WikiController>>();
-
             WikiPage wikiPage = new WikiPage(expectedTitle);
-            wikiPage.Path = path;
+
+            WikipageEdit wikiPageEdit= new WikipageEdit();
+            wikiPageEdit.Title = expectedTitle;
 
             mockWikiRepo.Setup(repo => repo.GetByPath(path)).Returns(wikiPage);
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth, mockLogger.Object);
+            mapperMock.Setup(m => m.Map<WikipageEdit>(wikiPage)).Returns(wikiPageEdit);
+            var controller = new WikiController(mapperMock.Object, mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, new AuthorizeStub(true), mockLogger.Object);
 
             // Act
             var result = controller.Edit(path);
@@ -114,7 +102,7 @@ namespace ASPWiki.Tests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result.Result);
 
-            var model = Assert.IsAssignableFrom<WikiPage>(viewResult.ViewData.Model);
+            var model = Assert.IsAssignableFrom<WikipageEdit>(viewResult.ViewData.Model);
             Assert.Equal(expectedTitle, model.Title);
             Assert.Equal("Edit", viewResult.ViewName);
         }
@@ -125,17 +113,10 @@ namespace ASPWiki.Tests
             string expectedTitle = "BlueBanana";
             string path = "Heh/This/Is/" + expectedTitle;
 
-            // Arrange
-            var mockRouteGen = new Mock<IRouteGenerator>();
-            var mockWikiService = new Mock<IWikiService>();
-            var mockWikiRepo = new Mock<IWikiRepository>();
-            var mockAuth = new AuthorizeStub(false);
-            var mockLogger = new Mock<ILogger<WikiController>>();
-
             WikiPage wikiPage = new WikiPage(expectedTitle);
 
             mockWikiRepo.Setup(repo => repo.GetByPath(path)).Returns(wikiPage);
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth, mockLogger.Object);
+            var controller = new WikiController(mapperMock.Object, mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, new AuthorizeStub(false), mockLogger.Object);
 
             // Act
             var result = controller.Edit(path);
@@ -149,14 +130,8 @@ namespace ASPWiki.Tests
         {
             string wikiPageRoute = "Omg/This/Exists/Not";
 
-            // Arrange
-            var mockRouteGen = new Mock<IRouteGenerator>();
-            var mockWikiService = new Mock<IWikiService>();
-            var mockWikiRepo = new Mock<IWikiRepository>();
-            var mockAuth = new AuthorizeStub(true);
-            var mockLogger = new Mock<ILogger<WikiController>>();
-
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth, mockLogger.Object);
+            mapperMock.Setup(m => m.Map<WikipageView>(new WikiPage())).Returns(new WikipageView());
+            var controller = new WikiController(mapperMock.Object, mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, new AuthorizeStub(true), mockLogger.Object);
 
             // Act
             var result = controller.ViewPage(wikiPageRoute, null);
@@ -172,19 +147,16 @@ namespace ASPWiki.Tests
         {
             string wikiPageRoute = "Omg/This/Exists";
 
-            // Arrange
-            var mockRouteGen = new Mock<IRouteGenerator>();
-            var mockWikiService = new Mock<IWikiService>();
-            var mockWikiRepo = new Mock<IWikiRepository>();
-            var mockAuth = new AuthorizeStub(true);
-            var mockLogger = new Mock<ILogger<WikiController>>();
+            WikiPage wikiPage = new WikiPage();
 
-            WikiPage wikiPage = new WikiPage("Exists");
-            wikiPage.ContentHistory = new List<string>(new string[] { "v0", "v1", "current" });
-            wikiPage.Content = "current";
+            WikipageView wikiPageView = new WikipageView();
+            wikiPageView.Title = "Exists";
+            wikiPageView.ContentHistory = new List<string>(new string[] { "v0", "v1", "current" });
+            wikiPageView.Content = "current";
 
             mockWikiRepo.Setup(repo => repo.GetByPath(wikiPageRoute)).Returns(wikiPage);
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth, mockLogger.Object);
+            mapperMock.Setup(m => m.Map<WikipageView>(wikiPage)).Returns(wikiPageView);
+            var controller = new WikiController(mapperMock.Object, mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, new AuthorizeStub(true), mockLogger.Object);
 
             // Act
             var result = controller.ViewPage(wikiPageRoute, null);
@@ -192,38 +164,10 @@ namespace ASPWiki.Tests
             // Assert
             var viewResult = Assert.IsType<ViewResult>(result.Result);
 
-            var model = Assert.IsAssignableFrom<WikiPage>(viewResult.ViewData.Model);
-            Assert.Equal("Exists", model.Title);
-            Assert.Equal(wikiPage.ContentHistory[wikiPage.ContentHistory.Count - 1], model.Content);
-            Assert.Equal("View", viewResult.ViewName);
-        }
-
-        [Fact]
-        public void View_Should_Show_WikiPage_With_Right_Version()
-        {
-            string wikiPageRoute = "Omg/This/Exists";
-
-            // Arrange
-            var mockRouteGen = new Mock<IRouteGenerator>();
-            var mockWikiService = new Mock<IWikiService>();
-            var mockWikiRepo = new Mock<IWikiRepository>();
-            var mockAuth = new AuthorizeStub(true);
-            var mockLogger = new Mock<ILogger<WikiController>>();
-
-            WikiPage wikiPage = new WikiPage("Exists");
-            wikiPage.ContentHistory = new List<string>(new string[] { "v0", "v1", "current" });
-
-            mockWikiRepo.Setup(repo => repo.GetByPath(wikiPageRoute)).Returns(wikiPage);
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth, mockLogger.Object);
-
-            // Act
-            var result = controller.ViewPage(wikiPageRoute, "1");
-
-            // Assert
-            var viewResult = Assert.IsType<ViewResult>(result.Result);
-
-            var model = Assert.IsAssignableFrom<WikiPage>(viewResult.ViewData.Model);
-            Assert.Equal(wikiPage.ContentHistory[1], model.Content);
+            var model = Assert.IsAssignableFrom<WikipageView>(viewResult.ViewData.Model);
+            Assert.Equal(wikiPageView.Title, model.Title);
+            Assert.Equal(wikiPageView.Content, model.Content);
+            Assert.Equal(wikiPageView.ContentHistory.Count, model.ContentHistory.Count);
             Assert.Equal("View", viewResult.ViewName);
         }
 
@@ -232,18 +176,11 @@ namespace ASPWiki.Tests
         {
             string wikiPageRoute = "Omg/This/Exists";
 
-            // Arrange
-            var mockRouteGen = new Mock<IRouteGenerator>();
-            var mockWikiService = new Mock<IWikiService>();
-            var mockWikiRepo = new Mock<IWikiRepository>();
-            var mockAuth = new AuthorizeStub(false);
-            var mockLogger = new Mock<ILogger<WikiController>>();
-
             WikiPage wikiPage = new WikiPage("Exists");
             wikiPage.ContentHistory = new List<string>(new string[] { "v0", "v1", "current" });
 
             mockWikiRepo.Setup(repo => repo.GetByPath(wikiPageRoute)).Returns(wikiPage);
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth, mockLogger.Object);
+            var controller = new WikiController(mapperMock.Object, mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, new AuthorizeStub(false), mockLogger.Object);
 
             // Act
             var result = controller.ViewPage(wikiPageRoute, "1");
@@ -257,14 +194,7 @@ namespace ASPWiki.Tests
         {
             string pathToDelete = "Delete/This/Page";
             
-            // Arrange
-            var mockRouteGen = new Mock<IRouteGenerator>();
-            var mockWikiService = new Mock<IWikiService>();
-            var mockWikiRepo = new Mock<IWikiRepository>();
-            var mockAuth = new AuthorizeStub(true);
-            var mockLogger = new Mock<ILogger<WikiController>>();
-
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth, mockLogger.Object);
+            var controller = new WikiController(mapperMock.Object, mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, new AuthorizeStub(true), mockLogger.Object);
             controller.TempData = new TempDataDictionary(new Mock<HttpContext>().Object, new Mock<ITempDataProvider>().Object);
 
             // Act
@@ -280,14 +210,7 @@ namespace ASPWiki.Tests
         {
             string pathToDelete = "Delete/This/Page";
 
-            // Arrange
-            var mockRouteGen = new Mock<IRouteGenerator>();
-            var mockWikiService = new Mock<IWikiService>();
-            var mockWikiRepo = new Mock<IWikiRepository>();
-            var mockAuth = new AuthorizeStub(false);
-            var mockLogger = new Mock<ILogger<WikiController>>();
-
-            var controller = new WikiController(mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, mockAuth, mockLogger.Object);
+            var controller = new WikiController(mapperMock.Object, mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, new AuthorizeStub(false), mockLogger.Object);
             controller.TempData = new TempDataDictionary(new Mock<HttpContext>().Object, new Mock<ITempDataProvider>().Object);
 
             // Act

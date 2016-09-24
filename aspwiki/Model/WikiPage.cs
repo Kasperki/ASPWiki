@@ -21,7 +21,7 @@ namespace ASPWiki.Model
 
         public bool Public { get; set; }
 
-        public Label label { get; set; }
+        public Label Label { get; set; }
 
         public int Visits { get; set; }
 

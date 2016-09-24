@@ -121,7 +121,7 @@ namespace ASPWiki.Services
                 wikiPage.Public = true;
 
             //Attachments
-            var attachments = BindUploadsToAttacments(uploads, indetity.IsAuthenticated);     
+            var attachments = BindUploadsToAttacments(uploads, wikiPage.Id, indetity.IsAuthenticated);     
             wikiPage.Attachments = attachments;
 
             var oldAttachments = wikiRepository.GetById(wikiPage.Id)?.Attachments;
@@ -133,7 +133,7 @@ namespace ASPWiki.Services
             wikiPage.LastModified = DateTime.Now;
         }
 
-        public List<Attachment> BindUploadsToAttacments(IEnumerable<IFormFile> uploads, bool isAuthenticated)
+        public List<Attachment> BindUploadsToAttacments(IEnumerable<IFormFile> uploads, Guid wikipageId, bool isAuthenticated)
         {
             var attachments = new List<Attachment>();
 
@@ -143,6 +143,7 @@ namespace ASPWiki.Services
                 {
                     var attachment = new Attachment
                     {
+                        WikipageId = wikipageId,
                         FileId = Guid.NewGuid(),
                         FileName = System.IO.Path.GetFileName(upload.FileName),
                         ContentType = upload.ContentType

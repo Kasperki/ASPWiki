@@ -5,6 +5,7 @@ namespace ASPWiki.Model
 {
     public class Attachment
     {
+        public Guid WikipageId { get; set; }
         public Guid FileId { get; set; }
         [StringLength(255)]
         public string FileName { get; set; }

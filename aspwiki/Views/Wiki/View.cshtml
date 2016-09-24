@@ -1,4 +1,4 @@
-﻿@model WikiPage
+﻿@model WikipageView
 
 @{ 
     ViewData["Title"] = Model.Title;
@@ -15,7 +15,7 @@
                         <i class="fa fa-eye-slash fa-2x" aria-hidden="true" style="color:orange" data-toggle="tooltip" title="Hidden"></i>
                     }
                 </span>
-                @Html.Partial("~/Views/Wiki/Label.cshtml", Model.label)
+                @Html.Partial("~/Views/Wiki/Label.cshtml", Model.Label)
             </div>
             <div class="col-md-6">
                 <div class="row">
@@ -52,7 +52,7 @@
     </div>
     
     <section>
-        @Html.Partial("Attachments", Model)
+        @Html.Partial("Attachments", Model.Attachments)
     </section>
 
     <div id="content">
@@ -65,7 +65,7 @@
 <br />
 <div class="row">
     <div class="col-sm-12">
-        <span>Written by: @(@Model.Author == null ? "Uknown" : @Model.Author) - Size: @Model.GetSizeKiloBytes() - @Html.DisplayFor(model => model.LastModified)</span>
+        <span>Written by: @(@Model.Author == null ? "Unknown" : @Model.Author) - Size: @Model.Size - @Html.DisplayFor(model => model.LastModified)</span>
     </div>
 </div>
 

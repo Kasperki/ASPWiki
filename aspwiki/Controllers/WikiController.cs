@@ -9,9 +9,16 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using AutoMapper;
+using ASPWiki.ViewModels;
 
 namespace ASPWiki.Controllers
 {
+    /// <summary>
+    /// WikiController
+    /// 
+    /// TODO CONTENT HISTORY GET BY AJAX REQUEST, DO NOT SEND WHOLE DATA TO VIEW!
+    /// </summary>
     public class WikiController : Controller
     {
         private readonly IRouteGenerator routeGenerator;
@@ -24,13 +31,16 @@ namespace ASPWiki.Controllers
 
         private readonly ILogger<WikiController> logger;
 
-        public WikiController(IRouteGenerator routeGenerator, IWikiRepository wikiRepository, IWikiService wikiService, IAuthorizationService authorizationService, ILogger<WikiController> logger)
+        private readonly IMapper mapper;
+
+        public WikiController(IMapper mapper, IRouteGenerator routeGenerator, IWikiRepository wikiRepository, IWikiService wikiService, IAuthorizationService authorizationService, ILogger<WikiController> logger)
         {
             this.routeGenerator = routeGenerator;
             this.wikiRepository = wikiRepository;
             this.wikiService = wikiService;
             this.authorizationService = authorizationService;
             this.logger = logger;
+            this.mapper = mapper;
         }
 
         [HttpGet("Wiki/New")]
@@ -44,7 +54,7 @@ namespace ASPWiki.Controllers
         public IActionResult Add(string title)
         {
             var wikiPage = new WikiPage(title);
-            return View("Edit", wikiPage);
+            return View("Edit", mapper.Map<WikipageEdit>(wikiPage));
         }
 
         [HttpGet("Wiki/Edit/{*path}")]
@@ -57,7 +67,7 @@ namespace ASPWiki.Controllers
 
             if (await authorizationService.AuthorizeAsync(User, wikiPage, new WikiPageEditRequirement()))
             {
-                return View("Edit", wikiPage);
+                return View("Edit", mapper.Map<WikipageEdit>(wikiPage));
             }
             else
             {
@@ -83,7 +93,7 @@ namespace ASPWiki.Controllers
             if (await authorizationService.AuthorizeAsync(User, wikiPage, new WikiPageEditRequirement()))
             {
                 wikiService.AddVisit(wikiPage);
-                return View("View", wikiPage);
+                return View("View", mapper.Map<WikipageView>(wikiPage));
             }
             else
             {
@@ -93,11 +103,11 @@ namespace ASPWiki.Controllers
 
         [HttpPost("Wiki/Save")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Save(WikiPage wikiPage, IEnumerable<IFormFile> uploads)
+        public async Task<IActionResult> Save(WikipageSave wikipageSave, IEnumerable<IFormFile> uploads)
         {
             if (ModelState.IsValid)
             {
-                var wiki = wikiRepository.GetById(wikiPage.Id);
+                var wiki = wikiRepository.GetById(wikipageSave.Id);
                 if (wiki != null)
                 {
                    if (!await authorizationService.AuthorizeAsync(User, wiki, new WikiPageEditRequirement()))
@@ -108,6 +118,8 @@ namespace ASPWiki.Controllers
 
                 try
                 {
+                    WikiPage wikiPage = mapper.Map<WikiPage>(wikipageSave);
+
                     if (wiki == null)
                     {
                         wikiService.Add(wikiPage, uploads, User.Identity);
@@ -125,14 +137,14 @@ namespace ASPWiki.Controllers
                 {
                     logger.LogError(new EventId(Constants.ERROR_CODE_EXPECTION), e, "Error saving wikipage");
                     this.FlashMessageError(e.Message); //This should not print every single error
-                    return View("Edit", wikiPage);
+                    return View("Edit", wikipageSave);
                 }
             }
             else
             {
                 logger.LogError("Error saving wikipage model state not valid:" + this.GetModelStateErrors());
                 this.FlashMessageError("Model invalid: " + this.GetModelStateErrors());
-                return View("Edit", wikiPage);
+                return View("Edit", wikipageSave);
             }
         }
 

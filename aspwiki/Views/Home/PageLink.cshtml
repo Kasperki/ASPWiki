@@ -1,5 +1,5 @@
-﻿@using ASPWiki.Model
-@model WikiPage
+﻿@using ASPWiki.ViewModels
+@model WikipageSummary
 
 <article class="row" style="margin:15px;word-break:break-all;">
     <div class="col-sm-12">
@@ -7,12 +7,12 @@
     </div>
 
     <div class="col-sm-12">
-        @Html.Raw(@Model.GetContentSummary())
+        @Html.Raw(@Model.ContentSummary)
     </div>
 
     <div class="col-sm-12">
-        @Html.Partial("~/Views/Wiki/Label.cshtml", Model.label)
-        <span>Written by: @(@Model.Author == null ? "Uknown" : @Model.Author) - Size: @Model.GetSizeKiloBytes() - @Html.DisplayFor(model => model.LastModified)</span>
-        <span>@Model.Attachments.Count <i class="fa fa-paperclip" aria-hidden="true"></i></span>
+        @Html.Partial("~/Views/Wiki/Label.cshtml", Model.Label)
+        <span>Written by: @(@Model.Author == null ? "Uknown" : @Model.Author) - Size: @Model.Size - @Html.DisplayFor(model => model.LastModified)</span>
+        <span>@Model.AttachmentCount <i class="fa fa-paperclip" aria-hidden="true"></i></span>
     </div>
 </article>

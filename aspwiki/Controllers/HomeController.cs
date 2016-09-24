@@ -2,11 +2,14 @@
 using ASPWiki.Services;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using ASPWiki.Model;
+using AutoMapper;
+using ASPWiki.ViewModels;
 
 namespace ASPWiki.Controllers
 {
-    //AUTOMAPPER, CLEAN CONTROLLERS
+    //IsValidPath Buggings; Async mongoqueries?
+    
+    //CLEAN CONTROLLERS
      //CLEAN SERVICES
      //CLEAN WIKIMODEL
     //CONSTANTS T4
@@ -20,11 +23,13 @@ namespace ASPWiki.Controllers
     {
         private readonly IWikiRepository wikiRepository;
         private readonly IWikiService wikiService;
+        private readonly IMapper mapper;
 
-        public HomeController(IWikiRepository wikiRepository, IWikiService wikiService)
+        public HomeController(IMapper mapper, IWikiRepository wikiRepository, IWikiService wikiService)
         {
             this.wikiRepository = wikiRepository;
             this.wikiService = wikiService;
+            this.mapper = mapper;
         }
 
         public IActionResult Index()
@@ -32,7 +37,7 @@ namespace ASPWiki.Controllers
             var wiki = wikiRepository.GetAll();
             var wikiPagesLatests = wikiRepository.GetLatest(5);
             var wikiPagesPopular = wikiRepository.GetPopular(5);
-            return View("Index", new List<List<WikiPage>>{ wikiPagesLatests, wikiPagesPopular });
+            return View("Index", new List<List<WikipageSummary>>{ mapper.Map<List<WikipageSummary>>(wikiPagesLatests), mapper.Map<List<WikipageSummary>>(wikiPagesPopular) });
         }
 
         public IActionResult GetAsideWikiPages()

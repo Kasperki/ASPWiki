@@ -1,20 +1,20 @@
-﻿@model WikiPage
+﻿@model List<Attachment>
 
 <div>
-    @if (Model.Attachments != null)
+    @if (@Model != null)
     {
-        if (Model.Attachments.Count > 0)
+        if (Model.Count > 0)
         {
             <h4>Attachments:</h4>
         }
 
-        foreach (var attachment in Model.Attachments)
+        foreach (var attachment in Model)
         {
-            <a href="/Wiki/File/View/@Model.Id/@attachment.FileId">@attachment.FileName</a>
+            <a href="/Wiki/File/View/@attachment.WikipageId/@attachment.FileId">@attachment.FileName</a>
 
             @if (User.Identity.IsAuthenticated)
             {
-                <a id="deleteAttacment @attachment.FileId" class="pointer">
+                <a id="deleteAttacment @attachment.FileId" wikiId="@attachment.WikipageId" class="pointer">
                     <i class="fa fa-trash error" aria-hidden="true"></i>
                 </a>
             }
@@ -29,11 +29,12 @@
         $(this).hide("fast");
 
         var attachmentId = $(this).attr('id').substr(16);
+        var wikiId = $(this).attr('wikiId');
 
         $.ajax({
             url: '/Wiki/File/Delete',
             type: 'POST',
-            data: JSON.stringify({ WikiId: "@Model.Id", Id: attachmentId }),
+            data: JSON.stringify({ WikiId: wikiId, Id: attachmentId }),
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
             async: true,

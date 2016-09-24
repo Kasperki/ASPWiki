@@ -80,7 +80,7 @@ namespace ASPWiki.Tests
             FormFile file1 = new FormFile(stream, 0, stream.Length, "file1", "fileName");
             file1.ContentType = "text/plain";
 
-            var result = wikiService.BindUploadsToAttacments(new List<FormFile>() { file1 }, true);
+            var result = wikiService.BindUploadsToAttacments(new List<FormFile>() { file1 }, Guid.NewGuid(), true);
 
             Assert.Equal("fileName", result[0].FileName);
             Assert.Equal("text/plain", result[0].ContentType);

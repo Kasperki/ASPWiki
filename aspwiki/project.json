@@ -21,7 +21,8 @@
     "Serilog.Extensions.Logging": "1.1.0",
     "Serilog.Sinks.Literate": "2.0.0",
     "Serilog.Sinks.File": "2.2.0",
-    "MongoDB.Driver": "2.3.0-rc1"
+    "MongoDB.Driver": "2.3.0-rc1",
+    "AutoMapper": "5.0.2"
   },
 
   "tools": {

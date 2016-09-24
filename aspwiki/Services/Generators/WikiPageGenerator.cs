@@ -35,17 +35,22 @@ namespace ASPWiki.Services.Generators
                 wikiPage.Author = GetRandomName();
             }
 
-            wikiPage.label = (Label)random.Next(0, Enum.GetNames(typeof(Label)).Length);
+            wikiPage.Label = (Label)random.Next(0, Enum.GetNames(typeof(Label)).Length);
 
             var versions = random.Next(1, 12);
             for (int i = 0; i < versions; i++)
             {
-                wikiPage.ContentHistory.Add(wikiPage.Content.Substring(wikiPage.Content.Length ));
+                wikiPage.ContentHistory.Add(wikiPage.Content.Substring(0, wikiPage.Content.Length / (versions - i)));
             }
 
             wikiPage.Visits = random.Next(0, 10);
             wikiPage.Attachments = attachmentGenerator.GenerateList(random.Next(0, 5));
-            
+
+            foreach (var attachment in wikiPage.Attachments)
+            {
+                attachment.WikipageId = wikiPage.Id;
+            }
+
             return wikiPage;
         }
 

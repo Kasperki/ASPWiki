@@ -1,5 +1,4 @@
-﻿@using ASPWiki.Model;
-@model WikiPage
+﻿@model WikipageEdit
 
 @{
     ViewData["Title"] = "Edit";
@@ -9,7 +8,6 @@
     <div class="row" style="margin-top:20px;">
 
         @Html.HiddenFor(model => Model.Id)
-        @Html.HiddenFor(model => Model.Visits)
 
         <div class="col-xs-6">
             <label for="title">Title</label>
@@ -18,7 +16,7 @@
 
         <div class="col-xs-6">
             <label for="label">Label</label>
-            <select class="form-control" asp-for="label" asp-items="Html.GetEnumSelectList<Label>()"></select>
+            <select class="form-control" asp-for="Label" asp-items="Html.GetEnumSelectList<Label>()"></select>
         </div>
         <div class="col-xs-12">
             <label for="path">Path:</label>
@@ -26,8 +24,8 @@
                 @Html.Partial("PathLink", Model.PathArray)
             </span>
             <div class="input-group">
-                <span class="input-group-addon">Wiki/View/</span>
-                <input class="form-control" asp-for="Path" type="text" id="path" placeholder="page/path/here/..." value="@Model.GetPathToParent()" />
+                <span class="input-group-addon">@Url.Action("View", "Wiki")</span>
+                <input class="form-control" asp-for="Path" type="text" id="path" placeholder="page/path/here/..." value="@Model.PathToParent" />
                 <span class="input-group-addon" id="pathEnding"></span>
                 <span class="input-group-addon" id="pathIcon"></span>
             </div>
@@ -39,7 +37,7 @@
 
         <section>
             <div class="col-xs-12">
-                @Html.Partial("Attachments", Model)
+                @Html.Partial("Attachments", Model.Attachments)
             </div>
         </section>
 
@@ -47,7 +45,7 @@
         {
             <div class="form-group">
                 <div id="newFiles" class="col-xs-12" style="margin:10px 0 10px 0">
-                    <a id="addFile" class="pointer"><i class="fa fa-2x fa-plus-square"></i> ADD FILE</a>
+                    <a id="addFile" class="pointer"><i class="fa fa-2x fa-plus-square"></i> Add new file</a>
                     <input type="file" asp-for="Attachments" name="uploads"/>
                 </div>
             </div>

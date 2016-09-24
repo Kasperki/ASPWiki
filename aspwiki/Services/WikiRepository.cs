@@ -1,130 +1,197 @@
-﻿using System.Linq;
+﻿using MongoDB.Driver;
 using System.Collections.Generic;
 using ASPWiki.Model;
 using System;
+using MongoDB.Bson;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
 
 namespace ASPWiki.Services
 {
-    public class WikiRepository : IWikiRepository
+    public class WikiRepository : Repository<WikiPage>, IWikiRepository
     {
-        private Dictionary<DateTime, WikiPage> temporalWikiDir;
-        private List<WikiPage> wikiRepository;
+        private readonly IHttpContextAccessor context;
+        private Dictionary<Session, WikiPage> deletedDictionary;
 
-        public WikiRepository()
+        private class Session
         {
-            temporalWikiDir = new Dictionary<DateTime, WikiPage>();
-            wikiRepository = new List<WikiPage>();
+            public string id;
+            public string path;
+            public DateTime? created;
+
+            public Session(string id, string path, DateTime? created)
+            {
+                this.id = id;
+                this.path = path;
+                this.created = created;
+            }
+
+            public override int GetHashCode()
+            {
+                return id.GetHashCode() + (path != null ? path.GetHashCode() : 0);
+            }
+
+            public override bool Equals(object obj)
+            {
+                return Equals(obj as Session);
+            }
+            public bool Equals(Session obj)
+            {
+                return obj != null && obj.id == this.id && obj.path == this.path;
+            }
+        }
+        
+        public bool? authenticated { get { return context?.HttpContext?.User?.Identity?.IsAuthenticated; } }
+
+        public WikiRepository(IDatabaseConnection databaseConnection, IHttpContextAccessor context) :base(databaseConnection, Constants.WikiPagesCollectionName)
+        {
+            deletedDictionary = new Dictionary<Session, WikiPage>();
+            this.context = context;
         }
 
-        public WikiPage GetByPath(string path)
+        public void Delete(WikiPage wikipage)
         {
-            if (path != null)
+            AddWikipageForRecover(wikipage);
+
+            var builder = Builders<WikiPage>.Filter;
+            var filter = builder.Eq(x => x.Id, wikipage.Id);
+
+            collection.DeleteOne(filter);
+        }
+
+        private void AddWikipageForRecover(WikiPage wikipage)
+        {
+            deletedDictionary[new Session(context.HttpContext.Session.Id, wikipage.Path, DateTime.Now)] = wikipage;
+
+            //Delete old wikipages from recover list
+            var itemsToBeRemoved = new List<Session>();
+            foreach (KeyValuePair<Session, WikiPage> item in deletedDictionary)
             {
-                foreach (WikiPage wikiPage in wikiRepository)
+                if (item.Key.created + new TimeSpan(0, 0, 10) < DateTime.Now)
                 {
-                    if (String.Equals(wikiPage.Path, path))
-                        return wikiPage;
+                    itemsToBeRemoved.Add(item.Key);
                 }
             }
 
-            return null;
-        }
-
-        public List<WikiPage> GetLatest(int number, bool authenticated)
-        {
-            var query = from wikiPage in wikiRepository select wikiPage;
-
-            if (!authenticated)
-                query = query.Where(wikiPage => wikiPage.Public == true);
-
-            query = query.OrderByDescending(wikiPage => wikiPage.LastModified);
-
-            return query.Take(number).ToList();
-        }
-
-        public List<WikiPage> GetAll(bool authenticated)
-        {
-            if (authenticated)
+            foreach (var item in itemsToBeRemoved)
             {
-                return wikiRepository.ToList();
+                deletedDictionary.Remove(item);
+            }
+        }
+
+        public List<WikiPage> GetAll()
+        {
+            if (authenticated == true)
+            {
+                return collection.Find(_ => true).ToList();
             }
             else
             {
-                return (from wikiPage in wikiRepository where wikiPage.Public == true select wikiPage).ToList();
+                return collection.Find(x => x.Public ==  true).ToList();
             }
-        }
-
-        public void Save(WikiPage wikiPage)
-        {
-            var wiki = GetById(wikiPage.Id);
-
-            if (wiki != null)
-            {
-                Delete(wiki.Path);
-            }
-
-            wikiRepository.Add(wikiPage); 
-        }
-
-        public void Delete(string path)
-        {
-            temporalWikiDir.Add(DateTime.Now, GetByPath(path));
-
-            wikiRepository.Remove(GetByPath(path));
-        }
-
-        public bool Recover(string path)
-        {
-            bool recovered = false;
-            List<DateTime> wikiPageToBeRemoved = new List<DateTime>();
-
-            foreach (KeyValuePair<DateTime, WikiPage> wikiPage in temporalWikiDir)
-            {
-                if (wikiPage.Key.AddDays(1) < DateTime.Now)
-                {
-                    wikiPageToBeRemoved.Add(wikiPage.Key);
-                    continue;
-                }
-
-                if (String.Equals(wikiPage.Value.Path, path))
-                {
-                    Save(wikiPage.Value);
-                    wikiPageToBeRemoved.Add(wikiPage.Key);
-                    recovered = true;
-                }
-            }
-
-            foreach(var key in wikiPageToBeRemoved)
-            {
-                temporalWikiDir.Remove(key);
-            }
-
-            return recovered;
         }
 
         public WikiPage GetById(Guid id)
         {
-            return wikiRepository.FirstOrDefault(w => w.Id == id);
+            var builder = Builders<WikiPage>.Filter;
+            var filter = builder.Eq(x => x.Id, id);
+
+            return collection.Find(filter).FirstOrDefault();
         }
 
-        public List<WikiPage> SearchByTitle(string keywords, bool authenticated)
+        public WikiPage GetByPath(string path)
         {
-            if (authenticated)
-                return (from wikiPage in wikiRepository where wikiPage.Title.Contains(keywords) select wikiPage).ToList();
+            var builder = Builders<WikiPage>.Filter;
 
-            return (from wikiPage in wikiRepository where wikiPage.Title.Contains(keywords) && wikiPage.Public == true select wikiPage).ToList();
+            path = System.Net.WebUtility.UrlDecode(path);
+
+            var filter = builder.Eq(x => x.Path, path);
+            return collection.Find(filter).FirstOrDefault();
         }
 
-        public List<WikiPage> GetPopular(int number, bool authenticated)
+        public List<WikiPage> GetLatest(int limit)
         {
-            var query = from wikiPage in wikiRepository select wikiPage;
+            var sort = Builders<WikiPage>.Sort.Descending("LastModified");
 
-            if (!authenticated)
-                query = query.Where(wikiPage => wikiPage.Public == true);
+            if (authenticated == true)
+            {
+                return collection.Find(new BsonDocument()).Sort(sort).ToList().Take(limit).ToList();
+            }
+            else
+            {
+                return collection.Find(x => x.Public == true).Sort(sort).ToList().Take(limit).ToList();
+            }
+          
+        }
 
-            query = query.OrderByDescending(wikiPage => wikiPage.Visits);
+        public List<WikiPage> GetPopular(int limit)
+        {
+            var sort = Builders<WikiPage>.Sort.Descending("Visits");
+          
+            if (authenticated == true)
+            {
+                return collection.Find(new BsonDocument()).Sort(sort).ToList().Take(limit).ToList();
+            }
+            else
+            {
+                return collection.Find(x => x.Public == true).Sort(sort).ToList().Take(limit).ToList();
+            }
+        }
 
-            return query.Take(number).ToList();
+        public bool Recover(string path)
+        {
+            if (!deletedDictionary.ContainsKey(new Session(context.HttpContext.Session.Id, path, null)))
+                return false;
+
+            Add(deletedDictionary[new Session(context.HttpContext.Session.Id, path, null)]);
+            return true;
+        }
+
+        public void Update(WikiPage wikiPage)
+        {
+            var builder = Builders<WikiPage>.Filter;
+            var filter = builder.Eq(x => x.Id, wikiPage.Id);
+            collection.ReplaceOne(filter, wikiPage);
+        }
+
+        public List<WikiPage> SearchByTitle(string keywords)
+        {
+            var all = GetAll();
+            List<WikiPage> list = new List<WikiPage>();
+
+            foreach (var item in all)
+            {
+                if ((item.Public || authenticated == true) && item.Title.Contains(keywords))
+                {
+                    list.Add(item);
+                }
+            }
+
+            return list;
+        }
+
+        public void Add(WikiPage wikiPage)
+        {
+            collection.InsertOne(wikiPage);
+        }
+
+        public void AddVisit(WikiPage wikipage)
+        {
+            var builder = Builders<WikiPage>.Filter;
+            var filter = builder.Eq(x => x.Id, wikipage.Id);
+            var update = Builders<WikiPage>.Update;
+            var updateDefinition = update.Set("Visits", wikipage.Visits++);
+            collection.UpdateOne(filter, updateDefinition);
+        }
+
+        public void RemoveFile(WikiPage wikipage, Guid fileId)
+        {
+            var builder = Builders<WikiPage>.Filter;
+            var filter = builder.Eq(x => x.Id, wikipage.Id);
+            var update = Builders<WikiPage>.Update;
+            wikipage.RemoveAttacment(fileId);
+            var updateDefinition = update.Set("Attachments", wikipage.Attachments);
+            collection.UpdateOne(filter, updateDefinition);
         }
     }
 }

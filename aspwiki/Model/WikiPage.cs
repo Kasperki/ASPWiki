@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,6 +10,7 @@ namespace ASPWiki.Model
 {
     public class WikiPage
     {
+        [BsonIgnoreIfDefault]
         public Guid Id { get; set; }
 
         [Required]
@@ -72,7 +74,7 @@ namespace ASPWiki.Model
             {
                 ContentHistory = new List<string>();
             }
-        } 
+        }
 
         public WikiPage(string title)
         {

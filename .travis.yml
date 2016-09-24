@@ -1,6 +1,8 @@
 language: csharp  
 sudo: required  
-dist: trusty  
+dist: trusty
+services:
+  - mongodb  
 env:  
   - CLI_VERSION=latest
 addons:  

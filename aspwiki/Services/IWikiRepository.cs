@@ -6,14 +6,18 @@ namespace ASPWiki.Services
 {
     public interface IWikiRepository
     {
-        void Save(WikiPage wikiPage);
-        void Delete(string path);
-        bool Recover(string path);
+        void Add(WikiPage obj);
+        void Update(WikiPage obj);
+        void Delete(WikiPage obj);
         WikiPage GetById(Guid id);
+        List<WikiPage> GetAll();
+
+        void AddVisit(WikiPage wikipage);
+        void RemoveFile(WikiPage wikipage, Guid fileId);
+        bool Recover(string path);
         WikiPage GetByPath(string path);
-        List<WikiPage> GetLatest(int number, bool authenticated);
-        List<WikiPage> GetPopular(int number, bool authenticated);
-        List<WikiPage> GetAll(bool authenticated);
-        List<WikiPage> SearchByTitle(string keywords, bool authenticated);
+        List<WikiPage> GetLatest(int number);
+        List<WikiPage> GetPopular(int number);
+        List<WikiPage> SearchByTitle(string keywords);
     }
 }

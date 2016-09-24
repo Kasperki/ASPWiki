@@ -16,7 +16,6 @@ namespace ASPWiki.Controllers
     {
         private readonly IRouteGenerator routeGenerator;
 
-        //TODO THIS WILL BE A REAL REPOSITORY_____ !!
         private readonly IWikiRepository wikiRepository;
 
         private readonly IWikiService wikiService;
@@ -98,7 +97,7 @@ namespace ASPWiki.Controllers
         {
             if (ModelState.IsValid)
             {
-                var wiki = wikiRepository.GetByPath(wikiPage.Path);
+                var wiki = wikiRepository.GetById(wikiPage.Id);
                 if (wiki != null)
                 {
                    if (!await authorizationService.AuthorizeAsync(User, wiki, new WikiPageEditRequirement()))
@@ -109,14 +108,22 @@ namespace ASPWiki.Controllers
 
                 try
                 {
-                    wikiService.Save(wikiPage, uploads, User.Identity);
+                    if (wiki == null)
+                    {
+                        wikiService.Add(wikiPage, uploads, User.Identity);
+                    }
+                    else
+                    {
+                        wikiService.Update(wikiPage, uploads, User.Identity);
+                    }
+
                     logger.LogInformation(User.Identity?.Name + " saved new wikipage:" + wikiPage.Title);
                     this.FlashMessageSuccess("Wikipage: " + wikiPage.Title + " succesfully saved");
                     return Redirect("/Wiki/View/" + wikiPage.Path);
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(new EventId(101), e, "Error saving wikipage");
+                    logger.LogError(new EventId(Constants.ERROR_CODE_EXPECTION), e, "Error saving wikipage");
                     this.FlashMessageError(e.Message); //This should not print every single error
                     return View("Edit", wikiPage);
                 }
@@ -133,9 +140,11 @@ namespace ASPWiki.Controllers
         [HttpGet("Wiki/Delete/{*path}")]
         public async Task<IActionResult> Delete(string path)
         {
-            if (await authorizationService.AuthorizeAsync(User, wikiRepository.GetByPath(path), new WikiPageEditRequirement()))
+            var wikiPage = wikiRepository.GetByPath(path);
+
+            if (await authorizationService.AuthorizeAsync(User, wikiPage, new WikiPageEditRequirement()))
             {
-                wikiRepository.Delete(path);
+                wikiRepository.Delete(wikiPage);
 
                 logger.LogInformation(User?.Identity?.Name + " deleted wikipage:" + path);
                 this.FlashMessageError("Wikipage: " + this.GetLastItemFromPath(path) +
@@ -155,7 +164,9 @@ namespace ASPWiki.Controllers
         public IActionResult Revert(string path)
         {
             if (wikiRepository.Recover(path))
+            {
                 this.FlashMessageSuccess("Wikipage: " + this.GetLastItemFromPath(path) + " recovered");
+            }
 
             return RedirectToAction("Index", "Home");
         }
@@ -194,7 +205,7 @@ namespace ASPWiki.Controllers
 
             var searchData = data.Value<string>("data");
 
-            List<WikiPage> wikipages = wikiRepository.SearchByTitle(searchData, User.Identity.IsAuthenticated);
+            List<WikiPage> wikipages = wikiRepository.SearchByTitle(searchData);
 
             Response.ContentType = "text/javascript";
             return new OkObjectResult(JsonConvert.SerializeObject(wikipages));

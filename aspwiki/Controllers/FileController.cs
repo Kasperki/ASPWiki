@@ -52,7 +52,7 @@ namespace ASPWiki.Controllers
             try
             {
                 var wikiPage = wikiRepository.GetById(new Guid(WikiId));
-                wikiPage.RemoveAttacment(new Guid(Id));
+                wikiRepository.RemoveFile(wikiPage, new Guid(Id));
                 return Ok();
             }
             catch (Exception)

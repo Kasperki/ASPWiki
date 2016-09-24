@@ -8,10 +8,10 @@ namespace ASPWiki.Services
 {
     public interface IWikiService
     {
-        void Save(WikiPage wikiPage, IEnumerable<IFormFile> uploads, IIdentity indentity);
+        void Add(WikiPage wikiPage, IEnumerable<IFormFile> uploads, IIdentity indentity);
+        void Update(WikiPage wikiPage, IEnumerable<IFormFile> uploads, IIdentity indentity);
         void AddVisit(WikiPage wikiPage);
         List<Node> GetWikiTree(List<WikiPage> wikiPages);
         bool IsValidPath(string path, Guid id);
-        List<WikiPage> FilterPublic(List<WikiPage> wikiPages);
     }
 }

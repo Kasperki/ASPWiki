@@ -20,7 +20,8 @@
     "Microsoft.AspNetCore.Authentication.Cookies": "1.0.0",
     "Serilog.Extensions.Logging": "1.1.0",
     "Serilog.Sinks.Literate": "2.0.0",
-    "Serilog.Sinks.File": "2.2.0"
+    "Serilog.Sinks.File": "2.2.0",
+    "MongoDB.Driver": "2.3.0-rc1"
   },
 
   "tools": {

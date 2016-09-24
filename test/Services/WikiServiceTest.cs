@@ -4,6 +4,8 @@ using ASPWiki.Model;
 using Moq;
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http.Internal;
+using System.IO;
 
 namespace ASPWiki.Tests
 {
@@ -69,6 +71,19 @@ namespace ASPWiki.Tests
 
             Exception e4 = Assert.Throws<Exception>(() => wikiService.IsValidPath("w1/w6/w1", w1.Id)); //W1 PATH: W1 > W6 > W1
             Assert.Equal("Parent not found", e4.Message);
+        }
+
+        [Fact(Skip = "NotReady")]
+        public void BindUploadsToAttacments_Should_Return_Attachments_From_FileUploads()
+        {
+            Stream stream = File.OpenRead("project.json");
+            FormFile file1 = new FormFile(stream, 0, stream.Length, "file1", "fileName");
+            file1.ContentType = "text/plain";
+
+            var result = wikiService.BindUploadsToAttacments(new List<FormFile>() { file1 }, true);
+
+            Assert.Equal("fileName", result[0].FileName);
+            Assert.Equal("text/plain", result[0].ContentType);
         }
     }
 }

@@ -32,7 +32,9 @@ namespace ASPWiki.Controllers
                 string sessionId = HttpContext.Request.Cookies["sessionId"];
 
                 if (authToken == null || sessionId == null)
-                    return Redirect("https://127.0.0.1:8081/login");
+                {
+                    return Redirect(Constants.AuthenticationLoginUrl);
+                }
 
                 try
                 {
@@ -40,7 +42,7 @@ namespace ASPWiki.Controllers
                 }
                 catch (Exception e)
                 {
-                    logger.LogWarning(new EventId(100), e, "Login failed from ip:" + HttpContext.Connection.RemoteIpAddress.MapToIPv4());
+                    logger.LogWarning(new EventId(Constants.WARNING_CODE_UNAUTHORIZED), e, "Login failed from ip:" + HttpContext.Connection.RemoteIpAddress.MapToIPv4());
 
                     this.FlashMessageError("401");
                     return View("Error");

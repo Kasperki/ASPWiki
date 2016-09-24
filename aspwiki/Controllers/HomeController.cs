@@ -6,6 +6,16 @@ using ASPWiki.Model;
 
 namespace ASPWiki.Controllers
 {
+    //AUTOMAPPER, CLEAN CONTROLLERS
+     //CLEAN SERVICES
+     //CLEAN WIKIMODEL
+    //CONSTANTS T4
+
+    //TODO ADD LIMIT FOR ADDING NEW PAGES?
+     //TODO REMOVE ALL OLD FILES
+
+     //Mobile friendly, colors, code tag easily available
+
     public class HomeController : Controller
     {
         private readonly IWikiRepository wikiRepository;
@@ -17,17 +27,17 @@ namespace ASPWiki.Controllers
             this.wikiService = wikiService;
         }
 
-        // GET: /<controller>/
         public IActionResult Index()
         {
-            var wikiPagesLatests = wikiRepository.GetLatest(5, User.Identity.IsAuthenticated);
-            var wikiPagesPopular = wikiRepository.GetPopular(5, User.Identity.IsAuthenticated);
+            var wiki = wikiRepository.GetAll();
+            var wikiPagesLatests = wikiRepository.GetLatest(5);
+            var wikiPagesPopular = wikiRepository.GetPopular(5);
             return View("Index", new List<List<WikiPage>>{ wikiPagesLatests, wikiPagesPopular });
         }
 
         public IActionResult GetAsideWikiPages()
         {
-            var wikiPages = wikiRepository.GetAll(User.Identity.IsAuthenticated);
+            var wikiPages = wikiRepository.GetAll();
             var wikiTree = wikiService.GetWikiTree(wikiPages);
 
             Response.ContentType = "application/json";

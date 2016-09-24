@@ -84,7 +84,23 @@ namespace ASPWiki.Services
             }
         }
 
-        public void Save(WikiPage wikiPage, IEnumerable<IFormFile> uploads, IIdentity indetity)
+        public void Add(WikiPage wikiPage, IEnumerable<IFormFile> uploads, IIdentity indetity)
+        {
+            Save(wikiPage, uploads, indetity);
+
+            //Persist and add
+            wikiRepository.Add(wikiPage);
+        }
+
+        public void Update(WikiPage wikiPage, IEnumerable<IFormFile> uploads, IIdentity indetity)
+        {
+            Save(wikiPage, uploads, indetity);
+
+            //Persist and save
+            wikiRepository.Update(wikiPage);
+        }
+
+        private void Save(WikiPage wikiPage, IEnumerable<IFormFile> uploads, IIdentity indetity)
         {
             //Path
             wikiPage.SetPath(wikiPage.Path);
@@ -115,12 +131,9 @@ namespace ASPWiki.Services
 
             //ModifiedTime
             wikiPage.LastModified = DateTime.Now;
-
-            //Persist and save
-            wikiRepository.Save(wikiPage);
         }
 
-        private List<Attachment> BindUploadsToAttacments(IEnumerable<IFormFile> uploads, bool isAuthenticated)
+        public List<Attachment> BindUploadsToAttacments(IEnumerable<IFormFile> uploads, bool isAuthenticated)
         {
             var attachments = new List<Attachment>();
 
@@ -147,15 +160,9 @@ namespace ASPWiki.Services
             return attachments;
         }
 
-        public List<WikiPage> FilterPublic(List<WikiPage> wikiPages)
-        {
-            return (from entry in wikiPages where entry.Public == true select entry).ToList();
-        }
-
         public void AddVisit(WikiPage wikiPage)
         {
-            wikiPage.Visits++;
-            //TODO PERSISTS & SAVE TO DATABASE
+            wikiRepository.AddVisit(wikiPage);
         }
     }
 }

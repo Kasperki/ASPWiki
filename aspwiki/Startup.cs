@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authorization;
 using Serilog;
 using System.IO;
+using ASPWiki.Services.Generators;
 
 namespace ASPWiki
 {
@@ -28,12 +29,12 @@ namespace ASPWiki
                 builder.AddApplicationInsightsSettings(developerMode: true);
             }
 
-            string path = "Logs";
-            if (!Directory.Exists(path))
+            if (!Directory.Exists(Constants.LoggingFilePath))
             {
-                Directory.CreateDirectory(path);
+                Directory.CreateDirectory(Constants.LoggingFilePath);
             }
-            Log.Logger = new LoggerConfiguration().Enrich.FromLogContext().WriteTo.File(path + "/log.txt").CreateLogger();
+
+            Log.Logger = new LoggerConfiguration().Enrich.FromLogContext().WriteTo.File(Constants.LoggingFilePath + "/" + Constants.LoggingFileName).CreateLogger();
 
             Configuration = builder.Build();
         }
@@ -51,19 +52,28 @@ namespace ASPWiki
 
             services.AddMvc();
 
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IDatabaseConnection, DatabaseConnection>();
+
             services.AddSingleton<IRouteGenerator, RouteGenerator>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
             services.AddSingleton<IAuthorizationHandler, WikiPageHandler>();
             services.AddSingleton<IWikiRepository, WikiRepository>();
             services.AddSingleton<IWikiService, WikiService>();
 
+            //TEST ENVIRONMENT TESTDATA GENERATION
+            services.AddSingleton<IGarbageGenerator<Attachment>, AttachmentGenerator>();
             services.AddSingleton<IGarbageGenerator<WikiPage>, WikiPageGenerator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApplicationLifetime appLifetime, IGarbageGenerator<WikiPage> wikiPageGenerator)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApplicationLifetime appLifetime,
+            IDatabaseConnection databaseConnection, IWikiRepository wikiRepo, IGarbageGenerator<WikiPage> wikiPageGenerator)
         {
-            wikiPageGenerator.GenerateToDatabase(15);
+            if (env.IsDevelopment())
+            {
+                var testDataGenerator = new TestDataGenerator(databaseConnection, wikiRepo, wikiPageGenerator);
+            }
 
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();

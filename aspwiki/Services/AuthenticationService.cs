@@ -14,24 +14,21 @@ namespace ASPWiki.Services
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IHttpContextAccessor httpContextAccessor;
-
         private HttpClient client;
-
-        private const string validationUrl = "https://127.0.0.1:8081/test";
 
         public AuthenticationService(IHttpContextAccessor httpContextAccessor)
         {
             this.httpContextAccessor = httpContextAccessor;
 
             client = new HttpClient();
-            client.BaseAddress = new Uri(validationUrl);
+            client.BaseAddress = new Uri(Constants.AuthenticationValidationUrl);
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
         public async Task<Session> ValidateToken(string authToken, string sessionId)
         {
-            HttpResponseMessage responseMessage = await client.GetAsync(validationUrl + "?authToken=" + authToken + "&sessionId=" + sessionId);
+            HttpResponseMessage responseMessage = await client.GetAsync(Constants.AuthenticationValidationUrl + "?authToken=" + authToken + "&sessionId=" + sessionId);
 
             if (responseMessage.IsSuccessStatusCode)
             {

@@ -80,15 +80,15 @@ namespace ASPWiki.Controllers
         {
             var wikiPage = wikiRepository.GetByPath(path);
 
+            if (wikiPage == null)
+                return RedirectToAction("NotFound", "Wiki", new { title = this.GetLastItemFromPath(path) });
+
             int versionNum;
             if (version != null && int.TryParse(version, out versionNum))
             {
                 if(versionNum >= 0 && versionNum < wikiPage.ContentHistory.Count)
                     wikiPage.Content = wikiPage.ContentHistory[Convert.ToInt32(versionNum)];
             }
-
-            if (wikiPage == null)
-                return RedirectToAction("NotFound", "Wiki", new { title = this.GetLastItemFromPath(path) });
 
             if (await authorizationService.AuthorizeAsync(User, wikiPage, new WikiPageEditRequirement()))
             {
@@ -136,7 +136,7 @@ namespace ASPWiki.Controllers
                 catch (Exception e)
                 {
                     logger.LogError(new EventId(Constants.ERROR_CODE_EXPECTION), e, "Error saving wikipage");
-                    this.FlashMessageError(e.Message); //This should not print every single error
+                    this.FlashMessageError(e.Message); //TODO This should not print every single error
                     return View("Edit", wikipageSave);
                 }
             }

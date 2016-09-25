@@ -12,7 +12,10 @@
 
     <div class="col-sm-12">
         @Html.Partial("~/Views/Wiki/Label.cshtml", Model.Label)
-        <span>Written by: @(@Model.Author == null ? "Uknown" : @Model.Author) - Size: @Model.Size - @Html.DisplayFor(model => model.LastModified)</span>
+        <span>Written by: @(@Model.Author == null ? "Uknown" : @Model.Author) - Size: @Model.Size</span>
         <span>@Model.AttachmentCount <i class="fa fa-paperclip" aria-hidden="true"></i></span>
+    </div>
+    <div class="col-sm-12">
+        <span>@Html.DisplayFor(model => model.LastModified)</span>
     </div>
 </article>

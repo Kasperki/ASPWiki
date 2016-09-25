@@ -81,9 +81,11 @@ body {
 
 .zoomInHide {
     color: #000000;
+    background-color: #DDDDDD;
     &:hover {
         color: rgb(0,0,0);
         color: rgba(0,0,0,0);
+        background-color: rgba(0,0,0,0);
         transform: scale(0.8);
         transition: all .2s ease-in-out; 
         cursor: pointer;
@@ -93,12 +95,20 @@ body {
 .zoomInShow {
     color: rgb(0,0,0);
     color: rgba(0,0,0,0);
+    background-color: rgba(0,0,0,0);
     &:hover {
         color: @AboveTheWorld;
+        background-color: @AboveTheWorld;
         transform: scale(1.2);
         transition: all .3s ease-in-out; 
         cursor: pointer;
     }
+}
+
+.versionBar {
+    position:absolute;
+    width:32px;
+    height:7px;
 }
 
 .btn {
@@ -128,6 +138,7 @@ body {
 
 .success {
     color: @AboveTheWorld;
+    background-color: @AboveTheWorld;
 }
 
 .warning {

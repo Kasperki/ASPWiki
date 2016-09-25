@@ -59,10 +59,12 @@ body {
 }
 .zoomInHide {
   color: #000000;
+  background-color: #DDDDDD;
 }
 .zoomInHide:hover {
   color: #000000;
   color: rgba(0, 0, 0, 0);
+  background-color: rgba(0, 0, 0, 0);
   transform: scale(0.8);
   transition: all 0.2s ease-in-out;
   cursor: pointer;
@@ -70,12 +72,19 @@ body {
 .zoomInShow {
   color: #000000;
   color: rgba(0, 0, 0, 0);
+  background-color: rgba(0, 0, 0, 0);
 }
 .zoomInShow:hover {
   color: #3FB8AF;
+  background-color: #3FB8AF;
   transform: scale(1.2);
   transition: all 0.3s ease-in-out;
   cursor: pointer;
+}
+.versionBar {
+  position: absolute;
+  width: 32px;
+  height: 7px;
 }
 .btn {
   -webkit-border-radius: 4px;
@@ -115,6 +124,7 @@ body {
 }
 .success {
   color: #3FB8AF;
+  background-color: #3FB8AF;
 }
 .warning {
   background-color: #FF9E9D;

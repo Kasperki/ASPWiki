@@ -6,9 +6,7 @@ using AutoMapper;
 using ASPWiki.ViewModels;
 
 namespace ASPWiki.Controllers
-{
-    //IsValidPath Buggings; Async mongoqueries?
-    
+{    
     //CLEAN CONTROLLERS
      //CLEAN SERVICES
      //CLEAN WIKIMODEL

@@ -111,6 +111,17 @@ body {
     height:7px;
 }
 
+.versionBarSelected {
+  position:absolute;
+  width: 0; 
+  height: 0; 
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  
+  border-top: 12px solid @AboveTheWorld;
+}
+
+
 .btn {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
@@ -134,6 +145,20 @@ body {
   .btn;
   font-size: 15px;
   margin: 5px;
+}
+
+.btn-add {
+  .btn;
+  border-radius: 50%;
+  width: 125px;
+  height: 125px;
+  float: none;
+  margin: 0 auto;
+
+  &:hover {
+    border-color: white;
+    text-decoration: none !important;
+  }
 }
 
 .success {
@@ -164,6 +189,10 @@ body {
 
 .pointer {
     cursor: pointer;
+}
+
+.noTextDecoration:hover {
+    text-decoration: none;
 }
 
 /*

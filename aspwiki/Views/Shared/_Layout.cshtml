@@ -44,12 +44,12 @@
                 <ul class="nav navbar-nav pull-left" style="margin-right:15px;">
                     @if (!User.Identities.Any(u => u.IsAuthenticated))
                     {
-                        <li><a href="/Login">Login</a></li>
+                        <li><a asp-action="Login" asp-controller="Authentication">Login</a></li>
                     }
                     else
                     {
                         <li>
-                            <a href="/Logout">
+                            <a asp-action="Logout" asp-controller="Authentication">
                                 Logout: @User.Identity.Name
                             </a>
                         </li>
@@ -71,11 +71,12 @@
         <div class="header-content">
             <div class="header-content-inner">
                 <div id="buttonContainer">
-                    <a href="/Wiki/New">
-                        <div class="btn zoomIn">
-                             New page <i class="fa fa-plus" aria-hidden="true"></i>
+                    <button class="btn-add zoomIn" onclick="location.href='@Url.Action("New", "Wiki", null)'">
+                        <div>
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            <i class="fa fa-file-o fa-2x" aria-hidden="true"></i>
                         </div>
-                    </a>
+                    </button>
                 </div>
             </div>
         </div>

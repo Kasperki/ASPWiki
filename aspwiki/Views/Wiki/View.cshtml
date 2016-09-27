@@ -20,7 +20,7 @@
             <div class="col-md-6">
                 <div class="row">
                     <div class="col-sm-4 removePadding">
-                        <a asp-controller="Wiki" asp-action="Edit">
+                        <a asp-controller="Wiki" asp-action="Edit" class="noTextDecoration">
                             <div class="sm-btn zoomIn">
                                 Edit <i class="fa fa-pencil-square-o" aria-hidden="true"></i>
                             </div>
@@ -29,7 +29,7 @@
                     @if (User.Identity.IsAuthenticated)
                     {
                         <div class="col-sm-4 removePadding">
-                            <a asp-controller="Wiki" asp-action="Delete">
+                            <a asp-controller="Wiki" asp-action="Delete" class="noTextDecoration">
                                 <div class="sm-btn warning zoomIn">
                                     Delete <i class="fa fa-times" aria-hidden="true"></i>
                                 </div>
@@ -37,7 +37,7 @@
                         </div>
                     }
                     <div class="col-sm-4 removePadding">
-                        <a href="#" id="diff">
+                        <a href="#" id="diff" class="noTextDecoration">
                             <div class="sm-btn label-info zoomIn">
                                 Diff <i class="fa fa-tasks" aria-hidden="true"></i>
                             </div>

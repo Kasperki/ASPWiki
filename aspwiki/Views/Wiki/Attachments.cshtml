@@ -10,7 +10,7 @@
 
         foreach (var attachment in Model)
         {
-            <a href="/Wiki/File/View/@attachment.WikipageId/@attachment.FileId">@attachment.FileName</a>
+            <a href="/Wiki/File/View/@attachment.WikipageId/@attachment.FileId">@attachment.FileName</a> 
 
             @if (User.Identity.IsAuthenticated)
             {

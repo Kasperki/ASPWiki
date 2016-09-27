@@ -10,9 +10,15 @@
                 focus = true;
             }
 
-            <div style="display:inline-block;margin-left:32px;">
+            <div style="display:inline-block;margin-right:32px;">
                 <a href="/Wiki/View/@Model.Path?version=@i">
                     <div class="@focused zoomInHide versionBar"></div>
+
+                    @if (focused == "success")
+                    {
+                         <div class="versionBarSelected"></div> 
+                    }
+
                     <div class="zoomInShow versionBar"></div>
                 </a>
             </div>

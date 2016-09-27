@@ -59,12 +59,12 @@
                         <div class="hide">
                             @Html.EditorFor(x => x.Public)
                         </div>
-                        <a id="togglePublic">
+                        <a id="togglePublic" class="noTextDecoration">
                             <div id="publicIcon" class="sm-btn zoomIn" style="cursor:pointer;"></div>
                         </a>
                     </div>
                     <div class="col-sm-4">
-                        <a asp-controller="Wiki" asp-action="Delete">
+                        <a asp-controller="Wiki" asp-action="Delete" class="noTextDecoration">
                             <div class="sm-btn warning zoomIn">
                                 Delete<i class="fa fa-times" aria-hidden="true"></i>
                             </div>
@@ -72,7 +72,7 @@
                     </div>
                 }
                 <div class="col-sm-4">
-                    <a id="saveButton" asp-controller="Wiki" asp-action="Save" onclick="document.getElementById('wikiForm').submit(); return false;">
+                    <a id="saveButton" asp-controller="Wiki" asp-action="Save" onclick="document.getElementById('wikiForm').submit(); return false;" class="noTextDecoration">
                         <div class="sm-btn zoomIn">
                             <p style="display:inline;">Save</p> <i class="fa fa-floppy-o" aria-hidden="true"></i>
                         </div>

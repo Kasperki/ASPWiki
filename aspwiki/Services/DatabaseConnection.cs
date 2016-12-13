@@ -14,7 +14,18 @@ namespace ASPWiki.Services
 
         public void StartConnection()
         {
-            client = new MongoClient("mongodb://localhost:" + Constants.DatabasePort);
+            var databaseCredentials = MongoCredential.CreateCredential(Constants.DatabaseName, "root", "root");
+
+            MongoClientSettings clienSettings = new MongoClientSettings()
+            {
+                Server = new MongoServerAddress("localhost", Constants.DatabasePort),
+                Credentials = new[]
+                {
+                    databaseCredentials,
+                }
+            };
+
+            client = new MongoClient(clienSettings);
             database = client.GetDatabase(Constants.DatabaseName);
         }
 

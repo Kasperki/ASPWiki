@@ -15,7 +15,7 @@
 
         #region MonboDB
         public static int DatabasePort { get { return 27017; } }
-        public static string DatabaseName { get { return "wikipages"; } }
+        public static string DatabaseName { get { return "wiki"; } }
         public static string TestDatabaseName { get { return "wikipagesTest"; } }
         public static string WikiPagesCollectionName { get { return "wikipages"; } }
         #endregion

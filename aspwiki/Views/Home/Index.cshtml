@@ -23,3 +23,14 @@
         </div>
     </div>
 </section>
+
+@section scripts{
+<script src="~/js/prettify.js"></script>
+
+<script>
+$(document).ready(function () {
+    $("pre > code").parent().addClass('prettyprint');
+    prettyPrint();
+});
+</script>
+}

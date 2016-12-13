@@ -86,6 +86,7 @@ namespace ASPWiki.Services
 
         public void Add(WikiPage wikiPage, IEnumerable<IFormFile> uploads, IIdentity indetity)
         {
+            wikiPage.CreatedDate = DateTime.Now;
             Save(wikiPage, uploads, indetity);
 
             //Persist and add
@@ -106,28 +107,35 @@ namespace ASPWiki.Services
             wikiPage.SetPath(wikiPage.Path);
             IsValidPath(wikiPage.Path, wikiPage.Id);
 
+
             //Version history
             wikiPage.ContentHistory = wikiRepository.GetById(wikiPage.Id)?.ContentHistory ?? new List<string>();
 
-            if (wikiPage.ContentHistory.Count == 0 || !String.Equals(wikiPage.ContentHistory.Last(), wikiPage.Content))
+                //If content is not modified do not add new version.
+            if (wikiPage.ContentHistory.Count == 0 || wikiPage.ContentHistory.Last().GetHashCode() != wikiPage.Content.GetHashCode())
                 wikiPage.ContentHistory.Add(wikiPage.Content);
+
 
             //Author Name
             if (indetity.Name != null && indetity.Name != String.Empty)
                 wikiPage.Author = indetity.Name;
 
-            //Public for not autheticated users
+
+            //Public for not autheticated usersl
             if (!indetity.IsAuthenticated)
+            {
+                wikiPage.SetDueDate(); //TODO
                 wikiPage.Public = true;
+            }
 
             //Attachments
-            var attachments = BindUploadsToAttacments(uploads, wikiPage.Id, indetity.IsAuthenticated);     
-            wikiPage.Attachments = attachments;
+            wikiPage.Attachments = BindUploadsToAttacments(uploads, wikiPage.Id, indetity.IsAuthenticated);
 
             var oldAttachments = wikiRepository.GetById(wikiPage.Id)?.Attachments;
 
             if (oldAttachments != null)
                 wikiPage.Attachments = wikiPage.Attachments.Concat(oldAttachments).ToList();
+
 
             //ModifiedTime
             wikiPage.LastModified = DateTime.Now;

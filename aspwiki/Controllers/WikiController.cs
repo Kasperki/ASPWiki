@@ -57,6 +57,7 @@ namespace ASPWiki.Controllers
             return View("Edit", mapper.Map<WikipageEdit>(wikiPage));
         }
 
+        [Authorize]
         [HttpGet("Wiki/Edit/{*path}")]
         public async Task<IActionResult> Edit(string path)
         {

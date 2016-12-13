@@ -61,6 +61,8 @@ namespace ASPWiki.Mapping
                      .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src.Content))
                      .ForMember(dest => dest.Attachments, opt => opt.MapFrom(src => src.Attachments))
                      .ForMember(dest => dest.Public, opt => opt.MapFrom(src => src.Public))
+                     .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
+                     .ForMember(dest => dest.DueDate, opt => opt.Ignore())
                      .ForMember(dest => dest.Author, opt => opt.Ignore())
                      .ForMember(dest => dest.Visits, opt => opt.Ignore())
                      .ForMember(dest => dest.ContentHistory, opt => opt.Ignore())

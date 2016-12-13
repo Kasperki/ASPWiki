@@ -12,11 +12,16 @@ using System.IO;
 using ASPWiki.Services.Generators;
 using AutoMapper;
 using ASPWiki.Mapping;
+using System;
+using ASPWiki.Infastructure;
+using Microsoft.Extensions.Options;
 
 namespace ASPWiki
 {
     public class Startup
     {
+        private IConfigurationRoot Configuration { get; set; }
+
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -41,14 +46,15 @@ namespace ASPWiki
             Configuration = builder.Build();
         }
 
-        public IConfigurationRoot Configuration { get; }
-
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
             //ApplicationInsightsTelemetry
             services.AddApplicationInsightsTelemetry(Configuration);
+
+            //AddConfigurationOptions
+            services.Configure<ConfigurationOptions>(Configuration.GetSection(Constants.ENV_VARIABLE_PREFIX));
 
             AutoMapperConfiguration.Configure();
             services.AddSingleton(Mapper.Instance);

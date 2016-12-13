@@ -8,6 +8,8 @@
 
         public static string AuthenticationScheme { get { return "Cookies"; } }
 
+        public static string ENV_VARIABLE_PREFIX { get { return "ASPWiki"; } }
+
         #region Logging
         public static string LoggingFilePath { get { return "Logs"; } }
         public static string LoggingFileName { get { return "log.txt"; } }

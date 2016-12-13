@@ -1,4 +1,6 @@
-﻿using MongoDB.Driver;
+﻿using ASPWiki.Infastructure;
+using Microsoft.Extensions.Options;
+using MongoDB.Driver;
 
 namespace ASPWiki.Services
 {
@@ -7,14 +9,18 @@ namespace ASPWiki.Services
         private MongoClient client;
         private IMongoDatabase database;
 
-        public DatabaseConnection()
+        private readonly IOptions<ConfigurationOptions> options;
+
+
+        public DatabaseConnection(IOptions<ConfigurationOptions> options)
         {
+            this.options = options;
             StartConnection();
         }
 
         public void StartConnection()
         {
-            var databaseCredentials = MongoCredential.CreateCredential(Constants.DatabaseName, "root", "root");
+            var databaseCredentials = MongoCredential.CreateCredential(Constants.DatabaseName, options.Value.DatabaseUser, options.Value.DatabasePassword);
 
             MongoClientSettings clienSettings = new MongoClientSettings()
             {

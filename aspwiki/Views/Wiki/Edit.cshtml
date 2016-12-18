@@ -5,7 +5,7 @@
 }
 
 <form id="wikiForm" asp-action="Save" method="post" enctype="multipart/form-data">
-    <div class="row" style="margin-top:20px;">
+    <div class="row margin-top">
 
         @Html.HiddenFor(model => Model.Id)
 
@@ -60,7 +60,7 @@
                             @Html.EditorFor(x => x.Public)
                         </div>
                         <a id="togglePublic" class="noTextDecoration">
-                            <div id="publicIcon" class="sm-btn zoomIn" style="cursor:pointer;"></div>
+                            <div id="publicIcon" class="sm-btn zoomIn pointer"></div>
                         </a>
                     </div>
                     <div class="col-sm-4">
@@ -74,7 +74,7 @@
                 <div class="col-sm-4">
                     <a id="saveButton" asp-controller="Wiki" asp-action="Save" onclick="document.getElementById('wikiForm').submit(); return false;" class="noTextDecoration">
                         <div class="sm-btn zoomIn">
-                            <p style="display:inline;">Save</p> <i class="fa fa-floppy-o" aria-hidden="true"></i>
+                            <p class="inline">Save</p> <i class="fa fa-floppy-o" aria-hidden="true"></i>
                         </div>
                     </a>
                     <a id="saveButtonDisabled">

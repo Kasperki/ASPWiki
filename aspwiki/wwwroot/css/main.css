@@ -28,6 +28,15 @@ body {
 /*
    LANDING PAGE
 */
+.control-group {
+  padding-left: 8px;
+  padding-top: 8px;
+  width: 300px;
+}
+.page-link {
+  word-break: break-all;
+  margin-bottom: 5px;
+}
 .header {
   position: relative;
   width: 100%;
@@ -80,6 +89,12 @@ body {
   transform: scale(1.2);
   transition: all 0.3s ease-in-out;
   cursor: pointer;
+}
+.inline {
+  display: inline;
+}
+.margin-top {
+  margin-top: 20px;
 }
 .versionBar {
   position: absolute;
@@ -189,6 +204,9 @@ SIDE NAV
   .hideNarrow {
     display: none !important;
   }
+}
+#sidePanel {
+  height: 100%;
 }
 .sideButtonLink {
   width: 60%;

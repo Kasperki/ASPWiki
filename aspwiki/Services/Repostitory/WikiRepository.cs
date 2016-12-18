@@ -12,6 +12,8 @@ namespace ASPWiki.Services
     {
         private readonly IHttpContextAccessor context;
         private Dictionary<Session, WikiPage> deletedDictionary;
+        private bool? authenticated { get { return context?.HttpContext?.User?.Identity?.IsAuthenticated; } }
+
 
         private class Session
         {
@@ -40,8 +42,7 @@ namespace ASPWiki.Services
                 return obj != null && obj.id == this.id && obj.path == this.path;
             }
         }
-        
-        public bool? authenticated { get { return context?.HttpContext?.User?.Identity?.IsAuthenticated; } }
+
 
         public WikiRepository(IDatabaseConnection databaseConnection, IHttpContextAccessor context) :base(databaseConnection, Constants.WikiPagesCollectionName)
         {

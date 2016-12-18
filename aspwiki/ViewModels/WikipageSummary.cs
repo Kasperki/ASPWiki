@@ -13,6 +13,7 @@ namespace ASPWiki.ViewModels
 
         public string Path { get; set; }
 
+        [UIHint("Label")]
         public Label Label { get; set; }
 
         public string ContentSummary { get; set; }

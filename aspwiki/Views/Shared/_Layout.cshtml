@@ -123,14 +123,14 @@
 
     <script>
         $('#searchBox').selectize({
-            valueField: 'Path',
-            labelField: 'Title',
-            searchField:'Title',
+            valueField: 'path',
+            labelField: 'title',
+            searchField:'title',
             create: false,
             render: {
                 option: function (item, escape) {
                     return '<div><span class="title">' +
-                            '<span class="by">' + item.Title + '</span>' +
+                            '<span class="by">' + item.title + '</span>' +
                         '</span></div>';
                 }
             },
@@ -139,7 +139,7 @@
                 $.ajax({
                     url: '/Wiki/Search',
                     type: 'POST',
-                    data: JSON.stringify({ data: query }),
+                    data: JSON.stringify({ searchKeyword: query }),
                     contentType: 'application/json; charset=utf-8',
                     dataType: 'json',
                     async: true,

@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Logging;
 using AutoMapper;
 using ASPWiki.ViewModels;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace ASPWiki.Tests
 {
@@ -218,6 +220,34 @@ namespace ASPWiki.Tests
 
             // Assert
             ChallengeResult redirectResult = Assert.IsType<ChallengeResult>(result.Result);
+        }
+
+
+        [Fact]
+        public void Search_should_return_JsonResult_with_right_data()
+        {
+            string keyword = "car";
+            string jsonString = "{ searchKeyword :  '"+ keyword + "' }";
+
+            List<WikiPage> wikipages = new List<WikiPage>()
+            {
+                new WikiPage() { Title = "yellow car" },
+                new WikiPage() { Title = "supercarmega" },
+            };
+
+            mockWikiRepo.Setup(repo => repo.SearchByTitle(keyword)).Returns(wikipages);
+            var controller = new WikiController(mapperMock.Object, mockRouteGen.Object, mockWikiRepo.Object, mockWikiService.Object, new AuthorizeStub(false), mockLogger.Object);
+
+            // Act
+            var result = controller.Search(JObject.Parse(jsonString));
+
+            // Assert
+            JsonResult jsonResult = Assert.IsType<JsonResult>(result);
+
+            List<WikiPage> v = jsonResult.Value as List<WikiPage>;
+
+            Assert.Equal(wikipages[0].Title, v[0].Title);
+            Assert.Equal(wikipages[1].Title, v[1].Title);
         }
     }
 }

@@ -39,14 +39,14 @@ function GoTroughNodes(Node, i, parent, recursion)
 
     var row = $("<div class='row' style='margin-right:0px;'></div>");
 
-    if(Node.WikiPage != null)
-    var hrefLink = replaceInString(Node.WikiPage.Path.toString(), ",", "/");
+    if(Node.wikiPage != null)
+    var hrefLink = replaceInString(Node.wikiPage.path.toString(), ",", "/");
     
     var link = $("<a href='/Wiki/View/" + hrefLink  + "'></a>");
     var sideButton = $("<div class='col-sm-7 panel-heading sideButtonLink'></div>").css("margin-left", recursion * 5)
-    var title = $("<h4></h4>").addClass("panel-title").append(Node.Name);
+    var title = $("<h4></h4>").addClass("panel-title").append(Node.name);
 
-    if (Node.ChildNode.length > 0)
+    if (Node.childNode.length > 0)
     {
         var collapseLink = $("<div class='col-sm-5 panel-heading sideButtonCollapse'  data-toggle='collapse' href='#content" + i + "'></div>").css("margin-left", recursion * -5);
         collapseLink.html("<h4><i class='fa fa-chevron-down' style='float:right;'  aria-hidden='true'></i></h4>");
@@ -64,19 +64,19 @@ function GoTroughNodes(Node, i, parent, recursion)
     row.append(collapseLink);
     parent.append(row);
 
-    for (var j = 0; j < Node.ChildNode.length; j++)
+    for (var j = 0; j < Node.childNode.length; j++)
     {
-        let child = Node.ChildNode[j];
+        let child = Node.childNode[j];
 
         //NoChilds
-        if (child.ChildNode.length == 0)
+        if (child.childNode.length == 0)
         {
             var childPanel = $("#content" + i);
             if (childPanel.length <= 0)
                 childPanel = $("<div id='content" + i + "' class='panel-collapse collapse'>").css("margin-left", recursion * 5);
 
-            if (child.WikiPage != null)
-                childPanel.append($("<a class='noTextDecoration' href='/Wiki/View/" + replaceInString(child.WikiPage.Path.toString(), ",", "/") + "'><div class='sideButtonChild'><p>" + child.WikiPage.Title + "</p></div></a>"));
+            if (child.wikiPage != null)
+                childPanel.append($("<a class='noTextDecoration' href='/Wiki/View/" + replaceInString(child.wikiPage.path.toString(), ",", "/") + "'><div class='sideButtonChild'><p>" + child.wikiPage.title + "</p></div></a>"));
 
             parent.append(childPanel);
         }
@@ -88,7 +88,7 @@ function GoTroughNodes(Node, i, parent, recursion)
                 childPanel = $("<div id='content" + i + "' class='panel-collapse collapse'>").css("margin-left", recursion * 5);
 
             parent.append(childPanel);
-            GoTroughNodes(child, i + "_" + j + "" + child.Name, childPanel, recursion);
+            GoTroughNodes(child, i + "_" + j + "" + child.name, childPanel, recursion);
         }
     }
 }

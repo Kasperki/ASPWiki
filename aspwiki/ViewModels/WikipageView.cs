@@ -15,6 +15,7 @@ namespace ASPWiki.ViewModels
 
         public bool Public { get; set; }
 
+        [UIHint("Label")]
         public Label Label { get; set; }
 
         public List<Attachment> Attachments { get; set; }

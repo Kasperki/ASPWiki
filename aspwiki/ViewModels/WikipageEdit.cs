@@ -1,6 +1,7 @@
 ﻿using ASPWiki.Model;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace ASPWiki.ViewModels
 {
@@ -16,6 +17,7 @@ namespace ASPWiki.ViewModels
 
         public string PathToParent { get; set; }
 
+        [UIHint("Label")]
         public Label Label { get; set; }
 
         public string Content { get; set; }

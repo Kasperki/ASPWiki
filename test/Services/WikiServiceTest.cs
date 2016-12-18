@@ -73,6 +73,34 @@ namespace ASPWiki.Tests
             Assert.Equal("Parent not found", e4.Message);
         }
 
+        [Fact]
+        public void GetVersionContent_Should_Return_Latest_Content_If_Version_Is_Not_Valid()
+        {
+            WikiPage wiki = new WikiPage { Content = "D", ContentHistory = new List<string>() { "A", "B", "C" } };
+
+            string actual = wikiService.GetVersionContent(wiki, "a");
+            Assert.Equal("D", actual);
+        }
+
+        [Fact]
+        public void GetVersionContent_Should_Return_Right_Version()
+        {
+            WikiPage wiki = new WikiPage { Content = "D", ContentHistory = new List<string>() { "A", "B", "C" } };
+
+            string actual = wikiService.GetVersionContent(wiki, "1");
+            Assert.Equal("B", actual);
+        }
+
+        [Fact]
+        public void GetVersionContent_Should_Return_Latest_When_Version_Over_Newest()
+        {
+            WikiPage wiki = new WikiPage { Content = "D", ContentHistory = new List<string>() { "A", "B", "C" } };
+
+            string actual = wikiService.GetVersionContent(wiki, "666");
+            Assert.Equal("D", actual);
+        }
+
+
         [Fact(Skip = "NotReady")]
         public void BindUploadsToAttacments_Should_Return_Attachments_From_FileUploads()
         {

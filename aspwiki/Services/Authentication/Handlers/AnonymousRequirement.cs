@@ -4,15 +4,15 @@ using System.Threading.Tasks;
 
 namespace ASPWiki.Services
 {
-    public class WikiPageEditRequirement : IAuthorizationRequirement
+    public class AnonymousRequirement : IAuthorizationRequirement
     {
     }
 
-    public class WikiPageHandler : AuthorizationHandler<WikiPageEditRequirement, WikiPage>
+    public class AnonymousRequirementHandler : AuthorizationHandler<AnonymousRequirement, WikiPage>
     {
         protected override Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
-            WikiPageEditRequirement requirement,
+            AnonymousRequirement requirement,
             WikiPage resource)
         {
             if (resource.Public == true || context.User.Identity.IsAuthenticated)

@@ -68,7 +68,10 @@ namespace ASPWiki
 
             services.AddSingleton<IRouteGenerator, RouteGenerator>();
             services.AddSingleton<IAuthenticationService, AuthenticationService>();
-            services.AddSingleton<IAuthorizationHandler, WikiPageHandler>();
+
+            services.AddSingleton<IAuthorizationHandler, AuthenticationRequirementHandler>();
+            services.AddSingleton<IAuthorizationHandler, AnonymousRequirementHandler>();
+
             services.AddSingleton<IWikiRepository, WikiRepository>();
             services.AddSingleton<IWikiService, WikiService>();
 

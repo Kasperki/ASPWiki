@@ -26,7 +26,7 @@ namespace ASPWiki.Controllers
             {
                 var wikiPage = wikiRepository.GetById(wikiPageId);
 
-                if (wikiPage != null && await authorizationService.AuthorizeAsync(User, wikiPage, new WikiPageEditRequirement()))
+                if (wikiPage != null && await authorizationService.AuthorizeAsync(User, wikiPage, new AuthenticationRequirement()))
                 {
                     var fileToRetrieve = wikiPage.GetAttacment(id);
                     return File(fileToRetrieve.Content, fileToRetrieve.ContentType, fileToRetrieve.FileName);

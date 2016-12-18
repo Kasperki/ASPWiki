@@ -59,6 +59,18 @@ namespace ASPWiki.Services
             }
         }
 
+        public string GetVersionContent(WikiPage wikipage, string version)
+        {
+            int versionNum;
+            if (version != null && int.TryParse(version, out versionNum))
+            {
+                if (versionNum >= 0 && versionNum < wikipage.ContentHistory.Count)
+                    return wikipage.ContentHistory[Convert.ToInt32(versionNum)];
+            }
+
+            return wikipage.Content;
+        }
+
         //TODO GetByPath is heavy?
         //Should keep repo organized in treeshape by path?
         //CHANGING WIKIPAGE TO ITSELFS CHILD WOULD NOT BE VALID
@@ -117,14 +129,14 @@ namespace ASPWiki.Services
 
 
             //Author Name
-            if (indetity.Name != null && indetity.Name != String.Empty)
+            if (!String.IsNullOrEmpty(indetity.Name))
                 wikiPage.Author = indetity.Name;
 
 
-            //Public for not autheticated usersl
+            //Public for not autheticated users
             if (!indetity.IsAuthenticated)
             {
-                wikiPage.SetDueDate(); //TODO
+                //wikiPage.SetDueDate(); //TODO
                 wikiPage.Public = true;
             }
 

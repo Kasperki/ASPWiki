@@ -2,7 +2,6 @@
 using ASPWiki.Services;
 using ASPWiki.Model;
 using System;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
@@ -16,8 +15,6 @@ namespace ASPWiki.Controllers
 {
     /// <summary>
     /// WikiController
-    /// 
-    /// TODO CONTENT HISTORY GET BY AJAX REQUEST, DO NOT SEND WHOLE DATA TO VIEW!
     /// </summary>
     public class WikiController : Controller
     {
@@ -66,7 +63,7 @@ namespace ASPWiki.Controllers
             if (wikiPage == null)
                 return RedirectToAction("Add", new { title = this.GetLastItemFromPath(path) });
 
-            if (await authorizationService.AuthorizeAsync(User, wikiPage, new WikiPageEditRequirement()))
+            if (await authorizationService.AuthorizeAsync(User, wikiPage, new AuthenticationRequirement()))
             {
                 return View("Edit", mapper.Map<WikipageEdit>(wikiPage));
             }
@@ -84,15 +81,10 @@ namespace ASPWiki.Controllers
             if (wikiPage == null)
                 return RedirectToAction("NotFound", "Wiki", new { title = this.GetLastItemFromPath(path) });
 
-            int versionNum;
-            if (version != null && int.TryParse(version, out versionNum))
+            if (await authorizationService.AuthorizeAsync(User, wikiPage, new AnonymousRequirement()))
             {
-                if(versionNum >= 0 && versionNum < wikiPage.ContentHistory.Count)
-                    wikiPage.Content = wikiPage.ContentHistory[Convert.ToInt32(versionNum)];
-            }
+                wikiPage.Content = wikiService.GetVersionContent(wikiPage, version);
 
-            if (await authorizationService.AuthorizeAsync(User, wikiPage, new WikiPageEditRequirement()))
-            {
                 wikiService.AddVisit(wikiPage);
                 return View("View", mapper.Map<WikipageView>(wikiPage));
             }
@@ -111,7 +103,7 @@ namespace ASPWiki.Controllers
                 var wiki = wikiRepository.GetById(wikipageSave.Id);
                 if (wiki != null)
                 {
-                   if (!await authorizationService.AuthorizeAsync(User, wiki, new WikiPageEditRequirement()))
+                   if (!await authorizationService.AuthorizeAsync(User, wiki, new AnonymousRequirement()))
                    {
                        return new ChallengeResult();
                    }
@@ -155,14 +147,15 @@ namespace ASPWiki.Controllers
         {
             var wikiPage = wikiRepository.GetByPath(path);
 
-            if (await authorizationService.AuthorizeAsync(User, wikiPage, new WikiPageEditRequirement()))
+            if (await authorizationService.AuthorizeAsync(User, wikiPage, new AuthenticationRequirement()))
             {
                 wikiRepository.Delete(wikiPage);
 
                 logger.LogInformation(User?.Identity?.Name + " deleted wikipage:" + path);
-                this.FlashMessageError("Wikipage: " + this.GetLastItemFromPath(path) +
-                    " deleted: <a style='float:right;' href='/Wiki/Revert/" + path +
-                    "'><b><i class='fa fa-reply' aria-hidden='true'></i>UNDO </b></a>");
+                this.FlashMessageError("Wikipage: " + this.GetLastItemFromPath(path) + " deleted:"
+                    + "<a style='float:right;' href='/Wiki/Revert/" + path + "'>"
+                       + "<b><i class='fa fa-reply'></i>UNDO</b>"
+                    + "</a>");
 
                 return RedirectToAction("Index", "Home");
             }
@@ -198,30 +191,22 @@ namespace ASPWiki.Controllers
             var path = data.Value<string>("Path");
             var Id = data.Value<string>("Id");
 
-            string[] pathValue = path.Split('/');
-
             try
             {
                 wikiService.IsValidPath(path, new Guid(Id));
-                return new OkObjectResult(JsonConvert.SerializeObject(pathValue));
+                return new JsonResult(path.Split('/'));
             }
             catch (Exception e)
             {
-                return new OkObjectResult(JsonConvert.SerializeObject(e.Message));
+                return new JsonResult(e.Message);
             }   
         }
 
         [HttpPost("Wiki/Search")]
-        public IActionResult Search([FromBody]object searchKeyword)
+        public IActionResult Search([FromBody]JToken jsonbody)
         {
-            JObject data = searchKeyword as JObject;
-
-            var searchData = data.Value<string>("data");
-
-            List<WikiPage> wikipages = wikiRepository.SearchByTitle(searchData);
-
-            Response.ContentType = "text/javascript";
-            return new OkObjectResult(JsonConvert.SerializeObject(wikipages));
+            List<WikiPage> wikipages = wikiRepository.SearchByTitle(jsonbody.Value<string>("searchKeyword"));
+            return new JsonResult(wikipages);
         }
     }
 }

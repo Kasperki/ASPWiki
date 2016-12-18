@@ -1,9 +1,11 @@
 ﻿
 using ASPWiki.Controllers;
+using ASPWiki.Model;
 using ASPWiki.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System.Collections.Generic;
 using Xunit;
 
 namespace ASPWiki.Tests
@@ -11,13 +13,16 @@ namespace ASPWiki.Tests
     public class HomeControllerTest
     {
         private HomeController controller;
+        private Mock<IMapper> mockMapper;
+        private Mock<IWikiService> mockWikiService;
+        private Mock<IWikiRepository> mockWikiRepo;
 
         public HomeControllerTest()
         {
             // Arrange
-            var mockMapper = new Mock<IMapper>();
-            var mockWikiService = new Mock<IWikiService>();
-            var mockWikiRepo = new Mock<IWikiRepository>();
+            mockMapper = new Mock<IMapper>();
+            mockWikiService = new Mock<IWikiService>();
+            mockWikiRepo = new Mock<IWikiRepository>();
 
             controller = new HomeController(mockMapper.Object, mockWikiRepo.Object, mockWikiService.Object);
         }
@@ -55,5 +60,25 @@ namespace ASPWiki.Tests
             Assert.Equal("Forbidden", viewResult.ViewName);
         }
 
+        [Fact]
+        public void GetWikiTree_should_return_JsonResult_with_right_data()
+        {
+            List<Node> nodes = new List<Node>()
+            {
+                new Node("a") { },
+                new Node("b") { },
+            };
+
+            mockWikiRepo.Setup(repo => repo.GetAll()).Returns(new List<WikiPage>());
+            mockWikiService.Setup(repo => repo.GetWikiTree(It.IsAny<List<WikiPage>>())).Returns(nodes);
+            var controller = new HomeController(mockMapper.Object, mockWikiRepo.Object, mockWikiService.Object);
+
+            // Act
+            var result = controller.GetAsideWikiPages();
+
+            // Assert
+            JsonResult jsonResult = Assert.IsType<JsonResult>(result);
+            Assert.IsType<List<Node>>(jsonResult.Value);
+        }
     }
 }

@@ -11,7 +11,7 @@
     </div>
 
     <div class="col-sm-12">
-        @Html.Partial("~/Views/Wiki/Label.cshtml", Model.Label)
+        @Html.DisplayFor(m => m.Label)
         <span>Written by: @(@Model.Author == null ? "Uknown" : @Model.Author) - Size: @Model.Size</span>
         <span>@Model.AttachmentCount <i class="fa fa-paperclip" aria-hidden="true"></i></span>
     </div>

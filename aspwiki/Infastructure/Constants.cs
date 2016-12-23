@@ -1,12 +1,14 @@
-﻿namespace ASPWiki
+﻿using Microsoft.AspNetCore.Authentication.Twitter;
+
+namespace ASPWiki
 {
     public static class Constants
     {
-        public static string AuthenticationLoginUrl { get { return "https://127.0.0.1:8081/login"; } }
+        public static string AuthenticationSchemeKey { get { return TwitterDefaults.AuthenticationScheme; } }
 
-        public static string AuthenticationValidationUrl { get { return "https://127.0.0.1:8081/test"; } }
+        public static string AuthenticationSchemeCookies { get { return "Cookies"; } }
 
-        public static string AuthenticationScheme { get { return "Cookies"; } }
+        public const string LoginRedirectRoute = "/";
 
         public static string ENV_VARIABLE_PREFIX { get { return "ASPWiki"; } }
 

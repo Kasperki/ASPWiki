@@ -12,9 +12,9 @@ using System.IO;
 using ASPWiki.Services.Generators;
 using AutoMapper;
 using ASPWiki.Mapping;
-using System;
 using ASPWiki.Infastructure;
 using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Authentication.Twitter;
 
 namespace ASPWiki
 {
@@ -82,36 +82,36 @@ namespace ASPWiki
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApplicationLifetime appLifetime,
-            IDatabaseConnection databaseConnection, IWikiRepository wikiRepo, IGarbageGenerator<WikiPage> wikiPageGenerator)
+            IDatabaseConnection databaseConnection, IWikiRepository wikiRepo, IGarbageGenerator<WikiPage> wikiPageGenerator, IOptions<ConfigurationOptions> options, IAuthenticationService authenticationService)
         {
+
+            //TEST DATA
             if (env.IsDevelopment())
             {
                 var testDataGenerator = new TestDataGenerator(databaseConnection, wikiRepo, wikiPageGenerator);
             }
 
+            //LOGGING
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
-
             loggerFactory.AddSerilog();
 
             // Ensure any buffered events are sent at shutdown
             appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
       
-
-            app.UseApplicationInsightsRequestTelemetry();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
                 app.UseBrowserLink();
+
+                app.UseApplicationInsightsRequestTelemetry();
+                app.UseApplicationInsightsExceptionTelemetry();
             }
             else
             {
                 app.UseExceptionHandler("/Wiki/Error");
             }
-
-            app.UseApplicationInsightsExceptionTelemetry();
 
             app.UseStaticFiles();
 
@@ -121,11 +121,43 @@ namespace ASPWiki
 
             app.UseCookieAuthentication(new CookieAuthenticationOptions()
             {
-                AuthenticationScheme = Constants.AuthenticationScheme,
+                AuthenticationScheme = Constants.AuthenticationSchemeCookies,
                 LoginPath = new PathString("/Wiki/Error"),
                 AccessDeniedPath = new PathString("/Wiki/Forbidden"),
                 AutomaticAuthenticate = true,
                 AutomaticChallenge = true
+            });
+
+            app.UseTwitterAuthentication(new TwitterOptions
+            {
+                ConsumerKey = options.Value.TwitterKey,
+                ConsumerSecret = options.Value.TwitterKeySecret,
+                SignInScheme = Constants.AuthenticationSchemeCookies,
+                RetrieveUserDetails = false,
+                SaveTokens = true,
+                Events = new TwitterEvents()
+                {
+                    OnCreatingTicket = authenticationService.OnCreateTicket,
+                    OnRemoteFailure = authenticationService.OnRemoteFailure
+                }
+            });
+
+            //Login Map
+            app.Map("/login", signoutApp =>
+            {
+                signoutApp.Run(async context =>
+                {
+                    if (env.IsDevelopment())
+                    {
+                        await authenticationService.CreateDevClaim();
+                        context.Response.Redirect(Constants.LoginRedirectRoute);
+                    }
+                    else
+                    {
+                        await context.Authentication.ChallengeAsync(Constants.AuthenticationSchemeKey, authenticationService.GetAuthenticationProperties());
+                        return;
+                    }
+                });
             });
 
             app.UseMvc(routes =>

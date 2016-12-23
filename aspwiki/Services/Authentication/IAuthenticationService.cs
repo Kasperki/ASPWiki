@@ -1,11 +1,17 @@
 ﻿using System.Threading.Tasks;
-using ASPWiki.Model;
+using Microsoft.AspNetCore.Http.Authentication;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Twitter;
 
 namespace ASPWiki.Services
 {
     public interface IAuthenticationService
     {
-        Task<Session> ValidateToken(string token, string id);
-        Task<Session> CreateDevSession();
+        Task OnCreateTicket(TwitterCreatingTicketContext context);
+
+        Task OnRemoteFailure(FailureContext context);
+
+        AuthenticationProperties GetAuthenticationProperties();
+        Task CreateDevClaim();
     }
 }

@@ -11,6 +11,9 @@ namespace ASPWiki.Infastructure
         public string DatabaseUser { get; set; }
         public string DatabasePassword { get; set; }
 
+        public string TwitterKey { get; set; }
+        public string TwitterKeySecret { get; set; }
+
         public ConfigurationOptions()
         {
             DatabaseUser = "root";

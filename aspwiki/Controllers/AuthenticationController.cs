@@ -3,68 +3,37 @@ using Microsoft.AspNetCore.Mvc;
 using ASPWiki.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using ASPWiki.Model;
-using System;
+using Microsoft.AspNetCore.Http.Authentication;
 
 namespace ASPWiki.Controllers
 {
     public class AuthenticationController : Controller
     {
-        private readonly IAuthenticationService authenticationService;
         private readonly IHostingEnvironment env;
+        private readonly IAuthenticationService authenticationService;
         private readonly ILogger<AuthenticationController> logger;
 
-        public AuthenticationController(IAuthenticationService authenticationService, IHostingEnvironment env, ILogger<AuthenticationController> logger)
+        public AuthenticationController(IHostingEnvironment env, ILogger<AuthenticationController> logger, IAuthenticationService authenticationService)
         {
-            this.authenticationService = authenticationService;
             this.env = env;
             this.logger = logger;
+            this.authenticationService = authenticationService;
         }
 
         [HttpGet("Login")]
-        public async Task<IActionResult> Login()
+        public IActionResult Login()
         {
-            Session session;
-
-            if (env.IsProduction())
-            {
-                string authToken = HttpContext.Request.Cookies["authToken"];
-                string sessionId = HttpContext.Request.Cookies["sessionId"];
-
-                if (authToken == null || sessionId == null)
-                {
-                    return Redirect(Constants.AuthenticationLoginUrl);
-                }
-
-                try
-                {
-                    session = await authenticationService.ValidateToken(authToken, sessionId);
-                }
-                catch (Exception e)
-                {
-                    logger.LogWarning(new EventId(Constants.WARNING_CODE_UNAUTHORIZED), e, "Login failed from ip:" + HttpContext.Connection.RemoteIpAddress.MapToIPv4());
-
-                    this.FlashMessageError("401");
-                    return View("Error");
-                }
-            }
-            else
-            {
-                session = await authenticationService.CreateDevSession();
-            }
-
-            logger.LogInformation(session.Username + " logged in");
-            this.FlashMessageSuccess("Welcome: " + session.Username + "!");
-            return Redirect("/");
+            return Redirect(Constants.LoginRedirectRoute);
         }
+
 
         [HttpGet("Logout")]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.Authentication.SignOutAsync(Constants.AuthenticationScheme);
+            await HttpContext.Authentication.SignOutAsync(Constants.AuthenticationSchemeCookies);
             this.FlashMessageSuccess("Logged out succesfully!");
 
-            return Redirect("/");
+            return Redirect(Constants.LoginRedirectRoute);
         }
     }
 }

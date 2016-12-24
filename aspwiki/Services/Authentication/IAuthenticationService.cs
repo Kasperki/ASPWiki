@@ -13,5 +13,9 @@ namespace ASPWiki.Services
 
         AuthenticationProperties GetAuthenticationProperties();
         Task CreateDevClaim();
+
+        bool IsAuthenticated();
+
+        bool IsAuthenticatedAndWhiteListed();
     }
 }

@@ -1,4 +1,4 @@
-﻿!function () {/*
+!function () {/*
 
  Copyright (C) 2006 Google Inc.
 

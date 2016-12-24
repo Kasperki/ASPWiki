@@ -1,1 +1,1 @@
-﻿//Global js
+//Global js

@@ -10,10 +10,12 @@ namespace ASPWiki.Services
     public class WikiService : IWikiService
     {
         private readonly IWikiRepository wikiRepository;
+        private readonly IAuthenticationService authenticationService;
 
-        public WikiService(IWikiRepository wikiRepository)
+        public WikiService(IWikiRepository wikiRepository, IAuthenticationService authenticationService)
         {
             this.wikiRepository = wikiRepository;
+            this.authenticationService = authenticationService;
         }
 
         public List<Node> GetWikiTree(List<WikiPage> wikiPages)
@@ -134,14 +136,14 @@ namespace ASPWiki.Services
 
 
             //Public for not autheticated users
-            if (!indetity.IsAuthenticated)
+            if (!authenticationService.IsAuthenticated())
             {
                 //wikiPage.SetDueDate(); //TODO
                 wikiPage.Public = true;
             }
 
             //Attachments
-            wikiPage.Attachments = BindUploadsToAttacments(uploads, wikiPage.Id, indetity.IsAuthenticated);
+            wikiPage.Attachments = BindUploadsToAttacments(uploads, wikiPage.Id);
 
             var oldAttachments = wikiRepository.GetById(wikiPage.Id)?.Attachments;
 
@@ -153,11 +155,11 @@ namespace ASPWiki.Services
             wikiPage.LastModified = DateTime.Now;
         }
 
-        public List<Attachment> BindUploadsToAttacments(IEnumerable<IFormFile> uploads, Guid wikipageId, bool isAuthenticated)
+        public List<Attachment> BindUploadsToAttacments(IEnumerable<IFormFile> uploads, Guid wikipageId)
         {
             var attachments = new List<Attachment>();
 
-            if (uploads != null && isAuthenticated)
+            if (uploads != null && authenticationService.IsAuthenticatedAndWhiteListed())
             {
                 foreach (var upload in uploads)
                 {

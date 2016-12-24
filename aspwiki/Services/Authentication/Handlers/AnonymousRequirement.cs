@@ -10,12 +10,19 @@ namespace ASPWiki.Services
 
     public class AnonymousRequirementHandler : AuthorizationHandler<AnonymousRequirement, WikiPage>
     {
+        private readonly IAuthenticationService authenticationService;
+
+        public AnonymousRequirementHandler(IAuthenticationService authenticationService)
+        {
+            this.authenticationService = authenticationService;
+        }
+
         protected override Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
             AnonymousRequirement requirement,
             WikiPage resource)
         {
-            if (resource.Public == true || context.User.Identity.IsAuthenticated)
+            if (resource.Public == true || authenticationService.IsAuthenticatedAndWhiteListed())
             {
                 context.Succeed(requirement);
             }

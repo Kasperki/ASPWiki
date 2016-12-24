@@ -10,12 +10,20 @@ namespace ASPWiki.Services
 
     public class AuthenticationRequirementHandler : AuthorizationHandler<AuthenticationRequirement, WikiPage>
     {
+        private readonly IAuthenticationService authenticationService;
+
+        public AuthenticationRequirementHandler(IAuthenticationService authenticationService)
+        {
+            this.authenticationService = authenticationService;
+        }
+
         protected override Task HandleRequirementAsync(
             AuthorizationHandlerContext context,
             AuthenticationRequirement requirement,
             WikiPage resource)
         {
-            if (context.User.Identity.IsAuthenticated)
+
+            if (authenticationService.IsAuthenticatedAndWhiteListed())
             {
                 context.Succeed(requirement);
             }

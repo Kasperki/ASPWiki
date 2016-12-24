@@ -11,43 +11,14 @@ namespace ASPWiki.Services
     public class WikiRepository : Repository<WikiPage>, IWikiRepository
     {
         private readonly IHttpContextAccessor context;
-        private Dictionary<Session, WikiPage> deletedDictionary;
-        private bool? authenticated { get { return context?.HttpContext?.User?.Identity?.IsAuthenticated; } }
+        private readonly IAuthenticationService authenticationService;
+        private Dictionary<SessionPath, WikiPage> deletedDictionary;
 
-
-        private class Session
+        public WikiRepository(IDatabaseConnection databaseConnection, IHttpContextAccessor context, IAuthenticationService authenticationService) :base(databaseConnection, Constants.WikiPagesCollectionName)
         {
-            public string id;
-            public string path;
-            public DateTime? created;
-
-            public Session(string id, string path, DateTime? created)
-            {
-                this.id = id;
-                this.path = path;
-                this.created = created;
-            }
-
-            public override int GetHashCode()
-            {
-                return id.GetHashCode() + (path != null ? path.GetHashCode() : 0);
-            }
-
-            public override bool Equals(object obj)
-            {
-                return Equals(obj as Session);
-            }
-            public bool Equals(Session obj)
-            {
-                return obj != null && obj.id == this.id && obj.path == this.path;
-            }
-        }
-
-
-        public WikiRepository(IDatabaseConnection databaseConnection, IHttpContextAccessor context) :base(databaseConnection, Constants.WikiPagesCollectionName)
-        {
-            deletedDictionary = new Dictionary<Session, WikiPage>();
+            deletedDictionary = new Dictionary<SessionPath, WikiPage>();
             this.context = context;
+            this.authenticationService = authenticationService;
         }
 
         public void Delete(WikiPage wikipage)
@@ -62,13 +33,13 @@ namespace ASPWiki.Services
 
         private void AddWikipageForRecover(WikiPage wikipage)
         {
-            deletedDictionary[new Session(context.HttpContext.Session.Id, wikipage.Path, DateTime.Now)] = wikipage;
+            deletedDictionary[new SessionPath(context.HttpContext.Session.Id, wikipage.Path, DateTime.Now)] = wikipage;
 
             //Delete old wikipages from recover list
-            var itemsToBeRemoved = new List<Session>();
-            foreach (KeyValuePair<Session, WikiPage> item in deletedDictionary)
+            var itemsToBeRemoved = new List<SessionPath>();
+            foreach (KeyValuePair<SessionPath, WikiPage> item in deletedDictionary)
             {
-                if (item.Key.created + new TimeSpan(0, 0, 10) < DateTime.Now)
+                if (item.Key.created + new TimeSpan(0, WikiPage.REVERTABLE_IN_MINUTES, 0) < DateTime.Now)
                 {
                     itemsToBeRemoved.Add(item.Key);
                 }
@@ -82,7 +53,7 @@ namespace ASPWiki.Services
 
         public List<WikiPage> GetAll()
         {
-            if (authenticated == true)
+            if (authenticationService.IsAuthenticatedAndWhiteListed())
             {
                 return collection.Find(_ => true).ToList();
             }
@@ -114,7 +85,7 @@ namespace ASPWiki.Services
         {
             var sort = Builders<WikiPage>.Sort.Descending("LastModified");
 
-            if (authenticated == true)
+            if (authenticationService.IsAuthenticatedAndWhiteListed())
             {
                 return collection.Find(new BsonDocument()).Sort(sort).ToList().Take(limit).ToList();
             }
@@ -129,7 +100,7 @@ namespace ASPWiki.Services
         {
             var sort = Builders<WikiPage>.Sort.Descending("Visits");
           
-            if (authenticated == true)
+            if (authenticationService.IsAuthenticatedAndWhiteListed())
             {
                 return collection.Find(new BsonDocument()).Sort(sort).ToList().Take(limit).ToList();
             }
@@ -141,10 +112,10 @@ namespace ASPWiki.Services
 
         public bool Recover(string path)
         {
-            if (!deletedDictionary.ContainsKey(new Session(context.HttpContext.Session.Id, path, null)))
+            if (!deletedDictionary.ContainsKey(new SessionPath(context.HttpContext.Session.Id, path)))
                 return false;
 
-            Add(deletedDictionary[new Session(context.HttpContext.Session.Id, path, null)]);
+            Add(deletedDictionary[new SessionPath(context.HttpContext.Session.Id, path)]);
             return true;
         }
 
@@ -162,7 +133,7 @@ namespace ASPWiki.Services
 
             foreach (var item in all)
             {
-                if ((item.Public || authenticated == true) && item.Title.Contains(keywords))
+                if ((item.Public || authenticationService.IsAuthenticatedAndWhiteListed()) && item.Title.Contains(keywords))
                 {
                     list.Add(item);
                 }

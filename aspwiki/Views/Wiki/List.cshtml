@@ -1,0 +1,64 @@
+﻿@model List<NodeListModel>
+
+@functions {
+    public string Recursion(List<NodeListModel> nodes, string parent, int i)
+    {
+        string treeVIEW = "";
+        i++;
+
+        foreach (var node in nodes)
+        {
+            string url = "window.location.href=&#39;/Wiki/View/" + parent + "/" + node.Name + "&#39;";
+
+            treeVIEW += "<tr onclick='" + url + "'>" +
+                "<td style='padding-left:" + (i * 20) + "px;'>" + node.Name + "</td>" +
+                "<td>" + node.WikiPage?.Label.ToString() + " " + node.WikiPage?.Public + "</td>" +
+                "<td>" + node.WikiPage?.AttachmentCount + "</td>" +
+                "<td>" + node.WikiPage?.LastModified.ToString(Constants.FormatDatetimeView) + "</td>" +
+            "</tr>";
+
+            if (node.ChildNode != null)
+            {
+
+                treeVIEW += Recursion(node.ChildNode, parent + "/" + node.Name, i);
+            }
+        }
+
+        return treeVIEW;
+    }
+}
+
+<main>
+    <div class="row">
+        <h1>Wikipages</h1>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Wikipage</th>
+                    <th>Label</th>
+                    <th>Attacments</th>
+                    <th>Lastedit</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr onclick="window.location.href='/Wiki/View/@item.Name';">
+                        <td>@item.Name</td>
+                        <td>@Html.DisplayFor(m => item.WikiPage.Label)</td>
+                        <td>@Html.DisplayFor(m => item.WikiPage.AttachmentCount)</td>
+                        <td>@Html.DisplayFor(m => item.WikiPage.LastModified)</td>
+                    </tr>
+
+                    @if (item.ChildNode != null)
+                    {
+                        var d = Recursion(item.ChildNode, item.Name, 0);
+                        <text>@Html.Raw(d)</text>
+                    }
+
+                }
+            </tbody>
+        </table>
+    </div>
+</main>

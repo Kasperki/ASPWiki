@@ -12,7 +12,9 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Production"
+        "ASPWiki:TwitterKeySecret": "vCzAdc14DnJ62G8i3UWhxek3a20RMfM0bPhFbSNiYcOT7mfqo1",
+        "ASPWiki:TwitterKey": "Oc5x9gROgsQpryVpqhYebQNkr",
+        "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
     "ASPWiki": {

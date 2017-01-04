@@ -24,7 +24,11 @@ namespace ASPWiki.Controllers
             var wiki = wikiRepository.GetAll();
             var wikiPagesLatests = wikiRepository.GetLatest(5);
             var wikiPagesPopular = wikiRepository.GetPopular(5);
-            return View("Index", new List<List<WikipageSummary>>{ mapper.Map<List<WikipageSummary>>(wikiPagesLatests), mapper.Map<List<WikipageSummary>>(wikiPagesPopular) });
+
+            return View("Index", new HomeViewModel() {
+                LatestWikipages = mapper.Map<List<WikipageSummary>>(wikiPagesLatests),
+                PopularWikipages = mapper.Map<List<WikipageSummary>>(wikiPagesPopular),
+            });
         }
 
         public IActionResult GetAsideWikiPages()
@@ -32,7 +36,7 @@ namespace ASPWiki.Controllers
             var wikiPages = wikiRepository.GetAll();
             var wikiTree = wikiService.GetWikiTree(wikiPages);
 
-            return new JsonResult(wikiTree);
+            return new JsonResult(mapper.Map<List<NodeJsonModel>>(wikiTree));
         }
 
         [HttpGet("Wiki/Error/{statusCode?}")]

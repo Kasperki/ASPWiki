@@ -96,6 +96,16 @@ body {
 .margin-top {
   margin-top: 20px;
 }
+/* TABLE */
+.table tbody tr:hover {
+  background-color: rgba(127, 199, 175, 0.2);
+  cursor: pointer;
+}
+.table tbody td {
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+/* VERSION BAR*/
 .versionBar {
   position: absolute;
   width: 32px;
@@ -109,6 +119,7 @@ body {
   border-right: 16px solid transparent;
   border-top: 12px solid #3FB8AF;
 }
+/* BUTTON */
 .btn {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;

@@ -2,23 +2,23 @@
     ViewData["Title"] = "Home";
 }
 @using ASPWiki.ViewModels;
-@model List<List<WikipageSummary>>
+@model HomeViewModel
 
 <section>
     <div class="row">
         <div class="col-md-6">
-            <h1>Latest</h1>
-            @for (var i = 0; i < @Model[0].Count; i++)
+        <h1>Latest</h1>
+            @for (var i = 0; i < Model.LatestWikipages.Count; i++)
             {
-                @Html.Partial("PageLink", @Model[0][i]);
+                @Html.Partial("PageLink", Model.LatestWikipages[i]);
             }
         </div>
 
         <div class="col-md-6">
             <h1>Popular</h1>
-            @for (var i = 0; i < @Model[1].Count; i++)
+            @for (var i = 0; i < Model.PopularWikipages.Count; i++)
             {
-                @Html.Partial("PageLink", Model[1][i]);
+                @Html.Partial("PageLink", Model.PopularWikipages[i]);
             }
         </div>
     </div>
@@ -30,7 +30,7 @@
 <script>
 $(document).ready(function () {
     $("pre > code").parent().addClass('prettyprint');
-    prettyPrint();
-});
+            prettyPrint();
+        });
 </script>
 }

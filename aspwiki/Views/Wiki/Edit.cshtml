@@ -20,9 +20,8 @@
         </div>
         <div class="col-xs-12">
             <label for="path">Path:</label>
-            <span id="pathString">
-                @Html.Partial("PathLink", Model.PathArray)
-            </span>
+            <span id="pathString"></span>
+
             <div class="input-group">
                 <span class="input-group-addon">@Url.Action("View", "Wiki")</span>
                 <input class="form-control" asp-for="Path" type="text" id="path" placeholder="page/path/here/..." value="@Model.PathToParent" />

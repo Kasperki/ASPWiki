@@ -52,6 +52,9 @@
                     else
                     {
                         <li>
+                            <a asp-action="ListWikiPages" asp-controller="Wiki">List</a>
+                        </li>
+                        <li>
                             <a asp-action="Logout" asp-controller="Authentication">
                                 Logout: @User.Identity.Name
                             </a>

@@ -8,7 +8,9 @@ namespace ASPWiki.ViewModels
     public class WikipageEdit
     {
         public Guid Id { get; set; }
-
+        
+        [Required]
+        [MaxLength(50)]
         public string Title { get; set; }
 
         public string Path { get; set; }

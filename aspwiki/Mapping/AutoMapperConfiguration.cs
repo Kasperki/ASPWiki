@@ -26,6 +26,7 @@ namespace ASPWiki.Mapping
                      .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.GetSizeKiloBytes()))
                      .ForMember(dest => dest.AttachmentCount, opt => opt.MapFrom(src => src.Attachments.Count()))
                      .ForMember(dest => dest.LastModified, opt => opt.MapFrom(src => src.LastModified))
+                     .ForMember(dest => dest.Public, opt => opt.MapFrom(src => src.Public))
                      .ReverseMap();
 
                 cfg.CreateMap<WikiPage, WikipageView>()
@@ -50,10 +51,15 @@ namespace ASPWiki.Mapping
                      .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src.Content))
                      .ForMember(dest => dest.Attachments, opt => opt.MapFrom(src => src.Attachments))
                      .ForMember(dest => dest.Public, opt => opt.MapFrom(src => src.Public))
-                     .ForMember(dest => dest.PathToParent, opt => opt.MapFrom(src => src.GetPathToParent()))
+                     .ForMember(dest => dest.PathToParent, opt => opt.MapFrom(src => src.GetPathToParent()));
+
+                cfg.CreateMap<WikiPage, WikiPageMetadata>()
+                     .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
+                     .ForMember(dest => dest.Path, opt => opt.MapFrom(src => src.Path))
                      .ReverseMap();
 
-                cfg.CreateMap<WikipageSave, WikiPage>()
+                cfg.CreateMap<WikipageEdit, WikiPage>()
                      .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
                      .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Title))
                      .ForMember(dest => dest.Path, opt => opt.MapFrom(src => src.Path))
@@ -67,8 +73,10 @@ namespace ASPWiki.Mapping
                      .ForMember(dest => dest.Visits, opt => opt.Ignore())
                      .ForMember(dest => dest.ContentHistory, opt => opt.Ignore())
                      .ForMember(dest => dest.LastModified, opt => opt.Ignore())
-                     .ForMember(dest => dest.PathArray, opt => opt.Ignore())
-                     .ReverseMap();
+                     .ForMember(dest => dest.PathArray, opt => opt.Ignore());
+
+                cfg.CreateMap<Node, NodeJsonModel>();
+                cfg.CreateMap<Node, NodeListModel>();
             });
         }
     }

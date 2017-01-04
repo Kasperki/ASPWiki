@@ -4,7 +4,7 @@ namespace ASPWiki.Services.Generators
 {
     public class TestDataGenerator : GeneratorBase
     {
-        private const int WIKIPAGECOUNT = 15;
+        private const int WIKIPAGECOUNT = 25;
 
         public TestDataGenerator(IDatabaseConnection databaseConnection, IWikiRepository wikiRepo, IGarbageGenerator<WikiPage> wikiPageGenerator)
         {
@@ -15,9 +15,12 @@ namespace ASPWiki.Services.Generators
 
             foreach (var item in wikipages)
             {
-                if (GetRandomBoolean(30))
+                if (GetRandomBoolean(50))
                 {
-                    item.SetPath(wikipages[random.Next(0, wikipages.Count)].Path);
+                    var path = wikipages[random.Next(0, wikipages.Count)].Path;
+
+                    if (!path.Contains(item.Title))
+                        item.SetPath(path);
                 }
                 
             }

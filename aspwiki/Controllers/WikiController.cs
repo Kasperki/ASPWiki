@@ -40,6 +40,16 @@ namespace ASPWiki.Controllers
             this.mapper = mapper;
         }
 
+        [Authorize]
+        [HttpGet("Admin/List")]
+        public IActionResult ListWikiPages()
+        {
+            var wikiPages = wikiRepository.GetAll();
+            var wikiTree = wikiService.GetWikiTree(wikiPages);
+
+            return View("List", mapper.Map<List<NodeListModel>>(wikiTree));
+        }
+
         [HttpGet("Wiki/New")]
         public IActionResult New()
         {
@@ -96,7 +106,7 @@ namespace ASPWiki.Controllers
 
         [HttpPost("Wiki/Save")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Save(WikipageSave wikipageSave, IEnumerable<IFormFile> uploads)
+        public async Task<IActionResult> Save(WikipageEdit wikipageSave, IEnumerable<IFormFile> uploads)
         {
             if (ModelState.IsValid)
             {

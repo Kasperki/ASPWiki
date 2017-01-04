@@ -10,11 +10,14 @@ namespace ASPWiki.Model
 {
     public class WikiPage
     {
+        public const int LIFETIME_IN_DAYS = 1;
+
+        public const int REVERTABLE_IN_MINUTES = 10;
+
         [BsonIgnoreIfDefault]
         public Guid Id { get; set; }
 
         [Required]
-        [MaxLength(100)]
         public string Title { get; set; }
 
         public string Author { get; set; }
@@ -30,8 +33,11 @@ namespace ASPWiki.Model
 
         public string Content { get; set; }
 
-        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}", ApplyFormatInEditMode = true)]
+        public DateTime CreatedDate { get; set; }
+
         public DateTime LastModified { get; set; }
+
+        public DateTime? DueDate { get; set; }
 
         public string Path { get; set; }
 
@@ -150,6 +156,11 @@ namespace ASPWiki.Model
         public void RemoveAttacment(Guid attacmentId)
         {
             Attachments.RemoveAll(x => x.FileId == attacmentId);
+        }
+
+        public void SetDueDate()
+        {
+            this.DueDate = DateTime.Now.AddDays(LIFETIME_IN_DAYS);
         }
     }
 }

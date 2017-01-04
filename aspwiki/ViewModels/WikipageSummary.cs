@@ -22,6 +22,8 @@ namespace ASPWiki.ViewModels
 
         public string Size { get; set; }
 
+        public bool Public { get; set; }
+
         public int AttachmentCount { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy HH:mm}", ApplyFormatInEditMode = true)]

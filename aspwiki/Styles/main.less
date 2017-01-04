@@ -124,6 +124,23 @@ body {
    margin-top: 20px;
 }
 
+/* TABLE */
+
+.table { 
+    tbody {
+        tr:hover {
+            background-color: fade(@Release, 20%);
+            cursor: pointer;
+        }
+        td {
+            padding-top: 1px !important;
+            padding-bottom: 1px !important;
+        }
+    } 
+}
+
+/* VERSION BAR*/
+
 .versionBar {
     position:absolute;
     width:32px;
@@ -140,6 +157,7 @@ body {
   border-top: 12px solid @AboveTheWorld;
 }
 
+/* BUTTON */
 
 .btn {
   -webkit-border-radius: 4px;

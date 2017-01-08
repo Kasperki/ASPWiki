@@ -25,6 +25,7 @@ namespace test.Services
         public void SetUp(bool authenticated)
         {
             Mock<IHttpContextAccessor> httpContextMock = new Mock<IHttpContextAccessor>();
+            Mock<IAuthenticationService> authenticationMock = new Mock<IAuthenticationService>();
             httpContextMock.Setup(repo => repo.HttpContext.User.Identity.IsAuthenticated).Returns(authenticated);
             httpContextMock.Setup(repo => repo.HttpContext.Session.Id).Returns("sessionID");
 
@@ -32,7 +33,7 @@ namespace test.Services
             collection = testConnection.GetDatabase().GetCollection<WikiPage>(Constants.WikiPagesCollectionName);
             collection.DeleteMany(new BsonDocument());
 
-            wikiRepo = new WikiRepository(testConnection, httpContextMock.Object);
+            wikiRepo = new WikiRepository(testConnection, httpContextMock.Object, authenticationMock.Object);
         }
 
         private bool IsWikiPageEqual(WikiPage expected, WikiPage actual)
@@ -149,7 +150,7 @@ namespace test.Services
         }
 
         [Fact]
-        public void GetAll_Should_Return_null_if_no_wikipages_exists()
+        public void GetAll_Should_Return_0_if_no_wikipages_exists()
         {
             var actual = wikiRepo.GetAll();
             Assert.Equal(0, actual.Count);

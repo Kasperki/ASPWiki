@@ -15,6 +15,9 @@ using ASPWiki.Mapping;
 using ASPWiki.Infastructure;
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Authentication.Twitter;
+using Hangfire;
+using Hangfire.Mongo;
+using ASPWiki.Services.Tasks;
 
 namespace ASPWiki
 {
@@ -75,13 +78,17 @@ namespace ASPWiki
             services.AddSingleton<IWikiRepository, WikiRepository>();
             services.AddSingleton<IWikiService, WikiService>();
 
+            services.AddSingleton<DeleteDueWikipages>();
+            services.AddSingleton<TaskScheluder>();
+            services.AddHangfire(x => x.UseMongoStorage("mongodb://localhost", "hangfire"));
+
             //TEST ENVIRONMENT TESTDATA GENERATION
             services.AddSingleton<IGarbageGenerator<Attachment>, AttachmentGenerator>();
             services.AddSingleton<IGarbageGenerator<WikiPage>, WikiPageGenerator>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApplicationLifetime appLifetime,
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApplicationLifetime appLifetime, TaskScheluder taskScheduler, DeleteDueWikipages deleteDueWikipages,
             IDatabaseConnection databaseConnection, IWikiRepository wikiRepo, IGarbageGenerator<WikiPage> wikiPageGenerator, IOptions<ConfigurationOptions> options, IAuthenticationService authenticationService)
         {
 
@@ -96,6 +103,12 @@ namespace ASPWiki
             loggerFactory.AddDebug();
             loggerFactory.AddSerilog();
 
+            //TaskScheduler
+            GlobalConfiguration.Configuration.UseMongoStorage(databaseConnection.GetClientSettings(), "hangfire");
+            app.UseHangfireServer();
+
+            taskScheduler.AddJob(deleteDueWikipages);
+            
             // Ensure any buffered events are sent at shutdown
             appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
       

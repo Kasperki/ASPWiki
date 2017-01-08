@@ -59,6 +59,9 @@ namespace ASPWiki.Services
 
         public bool IsAuthenticated()
         {
+            if (httpContextAccessor?.HttpContext?.User == null)
+                return false;
+
             return httpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
         }
 

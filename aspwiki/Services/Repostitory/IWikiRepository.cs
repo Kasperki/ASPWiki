@@ -8,9 +8,10 @@ namespace ASPWiki.Services
     {
         void Add(WikiPage obj);
         void Update(WikiPage obj);
-        void Delete(WikiPage obj);
+        void Delete(WikiPage obj, bool revertable);
         WikiPage GetById(Guid id);
         List<WikiPage> GetAll();
+        List<WikiPage> GetAllPrivate();
 
         void AddVisit(WikiPage wikipage);
         void RemoveFile(WikiPage wikipage, Guid fileId);

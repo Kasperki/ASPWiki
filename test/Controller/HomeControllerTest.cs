@@ -2,6 +2,7 @@
 using ASPWiki.Controllers;
 using ASPWiki.Model;
 using ASPWiki.Services;
+using ASPWiki.ViewModels;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -78,7 +79,7 @@ namespace ASPWiki.Tests
 
             // Assert
             JsonResult jsonResult = Assert.IsType<JsonResult>(result);
-            Assert.IsType<List<Node>>(jsonResult.Value);
+            Assert.IsType<List<NodeJsonModel>>(jsonResult.Value);
         }
     }
 }

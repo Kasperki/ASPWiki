@@ -1,4 +1,5 @@
-﻿using ASPWiki.Infastructure;
+﻿using System;
+using ASPWiki.Infastructure;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 
@@ -20,9 +21,20 @@ namespace ASPWiki.Services
 
         public void StartConnection()
         {
+            client = new MongoClient(GetClientSettings());
+            database = client.GetDatabase(Constants.DatabaseName);
+        }
+
+        public IMongoDatabase GetDatabase()
+        {
+            return database;
+        }
+
+        public MongoClientSettings GetClientSettings()
+        {
             var databaseCredentials = MongoCredential.CreateCredential(Constants.DatabaseName, options.Value.DatabaseUser, options.Value.DatabasePassword);
 
-            MongoClientSettings clienSettings = new MongoClientSettings()
+            return new MongoClientSettings()
             {
                 Server = new MongoServerAddress("localhost", Constants.DatabasePort),
                 Credentials = new[]
@@ -30,14 +42,6 @@ namespace ASPWiki.Services
                     databaseCredentials,
                 }
             };
-
-            client = new MongoClient(clienSettings);
-            database = client.GetDatabase(Constants.DatabaseName);
-        }
-
-        public IMongoDatabase GetDatabase()
-        {
-            return database;
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ASPWiki.Model
+namespace ASPWiki.Model.Types
 {
     public enum Label
     {

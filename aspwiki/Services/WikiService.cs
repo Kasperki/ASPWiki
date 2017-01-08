@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Security.Principal;
 using Microsoft.AspNetCore.Http;
+using ASPWiki.Model.Types;
 
 namespace ASPWiki.Services
 {
@@ -138,7 +139,6 @@ namespace ASPWiki.Services
             //Public for not autheticated users
             if (!authenticationService.IsAuthenticated())
             {
-                //wikiPage.SetDueDate(); //TODO
                 wikiPage.Public = true;
             }
 
@@ -153,6 +153,32 @@ namespace ASPWiki.Services
 
             //ModifiedTime
             wikiPage.LastModified = DateTime.Now;
+        }
+
+        public TimeSpan? GetDueDateTimeSpan(DueDate date)
+        {
+            if (date == DueDate.Forever && !authenticationService.IsAuthenticatedAndWhiteListed())
+            {
+                return new TimeSpan(0, 10, 0);
+            }
+
+            switch (date)
+            {
+                case DueDate.Forever:
+                    return null;
+                case DueDate.Minutes_10:
+                    return new TimeSpan(0, 10, 0);
+                case DueDate.Minutes_30:
+                    return new TimeSpan(0, 30, 0);
+                case DueDate.Hour:
+                    return new TimeSpan(1, 0, 0);
+                case DueDate.Hour_6:
+                    return new TimeSpan(6, 0, 0);
+                case DueDate.Day:
+                    return new TimeSpan(24, 0, 0);
+                default:
+                    return new TimeSpan(0, 10, 0);
+            }
         }
 
         public List<Attachment> BindUploadsToAttacments(IEnumerable<IFormFile> uploads, Guid wikipageId)

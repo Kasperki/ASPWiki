@@ -24,7 +24,9 @@
     "Serilog.Sinks.File": "2.2.0",
     "MongoDB.Driver": "2.3.0-rc1",
     "AutoMapper": "5.0.2",
-    "Microsoft.AspNetCore.Authentication.Twitter": "1.1.0"
+    "Microsoft.AspNetCore.Authentication.Twitter": "1.1.0",
+    "Hangfire": "1.6.8",
+    "Hangfire.Mongo": "0.3.2"
   },
 
   "tools": {

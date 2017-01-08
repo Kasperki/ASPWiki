@@ -106,11 +106,11 @@ namespace ASPWiki.Controllers
 
         [HttpPost("Wiki/Save")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Save(WikipageEdit wikipageSave, IEnumerable<IFormFile> uploads)
+        public async Task<IActionResult> Save(WikipageEdit wikipageEditViewModel, IEnumerable<IFormFile> uploads)
         {
             if (ModelState.IsValid)
             {
-                var wiki = wikiRepository.GetById(wikipageSave.Id);
+                var wiki = wikiRepository.GetById(wikipageEditViewModel.Id);
                 if (wiki != null)
                 {
                    if (!await authorizationService.AuthorizeAsync(User, wiki, new AnonymousRequirement()))
@@ -121,7 +121,8 @@ namespace ASPWiki.Controllers
 
                 try
                 {
-                    WikiPage wikiPage = mapper.Map<WikiPage>(wikipageSave);
+                    WikiPage wikiPage = mapper.Map<WikiPage>(wikipageEditViewModel);
+                    wikiPage.SetDueDate(wikiService.GetDueDateTimeSpan(wikipageEditViewModel.DueDate));
 
                     if (wiki == null)
                     {
@@ -140,14 +141,14 @@ namespace ASPWiki.Controllers
                 {
                     logger.LogError(new EventId(Constants.ERROR_CODE_EXPECTION), e, "Error saving wikipage");
                     this.FlashMessageError(e.Message); //TODO This should not print every single error
-                    return View("Edit", wikipageSave);
+                    return View("Edit", wikipageEditViewModel);
                 }
             }
             else
             {
                 logger.LogError("Error saving wikipage model state not valid:" + this.GetModelStateErrors());
                 this.FlashMessageError("Model invalid: " + this.GetModelStateErrors());
-                return View("Edit", wikipageSave);
+                return View("Edit", wikipageEditViewModel);
             }
         }
 
@@ -159,7 +160,7 @@ namespace ASPWiki.Controllers
 
             if (await authorizationService.AuthorizeAsync(User, wikiPage, new AuthenticationRequirement()))
             {
-                wikiRepository.Delete(wikiPage);
+                wikiRepository.Delete(wikiPage, true);
 
                 logger.LogInformation(User?.Identity?.Name + " deleted wikipage:" + path);
                 this.FlashMessageError("Wikipage: " + this.GetLastItemFromPath(path) + " deleted:"

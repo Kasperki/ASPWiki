@@ -21,9 +21,12 @@ namespace ASPWiki.Services
             this.authenticationService = authenticationService;
         }
 
-        public void Delete(WikiPage wikipage)
+        public void Delete(WikiPage wikipage, bool revertable = true)
         {
-            AddWikipageForRecover(wikipage);
+            if (revertable)
+            {
+                AddWikipageForRecover(wikipage);
+            }
 
             var builder = Builders<WikiPage>.Filter;
             var filter = builder.Eq(x => x.Id, wikipage.Id);
@@ -61,6 +64,11 @@ namespace ASPWiki.Services
             {
                 return collection.Find(x => x.Public ==  true).ToList();
             }
+        }
+
+        public List<WikiPage> GetAllPrivate()
+        {
+            return collection.Find(_ => true).ToList();
         }
 
         public WikiPage GetById(Guid id)

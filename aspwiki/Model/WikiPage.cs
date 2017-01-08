@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+﻿using ASPWiki.Model.Types;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
@@ -10,8 +11,6 @@ namespace ASPWiki.Model
 {
     public class WikiPage
     {
-        public const int LIFETIME_IN_DAYS = 1;
-
         public const int REVERTABLE_IN_MINUTES = 10;
 
         [BsonIgnoreIfDefault]
@@ -91,6 +90,18 @@ namespace ASPWiki.Model
             ContentHistory = new List<string>();
         }
 
+        public void SetDueDate(TimeSpan? timeAlive)
+        {
+            if (timeAlive == null)
+            {
+                DueDate = null;
+            }
+            else
+            {
+                this.DueDate = DateTime.Now + timeAlive;
+            }
+        }
+
         public void SetPath(string ParentPath)
         {
             if (ParentPath != null && ParentPath != String.Empty)
@@ -156,11 +167,6 @@ namespace ASPWiki.Model
         public void RemoveAttacment(Guid attacmentId)
         {
             Attachments.RemoveAll(x => x.FileId == attacmentId);
-        }
-
-        public void SetDueDate()
-        {
-            this.DueDate = DateTime.Now.AddDays(LIFETIME_IN_DAYS);
         }
     }
 }

@@ -51,7 +51,8 @@ namespace ASPWiki.Mapping
                      .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src.Content))
                      .ForMember(dest => dest.Attachments, opt => opt.MapFrom(src => src.Attachments))
                      .ForMember(dest => dest.Public, opt => opt.MapFrom(src => src.Public))
-                     .ForMember(dest => dest.PathToParent, opt => opt.MapFrom(src => src.GetPathToParent()));
+                     .ForMember(dest => dest.PathToParent, opt => opt.MapFrom(src => src.GetPathToParent()))
+                     .ForMember(dest => dest.DueDate, opt => opt.Ignore());
 
                 cfg.CreateMap<WikiPage, WikiPageMetadata>()
                      .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))

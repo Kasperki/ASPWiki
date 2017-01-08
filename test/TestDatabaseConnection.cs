@@ -1,4 +1,5 @@
-﻿using ASPWiki;
+﻿using System;
+using ASPWiki;
 using ASPWiki.Services;
 using MongoDB.Driver;
 
@@ -16,13 +17,21 @@ namespace test
 
         public void StartConnection()
         {
-            client = new MongoClient("mongodb://localhost:" + Constants.DatabasePort);
+            client = new MongoClient(GetClientSettings());
             database = client.GetDatabase(Constants.TestDatabaseName);
         }
 
         public IMongoDatabase GetDatabase()
         {
             return database;
+        }
+
+        public MongoClientSettings GetClientSettings()
+        {
+            return new MongoClientSettings()
+            {
+                Server = new MongoServerAddress("localhost", Constants.DatabasePort),
+            };
         }
     }
 }

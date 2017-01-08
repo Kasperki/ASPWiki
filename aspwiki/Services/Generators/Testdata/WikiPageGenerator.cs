@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using ASPWiki.Model;
+using ASPWiki.Model.Types;
 
 namespace ASPWiki.Services.Generators
 {

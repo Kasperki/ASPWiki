@@ -1,9 +1,6 @@
-﻿using ASPWiki.Model;
+﻿using ASPWiki.Model.Types;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace ASPWiki.ViewModels
 {

@@ -7,5 +7,7 @@ namespace ASPWiki.Services
         void StartConnection();
 
         IMongoDatabase GetDatabase();
+
+        MongoClientSettings GetClientSettings();
     }
 }

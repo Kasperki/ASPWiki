@@ -31,13 +31,15 @@ namespace ASPWiki.Tests
             pathW22 = "w1/w2/w2";
 
             Mock<IWikiRepository> wikiRepoMock = new Mock<IWikiRepository>();
+            Mock<IAuthenticationService> authenticationMock = new Mock<IAuthenticationService>();
 
             wikiRepoMock.Setup(repo => repo.GetByPath(w1.Path)).Returns(w1);
             wikiRepoMock.Setup(repo => repo.GetByPath(w2.Path)).Returns(w2);
             wikiRepoMock.Setup(repo => repo.GetByPath(w22.Path)).Returns(w22);
 
             IWikiRepository wikiRepo = wikiRepoMock.Object;
-            wikiService = new WikiService(wikiRepo);
+            IAuthenticationService authenticationService = authenticationMock.Object;
+            wikiService = new WikiService(wikiRepo, authenticationService);
         }
 
         [Fact]
@@ -108,7 +110,7 @@ namespace ASPWiki.Tests
             FormFile file1 = new FormFile(stream, 0, stream.Length, "file1", "fileName");
             file1.ContentType = "text/plain";
 
-            var result = wikiService.BindUploadsToAttacments(new List<FormFile>() { file1 }, Guid.NewGuid(), true);
+            var result = wikiService.BindUploadsToAttacments(new List<FormFile>() { file1 }, Guid.NewGuid());
 
             Assert.Equal("fileName", result[0].FileName);
             Assert.Equal("text/plain", result[0].ContentType);

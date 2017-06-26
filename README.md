@@ -12,6 +12,22 @@ Very simple wiki made with ASP Net core as a training project.
 * Mongodb 
 * TwitterApp for authentication
 
+### Setup mongodb user for test
+
+Mongo 2.8
+```
+mongod --run mongo
+mongo --open mongo client
+
+//Local test db
+use wiki
+db.createUser({user: "DATABASEUSER", pwd: "PASSWORD", roles: [ { role: "readWrite", db: "wiki" }]})
+
+//Unit tests db
+use wikipagesTest
+db.createUser({user: "root", pwd: "root", roles: [ { role: "readWrite", db: "wikipagesTest" }]})
+```
+
 ## Installation
  Setup Environment variables
 ```

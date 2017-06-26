@@ -20,7 +20,9 @@ namespace ASPWiki.Services.Generators
                     var path = wikipages[random.Next(0, wikipages.Count)].Path;
 
                     if (!path.Contains(item.Title))
+                    {
                         item.SetPath(path);
+                    }
                 }
                 
             }
